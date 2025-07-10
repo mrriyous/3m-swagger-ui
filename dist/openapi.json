@@ -12,12 +12,8 @@
     "title": "3M Api",
     "contact": {
       "email": "alfi.dev@startup2050.com",
-      "name": "Alfi",
+      "name": "Api Developer",
       "url": ""
-    },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
   "tags": [
