@@ -4,6 +4,10 @@
     {
       "description": "DEMO API",
       "url": "https://startup2050.com/api/"
+    },
+    {
+      "description": "Localhost API",
+      "url": "http://localhost:8000/api/"
     }
   ],
   "info": {
@@ -8354,8 +8358,13 @@
         "operationId": "get-currencies"
       }
     },
-    "/chat": {
+    "/chats": {
       "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Get the list of available chats",
         "tags": [
           "Chat"
@@ -8377,10 +8386,51 @@
             "name": "read_status",
             "description": "Accept: all, read, unread"
           }
-        ]
+        ],
+
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MessageObject"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        },
+                        "offset": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "success": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/chat/{publicUsername}": {
+    "/chats/{publicUsername}": {
       "parameters": [
         {
           "schema": {
@@ -8398,7 +8448,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/subscription-info": {
+    "/chats/{publicUsername}/subscription-info": {
       "get": {
         "summary": "Get subsrciption info of the room (for read status)",
         "tags": [
@@ -8406,7 +8456,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/messages": {
+    "/chats/{publicUsername}/messages": {
       "get": {
         "summary": "Get list messages",
         "tags": [
@@ -8423,7 +8473,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/send-message": {
+    "/chats/{publicUsername}/send-message": {
       "post": {
         "summary": "Send message",
         "tags": [
@@ -8431,7 +8481,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/edit-message": {
+    "/chats/{publicUsername}/edit-message": {
       "post": {
         "summary": "Edit message",
         "tags": [
@@ -8439,7 +8489,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/mark-as-read": {
+    "/chats/{publicUsername}/mark-as-read": {
       "post": {
         "summary": "Mark room as read",
         "tags": [
@@ -8447,7 +8497,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/mark-as-unread": {
+    "/chats/{publicUsername}/mark-as-unread": {
       "post": {
         "summary": "mark room as unread",
         "tags": [
@@ -8455,7 +8505,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/archive-message": {
+    "/chats/{publicUsername}/archive-message": {
       "post": {
         "summary": "Archive a message",
         "tags": [
@@ -8463,7 +8513,7 @@
         ]
       }
     },
-    "/chat/{publicUsername}/delete-message": {
+    "/chats/{publicUsername}/delete-message": {
       "post": {
         "summary": "Delete room or message",
         "tags": [
@@ -8473,7 +8523,73 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "MessaeUser": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "username": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      },
+      "MessageMarkdown": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "MessageObject": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "rid": { "type": "string" },
+          "msg": { "type": "string" },
+          "attachments": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "ts": { "type": "string", "format": "date-time" },
+          "u": { "$ref": "#/components/schemas/MessageUser" },
+          "_updatedAt": { "type": "string", "format": "date-time" },
+          "urls": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "mentions": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "channels": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "md": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MessageMarkdown" }
+          },
+          "ts_in_unix": { "type": "integer" },
+          "has_been_read": { "type": "boolean" },
+          "ts_formatted": { "type": "string" },
+          "ts_formatted_full": { "type": "string" },
+          "ts_formatted_local": { "type": "string" },
+          "ts_formatted_full_local": { "type": "string" },
+          "ts_date_formatted": { "type": "string" },
+          "is_sent_by_logged_in_user": { "type": "boolean" },
+          "editable": { "type": "boolean" },
+          "is_edited": { "type": "boolean" }
+        }
+      }
+    },
     "securitySchemes": {
       "Authorization": {
         "name": "Authorization",
