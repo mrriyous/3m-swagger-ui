@@ -8402,10 +8402,10 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "messages": {
+                        "ims": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/MessageObject"
+                            "$ref": "#/components/schemas/ChatRoom"
                           }
                         },
                         "count": {
@@ -8587,6 +8587,120 @@
           "is_sent_by_logged_in_user": { "type": "boolean" },
           "editable": { "type": "boolean" },
           "is_edited": { "type": "boolean" }
+        }
+      },
+      "ChatPartner": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "login_name": { "type": "string" },
+          "public_username": { "type": "string" },
+          "first_name": { "type": "string", "nullable": true },
+          "last_name": { "type": "string", "nullable": true },
+          "email": { "type": "string", "nullable": true },
+          "email_verified_at": { "type": "string", "nullable": true },
+          "hide_images": { "type": "integer" },
+          "email_verified": { "type": "integer" },
+          "gender": { "type": "string" },
+          "partner_preference": { "type": "string", "nullable": true },
+          "relationship_goals": { "type": "string", "nullable": true },
+          "role": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "deleted_at": { "type": "string", "nullable": true },
+          "rocketchat_registered": { "type": "integer" },
+          "rocketchat_user_id": { "type": "string" },
+          "rocketchat_username": { "type": "string" },
+          "rocketchat_token": { "type": "string", "nullable": true },
+          "rocketchat_token_expires_at": { "type": "string", "nullable": true },
+          "timeoffset": { "type": "integer" },
+          "profile_picture_album_url": { "type": "string" },
+          "profile_picture_url": { "type": "string" }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "rid": { "type": "string" },
+          "u": { "$ref": "#/components/schemas/MessageUser" },
+          "_updatedAt": { "type": "string", "format": "date-time" },
+          "alert": { "type": "boolean" },
+          "fname": { "type": "string" },
+          "groupMentions": { "type": "integer" },
+          "name": { "type": "string" },
+          "open": { "type": "boolean" },
+          "t": { "type": "string" },
+          "ts": { "type": "string", "format": "date-time" },
+          "unread": { "type": "integer" },
+          "userMentions": { "type": "integer" },
+          "ls": { "type": "string", "format": "date-time" }
+        }
+      },
+      "LastMessage": {
+        "type": "object",
+        "properties": {
+          "rid": { "type": "string" },
+          "msg": { "type": "string" },
+          "attachments": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "ts": { "type": "string", "format": "date-time" },
+          "u": { "$ref": "#/components/schemas/MessageUser" },
+          "_id": { "type": "string" },
+          "_updatedAt": { "type": "string", "format": "date-time" },
+          "urls": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "mentions": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "channels": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "md": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MessageMarkdown" }
+          },
+          "ts_formatted_full_local": { "type": "string" },
+          "msg_shortened": { "type": "string" }
+        }
+      },
+      "ChatRoom": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "t": { "type": "string" },
+          "usernames": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "usersCount": { "type": "integer" },
+          "msgs": { "type": "integer" },
+          "ts": { "type": "string", "format": "date-time" },
+          "uids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "default": { "type": "boolean" },
+          "ro": { "type": "boolean" },
+          "sysMes": { "type": "boolean" },
+          "_USERNAMES": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "_updatedAt": { "type": "string", "format": "date-time" },
+          "lastMessage": { "$ref": "#/components/schemas/LastMessage" },
+          "lm": { "type": "string", "format": "date-time" },
+          "subscription": { "$ref": "#/components/schemas/Subscription" },
+          "chat_partner": { "$ref": "#/components/schemas/ChatPartner" },
+          "updated_at_in_unixms": { "type": "integer" },
+          "ts_formatted_local": { "type": "string" },
+          "message_unread": { "type": "boolean" }
         }
       }
     },
