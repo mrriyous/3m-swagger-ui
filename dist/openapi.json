@@ -8442,22 +8442,361 @@
         }
       ],
       "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Get chat room information",
         "tags": [
           "Chat"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Chat room information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ChatRoomData"
+                    }
+                  }
+                },
+                "x-examples": {
+                  "Example 1": {
+                    "error": false,
+                    "data": {
+                      "_id": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                      "t": "d",
+                      "usernames": [
+                        "mrriyous",
+                        "nuaira"
+                      ],
+                      "usersCount": 2,
+                      "msgs": 201,
+                      "ts": "2025-07-02T17:40:29.214Z",
+                      "uids": [
+                        "PLN7BBfiHDZFgQqE9",
+                        "ugEqHdBXruwxZgt7a"
+                      ],
+                      "default": false,
+                      "ro": false,
+                      "sysMes": true,
+                      "_USERNAMES": [
+                        "mrriyous",
+                        "nuaira"
+                      ],
+                      "_updatedAt": "2025-07-13T14:10:31.942Z",
+                      "lastMessage": {
+                        "rid": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                        "msg": "testing2",
+                        "attachments": [],
+                        "ts": "2025-07-13T14:10:31.932Z",
+                        "u": {
+                          "_id": "ugEqHdBXruwxZgt7a",
+                          "username": "nuaira",
+                          "name": "nuaira"
+                        },
+                        "_id": "9qbE9Nw4JSopxDdhC",
+                        "_updatedAt": "2025-07-13T14:10:31.938Z",
+                        "urls": [],
+                        "mentions": [],
+                        "channels": [],
+                        "md": [
+                          {
+                            "type": "PARAGRAPH",
+                            "value": [
+                              {
+                                "type": "PLAIN_TEXT",
+                                "value": "testing2"
+                              }
+                            ]
+                          }
+                        ],
+                        "ts_formatted_full_local": "July 13, 2025 09:10pm",
+                        "msg_shortened": "testing2"
+                      },
+                      "lm": "2025-07-13T14:10:31.932Z",
+                      "subscription": {
+                        "_id": "sbruJaHHChAsuxqoY",
+                        "rid": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                        "u": {
+                          "_id": "PLN7BBfiHDZFgQqE9",
+                          "username": "mrriyous"
+                        },
+                        "_updatedAt": "2025-07-13T16:34:02.904Z",
+                        "alert": false,
+                        "fname": "nuaira",
+                        "groupMentions": 0,
+                        "name": "nuaira",
+                        "open": true,
+                        "t": "d",
+                        "ts": "2025-07-02T17:40:29.217Z",
+                        "unread": 0,
+                        "userMentions": 0,
+                        "ls": "2025-07-13T16:34:02.904Z"
+                      },
+                      "chat_partner": {
+                        "id": 59,
+                        "login_name": "nuaira",
+                        "public_username": "nuaira",
+                        "first_name": "Nuaira",
+                        "last_name": "Nadira",
+                        "email": "nuaira@testing.com",
+                        "email_verified_at": null,
+                        "hide_images": 0,
+                        "email_verified": 1,
+                        "gender": "female",
+                        "partner_preference": "male",
+                        "relationship_goals": "medium_term",
+                        "role": "srs",
+                        "created_at": "2025-07-01T10:26:09.000000Z",
+                        "updated_at": "2025-07-07T08:53:07.000000Z",
+                        "deleted_at": null,
+                        "rocketchat_registered": 1,
+                        "rocketchat_user_id": "ugEqHdBXruwxZgt7a",
+                        "rocketchat_username": "nuaira",
+                        "rocketchat_token": "iVR2JtCwdbuAyKjfuf2UKOh612zFvJCUHHs1UnT-O-Q",
+                        "rocketchat_token_expires_at": "2025-09-30 17:41:07",
+                        "timeoffset": 7,
+                        "profile_picture_album_url": "http://localhost:8000/storage/profile-pictures/59_1751378283.jpg",
+                        "profile_picture_url": "http://localhost:8000/storage/profile-pictures/59_1751378283.jpg"
+                      },
+                      "updated_at_in_unixms": 1752415831942,
+                      "ts_formatted_local": "July 03, 2025 12:40am",
+                      "message_unread": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/chats/{publicUsername}/subscription-info": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "The public username of the chat partner"
+        }
+      ],
       "get": {
-        "summary": "Get subsrciption info of the room (for read status)",
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Get subscription info of the room (for read status)",
         "tags": [
           "Chat"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription info retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "_id": {
+                          "type": "string"
+                        },
+                        "rid": {
+                          "type": "string"
+                        },
+                        "u": {
+                          "type": "object",
+                          "properties": {
+                            "_id": {
+                              "type": "string"
+                            },
+                            "username": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "_updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "alert": {
+                          "type": "boolean"
+                        },
+                        "fname": {
+                          "type": "string"
+                        },
+                        "groupMentions": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "open": {
+                          "type": "boolean"
+                        },
+                        "t": {
+                          "type": "string"
+                        },
+                        "ts": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "unread": {
+                          "type": "integer"
+                        },
+                        "userMentions": {
+                          "type": "integer"
+                        },
+                        "ls": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "ls_in_unix": {
+                          "type": "integer"
+                        },
+                        "ls_in_date": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "ts_in_date": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "partners_room_meta": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "room_id": {
+                              "type": "integer"
+                            },
+                            "rocketchat_room_id": {
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "type": "integer"
+                            },
+                            "rocketchat_user_id": {
+                              "type": "string"
+                            },
+                            "rocketchat_username": {
+                              "type": "string"
+                            },
+                            "last_seen_at": {
+                              "type": "integer"
+                            },
+                            "unread_count": {
+                              "type": "integer"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "deleted_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "nullable": true
+                            },
+                            "last_seen_at_ts": {
+                              "type": "string"
+                            },
+                            "last_seen_at_ts_local": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "data": {
+                        "_id": "sbruJaHHChAsuxqoY",
+                        "rid": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                        "u": {
+                          "_id": "PLN7BBfiHDZFgQqE9",
+                          "username": "mrriyous"
+                        },
+                        "_updatedAt": "2025-07-13T16:34:02.904Z",
+                        "alert": false,
+                        "fname": "nuaira",
+                        "groupMentions": 0,
+                        "name": "nuaira",
+                        "open": true,
+                        "t": "d",
+                        "ts": "2025-07-02T17:40:29.217Z",
+                        "unread": 0,
+                        "userMentions": 0,
+                        "ls": "2025-07-13T16:34:02.904Z",
+                        "ls_in_unix": 1752424442904,
+                        "ls_in_date": "2025-07-13T23:34:02.904000Z",
+                        "ts_in_date": "2025-07-03T00:40:29.217000Z",
+                        "partners_room_meta": {
+                          "id": 3,
+                          "room_id": 2,
+                          "rocketchat_room_id": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                          "user_id": 59,
+                          "rocketchat_user_id": "ugEqHdBXruwxZgt7a",
+                          "rocketchat_username": "nuaira",
+                          "last_seen_at": 1752424536540,
+                          "unread_count": 0,
+                          "created_at": "2025-07-10T15:48:30.000000Z",
+                          "updated_at": "2025-07-13T16:35:36.000000Z",
+                          "deleted_at": null,
+                          "last_seen_at_ts": "2025-07-13 16:35:36",
+                          "last_seen_at_ts_local": "2025-07-13 23:35:36"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/chats/{publicUsername}/messages": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "The public username of the chat partner"
+        }
+      ],
       "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Get list messages",
         "tags": [
           "Chat"
@@ -8468,21 +8807,302 @@
               "type": "string"
             },
             "in": "query",
-            "name": "page"
+            "name": "page",
+            "description": "Page number for pagination",
+            "example": "1"
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MessageObject"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "data": {
+                        "messages": [
+                          {
+                            "_id": "Wp3uFgMxLYAzCm76h",
+                            "rid": "5xmeNGB5HALTftP3vPLN7BBfiHDZFgQqE9",
+                            "msg": "Haloo",
+                            "attachments": [],
+                            "ts": "2025-07-14T05:00:09.481Z",
+                            "u": {
+                              "_id": "5xmeNGB5HALTftP3v",
+                              "username": "sponsor_searcher",
+                              "name": "Alamak Jang"
+                            },
+                            "_updatedAt": "2025-07-14T05:00:09.505Z",
+                            "urls": [],
+                            "mentions": [],
+                            "channels": [],
+                            "md": [
+                              {
+                                "type": "PARAGRAPH",
+                                "value": [
+                                  {
+                                    "type": "PLAIN_TEXT",
+                                    "value": "Haloo"
+                                  }
+                                ]
+                              }
+                            ],
+                            "ts_in_unix": 1752469209481,
+                            "has_been_read": true,
+                            "ts_formatted": "05:00 am",
+                            "ts_formatted_full": "14 July 2025, 05:00am",
+                            "ts_formatted_local": "12:00 pm",
+                            "ts_formatted_full_local": "14 July 2025, 12:00pm",
+                            "ts_date_formatted": "July 14, 2025",
+                            "is_sent_by_logged_in_user": false,
+                            "editable": true,
+                            "is_edited": false
+                          },
+                          {
+                            "_id": "qykSn3xBKzew9uiDm",
+                            "rid": "5xmeNGB5HALTftP3vPLN7BBfiHDZFgQqE9",
+                            "msg": "bakaayraro",
+                            "attachments": [],
+                            "ts": "2025-07-13T16:35:24.316Z",
+                            "u": {
+                              "_id": "5xmeNGB5HALTftP3v",
+                              "username": "sponsor_searcher",
+                              "name": "Alamak Jang"
+                            },
+                            "_updatedAt": "2025-07-13T16:35:24.321Z",
+                            "urls": [],
+                            "mentions": [],
+                            "channels": [],
+                            "md": [
+                              {
+                                "type": "PARAGRAPH",
+                                "value": [
+                                  {
+                                    "type": "PLAIN_TEXT",
+                                    "value": "bakaayraro"
+                                  }
+                                ]
+                              }
+                            ],
+                            "ts_in_unix": 1752424524316,
+                            "has_been_read": true,
+                            "ts_formatted": "04:35 pm",
+                            "ts_formatted_full": "13 July 2025, 04:35pm",
+                            "ts_formatted_local": "11:35 pm",
+                            "ts_formatted_full_local": "13 July 2025, 11:35pm",
+                            "ts_date_formatted": "July 13, 2025",
+                            "is_sent_by_logged_in_user": false,
+                            "editable": false,
+                            "is_edited": false
+                          },
+                          {
+                            "_id": "6GhopMT2pM5Ynf4pj",
+                            "rid": "5xmeNGB5HALTftP3vPLN7BBfiHDZFgQqE9",
+                            "msg": "Paansi",
+                            "attachments": [],
+                            "ts": "2025-07-13T16:35:19.063Z",
+                            "u": {
+                              "_id": "PLN7BBfiHDZFgQqE9",
+                              "username": "mrriyous",
+                              "name": "Alfi Syahri"
+                            },
+                            "_updatedAt": "2025-07-13T16:35:19.073Z",
+                            "urls": [],
+                            "mentions": [],
+                            "channels": [],
+                            "md": [
+                              {
+                                "type": "PARAGRAPH",
+                                "value": [
+                                  {
+                                    "type": "PLAIN_TEXT",
+                                    "value": "Paansi"
+                                  }
+                                ]
+                              }
+                            ],
+                            "ts_in_unix": 1752424519063,
+                            "has_been_read": false,
+                            "ts_formatted": "04:35 pm",
+                            "ts_formatted_full": "13 July 2025, 04:35pm",
+                            "ts_formatted_local": "11:35 pm",
+                            "ts_formatted_full_local": "13 July 2025, 11:35pm",
+                            "ts_date_formatted": "July 13, 2025",
+                            "is_sent_by_logged_in_user": true,
+                            "editable": false,
+                            "is_edited": false
+                          },
+                          {
+                            "_id": "SnKJTYy6oSsDGidWL",
+                            "rid": "5xmeNGB5HALTftP3vPLN7BBfiHDZFgQqE9",
+                            "msg": "apasi",
+                            "attachments": [],
+                            "ts": "2025-07-13T16:34:19.760Z",
+                            "u": {
+                              "_id": "PLN7BBfiHDZFgQqE9",
+                              "username": "mrriyous",
+                              "name": "Alfi Syahri"
+                            },
+                            "_updatedAt": "2025-07-13T16:34:19.765Z",
+                            "urls": [],
+                            "mentions": [],
+                            "channels": [],
+                            "md": [
+                              {
+                                "type": "PARAGRAPH",
+                                "value": [
+                                  {
+                                    "type": "PLAIN_TEXT",
+                                    "value": "apasi"
+                                  }
+                                ]
+                              }
+                            ],
+                            "ts_in_unix": 1752424459760,
+                            "has_been_read": false,
+                            "ts_formatted": "04:34 pm",
+                            "ts_formatted_full": "13 July 2025, 04:34pm",
+                            "ts_formatted_local": "11:34 pm",
+                            "ts_formatted_full_local": "13 July 2025, 11:34pm",
+                            "ts_date_formatted": "July 13, 2025",
+                            "is_sent_by_logged_in_user": true,
+                            "editable": false,
+                            "is_edited": false
+                          },
+                          {
+                            "_id": "Qx5PXHXyDMrniukY9",
+                            "rid": "5xmeNGB5HALTftP3vPLN7BBfiHDZFgQqE9",
+                            "msg": "basdf",
+                            "attachments": [],
+                            "ts": "2025-07-13T16:34:01.726Z",
+                            "u": {
+                              "_id": "5xmeNGB5HALTftP3v",
+                              "username": "sponsor_searcher",
+                              "name": "Alamak Jang"
+                            },
+                            "_updatedAt": "2025-07-13T16:34:01.735Z",
+                            "urls": [],
+                            "mentions": [],
+                            "channels": [],
+                            "md": [
+                              {
+                                "type": "PARAGRAPH",
+                                "value": [
+                                  {
+                                    "type": "PLAIN_TEXT",
+                                    "value": "basdf"
+                                  }
+                                ]
+                              }
+                            ],
+                            "ts_in_unix": 1752424441726,
+                            "has_been_read": true,
+                            "ts_formatted": "04:34 pm",
+                            "ts_formatted_full": "13 July 2025, 04:34pm",
+                            "ts_formatted_local": "11:34 pm",
+                            "ts_formatted_full_local": "13 July 2025, 11:34pm",
+                            "ts_date_formatted": "July 13, 2025",
+                            "is_sent_by_logged_in_user": false,
+                            "editable": false,
+                            "is_edited": false
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/chats/{publicUsername}/send-message": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true
+        }
+      ],
       "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Send message",
         "tags": [
           "Chat"
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "The message content to send"
+                  }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "$ref": "#/components/schemas/MessageObject"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/chats/{publicUsername}/edit-message": {
       "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Edit message",
         "tags": [
           "Chat"
@@ -8491,6 +9111,11 @@
     },
     "/chats/{publicUsername}/mark-as-read": {
       "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Mark room as read",
         "tags": [
           "Chat"
@@ -8499,6 +9124,11 @@
     },
     "/chats/{publicUsername}/mark-as-unread": {
       "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "mark room as unread",
         "tags": [
           "Chat"
@@ -8507,6 +9137,11 @@
     },
     "/chats/{publicUsername}/archive-message": {
       "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Archive a message",
         "tags": [
           "Chat"
@@ -8515,6 +9150,11 @@
     },
     "/chats/{publicUsername}/delete-message": {
       "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "summary": "Delete room or message",
         "tags": [
           "Chat"
@@ -8671,6 +9311,39 @@
         }
       },
       "ChatRoom": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "t": { "type": "string" },
+          "usernames": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "usersCount": { "type": "integer" },
+          "msgs": { "type": "integer" },
+          "ts": { "type": "string", "format": "date-time" },
+          "uids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "default": { "type": "boolean" },
+          "ro": { "type": "boolean" },
+          "sysMes": { "type": "boolean" },
+          "_USERNAMES": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "_updatedAt": { "type": "string", "format": "date-time" },
+          "lastMessage": { "$ref": "#/components/schemas/LastMessage" },
+          "lm": { "type": "string", "format": "date-time" },
+          "subscription": { "$ref": "#/components/schemas/Subscription" },
+          "chat_partner": { "$ref": "#/components/schemas/ChatPartner" },
+          "updated_at_in_unixms": { "type": "integer" },
+          "ts_formatted_local": { "type": "string" },
+          "message_unread": { "type": "boolean" }
+        }
+      },
+      "ChatRoomData": {
         "type": "object",
         "properties": {
           "_id": { "type": "string" },
