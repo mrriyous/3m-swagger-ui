@@ -9161,6 +9161,67 @@
         }
       }
     },
+    "/chats/{publicUsername}/delete-message": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "The public username of the chat partner"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Delete message",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message_id": {
+                    "type": "string",
+                    "description": "The ID of the message to delete"
+                  }
+                },
+                "required": ["message_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageObject"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/chats/{publicUsername}/mark-as-read": {
       "parameters": [
         {
