@@ -9463,6 +9463,10 @@
                     "type": "integer",
                     "description": "ID of the user to report"
                   },
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for reporting the user"
+                  },
                   "message_id": {
                     "type": "string",
                     "description": "ID of the specific message being reported (optional)"
