@@ -36,6 +36,10 @@
     {
       "name": "Chat",
       "description": "Related endpoints for Chat features"
+    },
+    {
+      "name": "Reports & Interactions",
+      "description": "Endpoints for reporting users, blocking interactions, and requesting zoom calls"
     }
   ],
   "paths": {
@@ -9426,6 +9430,190 @@
                     "Example 1": {
                       "error": false,
                       "message": "Successfully deleted chat room"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports": {
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Report a user",
+        "tags": [
+          "Reports & Interactions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "description": "ID of the user to report"
+                  },
+                  "message_id": {
+                    "type": "string",
+                    "description": "ID of the specific message being reported (optional)"
+                  },
+                  "message_text": {
+                    "type": "string",
+                    "description": "Text content of the message being reported (optional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User reported successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "User reported successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interactions/block": {
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Block a user interaction",
+        "tags": [
+          "Reports & Interactions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "description": "ID of the user to block"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User blocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "User blocked successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/request-zoom-calls": {
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Request a zoom call with a partner",
+        "tags": [
+          "Reports & Interactions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id",
+                  "partner_user_id"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "description": "ID of the requesting user"
+                  },
+                  "partner_user_id": {
+                    "type": "integer",
+                    "description": "ID of the partner user for the zoom call"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Zoom call request submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Zoom call request submitted successfully"
                     }
                   }
                 }
