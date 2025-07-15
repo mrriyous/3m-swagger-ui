@@ -9194,10 +9194,58 @@
                     "error": {
                       "type": "boolean"
                     },
-                                          "message": {
-                        "type": "string"
-                      }
+                    "message": {
+                      "type": "string"
                     },
+                    "room_meta": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "room_id": {
+                          "type": "integer"
+                        },
+                        "rocketchat_room_id": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "type": "integer"
+                        },
+                        "rocketchat_user_id": {
+                          "type": "string"
+                        },
+                        "rocketchat_username": {
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "type": "integer"
+                        },
+                        "unread_count": {
+                          "type": "integer"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "deleted_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true
+                        },
+                        "last_seen_at_ts": {
+                          "type": "string"
+                        },
+                        "last_seen_at_ts_local": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
                   "x-examples": {
                     "Example 1": {
                       "error": false,
@@ -9261,8 +9309,7 @@
                     },
                     "message": {
                       "type": "string"
-                    },
-
+                    }
                   },
                   "x-examples": {
                     "Example 1": {
@@ -9312,75 +9359,12 @@
                     },
                     "message": {
                       "type": "string"
-                    },
-                    "room_meta": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "room_id": {
-                          "type": "integer"
-                        },
-                        "rocketchat_room_id": {
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "type": "integer"
-                        },
-                        "rocketchat_user_id": {
-                          "type": "string"
-                        },
-                        "rocketchat_username": {
-                          "type": "string"
-                        },
-                        "last_seen_at": {
-                          "type": "integer"
-                        },
-                        "unread_count": {
-                          "type": "integer"
-                        },
-                        "created_at": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "updated_at": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "deleted_at": {
-                          "type": "string",
-                          "format": "date-time",
-                          "nullable": true
-                        },
-                        "last_seen_at_ts": {
-                          "type": "string"
-                        },
-                        "last_seen_at_ts_local": {
-                          "type": "string"
-                        }
-                      }
                     }
                   },
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Successfully deleted chat room",
-                      "room_meta": {
-                        "id": 2,
-                        "room_id": 2,
-                        "rocketchat_room_id": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
-                        "user_id": 14,
-                        "rocketchat_user_id": "PLN7BBfiHDZFgQqE9",
-                        "rocketchat_username": "mrriyous",
-                        "last_seen_at": 1752541841984,
-                        "unread_count": 0,
-                        "created_at": "2025-07-10T15:38:45.000000Z",
-                        "updated_at": "2025-07-15T01:10:41.000000Z",
-                        "deleted_at": null,
-                        "last_seen_at_ts": "2025-07-15 01:10:41",
-                        "last_seen_at_ts_local": "2025-07-15 08:10:41"
-                      }
+                      "message": "Successfully deleted chat room"
                     }
                   }
                 }
