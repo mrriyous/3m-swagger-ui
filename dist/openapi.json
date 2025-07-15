@@ -9211,8 +9211,8 @@
                     "error": {
                       "type": "boolean"
                     },
-                    "data": {
-                      "$ref": "#/components/schemas/MessageObject"
+                    "message": {
+                      "type": "string"
                     }
                   }
                 }
