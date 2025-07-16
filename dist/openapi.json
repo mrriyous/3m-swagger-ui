@@ -9463,6 +9463,10 @@
                     "type": "integer",
                     "description": "ID of the user to report"
                   },
+                  "block": {
+                    "type": "boolean",
+                    "description": "Whether to block the user after reporting"
+                  },
                   "reason": {
                     "type": "string",
                     "description": "Reason for reporting the user"
@@ -9498,7 +9502,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "User reported successfully"
+                      "message": "User reported & blocked successfully"
                     }
                   }
                 }
