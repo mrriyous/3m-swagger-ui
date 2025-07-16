@@ -9512,63 +9512,6 @@
         }
       }
     },
-    "/interactions/block": {
-      "post": {
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "Block a user interaction",
-        "tags": [
-          "Reports & Interactions"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "user_id"
-                ],
-                "properties": {
-                  "user_id": {
-                    "type": "integer",
-                    "description": "ID of the user to block"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User blocked successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "message": "User blocked successfully"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/request-zoom-calls": {
       "post": {
         "security": [
@@ -9622,6 +9565,63 @@
                     "Example 1": {
                       "error": false,
                       "message": "Zoom call request submitted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interactions/block": {
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Block a user interaction",
+        "tags": [
+          "Reports & Interactions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "description": "ID of the user to block"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User blocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "User blocked successfully"
                     }
                   }
                 }
