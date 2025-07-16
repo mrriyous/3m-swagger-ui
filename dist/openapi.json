@@ -40,6 +40,10 @@
     {
       "name": "Reports & Interactions",
       "description": "Endpoints for reporting users, blocking interactions, and requesting zoom calls"
+    },
+    {
+      "name": "Contracts",
+      "description": "Endpoints for managing contracts between sponsors and seekers, including contract creation, approval, modification, and lifecycle management."
     }
   ],
   "paths": {
@@ -9630,6 +9634,1130 @@
           }
         }
       }
+    },
+    "/contracts": {
+      "get": {
+        "summary": "Get All Contracts",
+        "description": "Retrieves all contracts for the authenticated user (both as sponsor and seeker).",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by partner name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ContractListResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create New Contract",
+        "description": "Creates a new contract offer to a partner.",
+        "tags": ["Contracts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateContractResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}": {
+      "get": {
+        "summary": "Get Specific Contract",
+        "description": "Retrieves detailed information about a specific contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetContractResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contract not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/templates": {
+      "get": {
+        "summary": "Get Contract Templates",
+        "description": "Retrieves available contract templates for the authenticated user.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contract_type",
+            "in": "query",
+            "description": "Filter by contract type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["test_moon", "preliminary", "main"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTemplatesResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Save Contract Template",
+        "description": "Creates a new contract template.",
+        "tags": ["Contracts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTemplateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/approve": {
+      "post": {
+        "summary": "Approve Contract",
+        "description": "Approves a pending contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveContractResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/reject": {
+      "post": {
+        "summary": "Reject Contract",
+        "description": "Rejects a pending contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for rejection"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RejectContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/extend": {
+      "post": {
+        "summary": "Extend Contract",
+        "description": "Requests to extend an active contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["extension_days"],
+                "properties": {
+                  "extension_days": {
+                    "type": "integer",
+                    "description": "Number of days to extend",
+                    "minimum": 1,
+                    "maximum": 365
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtendContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/start-next-stage": {
+      "post": {
+        "summary": "Start Next Stage",
+        "description": "Requests to upgrade contract to the next stage (test_moon → preliminary → main).",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartNextStageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartNextStageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/change": {
+      "post": {
+        "summary": "Change Contract",
+        "description": "Requests to change contract terms.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/stop": {
+      "post": {
+        "summary": "Stop Contract",
+        "description": "Stops an active contract and starts a 72-hour cool-off period.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/restart": {
+      "post": {
+        "summary": "Restart Contract",
+        "description": "Restarts a stopped contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestartContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/actions/{actionId}/approve": {
+      "post": {
+        "summary": "Approve Contract Action",
+        "description": "Approves a pending contract action (extension, upgrade, or change request).",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "The action ID to approve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/actions/{actionId}/reject": {
+      "post": {
+        "summary": "Reject Contract Action",
+        "description": "Rejects a pending contract action.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "The action ID to reject",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for rejecting the action"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RejectActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts": {
+      "get": {
+        "summary": "Get All Contracts",
+        "description": "Retrieves all contracts for the authenticated user (both as sponsor and seeker).",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by partner name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ContractListResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create New Contract",
+        "description": "Creates a new contract offer to a partner.",
+        "tags": ["Contracts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateContractResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}": {
+      "get": {
+        "summary": "Get Specific Contract",
+        "description": "Retrieves detailed information about a specific contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetContractResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contract not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/templates": {
+      "get": {
+        "summary": "Get Contract Templates",
+        "description": "Retrieves available contract templates for the authenticated user.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contract_type",
+            "in": "query",
+            "description": "Filter by contract type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["test_moon", "preliminary", "main"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTemplatesResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Save Contract Template",
+        "description": "Creates a new contract template.",
+        "tags": ["Contracts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTemplateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/approve": {
+      "post": {
+        "summary": "Approve Contract",
+        "description": "Approves a pending contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveContractResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/reject": {
+      "post": {
+        "summary": "Reject Contract",
+        "description": "Rejects a pending contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for rejection"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RejectContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/extend": {
+      "post": {
+        "summary": "Extend Contract",
+        "description": "Requests to extend an active contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["extension_days"],
+                "properties": {
+                  "extension_days": {
+                    "type": "integer",
+                    "description": "Number of days to extend",
+                    "minimum": 1,
+                    "maximum": 365
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtendContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/start-next-stage": {
+      "post": {
+        "summary": "Start Next Stage",
+        "description": "Requests to upgrade contract to the next stage (test_moon → preliminary → main).",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartNextStageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartNextStageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/change": {
+      "post": {
+        "summary": "Change Contract",
+        "description": "Requests to change contract terms.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/stop": {
+      "post": {
+        "summary": "Stop Contract",
+        "description": "Stops an active contract and starts a 72-hour cool-off period.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/restart": {
+      "post": {
+        "summary": "Restart Contract",
+        "description": "Restarts a stopped contract.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestartContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/actions/{actionId}/approve": {
+      "post": {
+        "summary": "Approve Contract Action",
+        "description": "Approves a pending contract action (extension, upgrade, or change request).",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "The action ID to approve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/actions/{actionId}/reject": {
+      "post": {
+        "summary": "Reject Contract Action",
+        "description": "Rejects a pending contract action.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "The action ID to reject",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for rejecting the action"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RejectActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9844,6 +10972,590 @@
           "updated_at_in_unixms": { "type": "integer" },
           "ts_formatted_local": { "type": "string" },
           "message_unread": { "type": "boolean" }
+        }
+      },
+      "ContractListResponse": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Contract"
+            }
+          },
+          "first_page_url": {
+            "type": "string"
+          },
+          "from": {
+            "type": "integer"
+          },
+          "last_page": {
+            "type": "integer"
+          },
+          "last_page_url": {
+            "type": "string"
+          },
+          "next_page_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "path": {
+            "type": "string"
+          },
+          "per_page": {
+            "type": "integer"
+          },
+          "prev_page_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "to": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "Contract": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "contract_id": {
+            "type": "string"
+          },
+          "contract_type": {
+            "type": "string",
+            "enum": ["test_moon", "preliminary", "main"]
+          },
+          "sponsor_id": {
+            "type": "integer"
+          },
+          "seeker_id": {
+            "type": "integer"
+          },
+          "duration_days": {
+            "type": "integer"
+          },
+          "monthly_amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "financial_settings": {
+            "type": "object"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["awaiting_sponsor_approval", "awaiting_seeker_approval", "active", "paused", "expired", "stopped"]
+          },
+          "is_test_moon": {
+            "type": "boolean"
+          },
+          "is_preliminary": {
+            "type": "boolean"
+          },
+          "is_main": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sponsor": {
+            "$ref": "#/components/schemas/ContractUser"
+          },
+          "seeker": {
+            "$ref": "#/components/schemas/ContractUser"
+          },
+          "template": {
+            "$ref": "#/components/schemas/ContractTemplate"
+          }
+        }
+      },
+      "ContractUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "public_username": {
+            "type": "string"
+          }
+        }
+      },
+      "ContractTemplate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateContractRequest": {
+        "type": "object",
+        "required": ["seeker_username", "duration_days"],
+        "properties": {
+          "seeker_username": {
+            "type": "string",
+            "description": "Public username of the partner to offer contract to"
+          },
+          "duration_days": {
+            "type": "integer",
+            "description": "Contract duration in days",
+            "minimum": 30,
+            "maximum": 365
+          },
+          "monthly_amount": {
+            "type": "number",
+            "description": "Monthly payment amount",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code, 3 characters",
+            "maxLength": 3,
+            "default": "USD"
+          },
+          "financial_settings": {
+            "type": "object",
+            "description": "Additional financial configuration"
+          },
+          "template_id": {
+            "type": "integer",
+            "description": "ID of contract template to use"
+          }
+        }
+      },
+      "CreateContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        }
+      },
+      "GetContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/ContractWithActions"
+          }
+        }
+      },
+      "ContractWithActions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Contract"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "actions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ContractAction"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContractAction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "contract_id": {
+            "type": "integer"
+          },
+          "action_type": {
+            "type": "string",
+            "enum": ["extend", "start_next_stage", "change", "stop", "restart"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "approved", "completed", "rejected"]
+          },
+          "action_data": {
+            "type": "object"
+          },
+          "description": {
+            "type": "string"
+          },
+          "performed_by": {
+            "type": "integer"
+          },
+          "performed_by_user": {
+            "$ref": "#/components/schemas/ContractUser"
+          },
+          "approved_by": {
+            "type": "integer",
+            "nullable": true
+          },
+          "approved_by_user": {
+            "$ref": "#/components/schemas/ContractUser",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GetTemplatesResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContractTemplateFull"
+            }
+          }
+        }
+      },
+      "ContractTemplateFull": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "contract_type": {
+            "type": "string",
+            "enum": ["test_moon", "preliminary", "main"]
+          },
+          "monthly_amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "financial_settings": {
+            "type": "object"
+          },
+          "default_duration_days": {
+            "type": "integer"
+          },
+          "is_public": {
+            "type": "boolean"
+          },
+          "created_by": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by_user": {
+            "$ref": "#/components/schemas/ContractUser"
+          }
+        }
+      },
+      "CreateTemplateRequest": {
+        "type": "object",
+        "required": ["name", "contract_type", "default_duration_days"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Template name",
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "description": "Template description"
+          },
+          "contract_type": {
+            "type": "string",
+            "description": "Type of contract",
+            "enum": ["test_moon", "preliminary", "main"]
+          },
+          "monthly_amount": {
+            "type": "number",
+            "description": "Default monthly amount",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code, 3 characters",
+            "maxLength": 3,
+            "default": "USD"
+          },
+          "financial_settings": {
+            "type": "object",
+            "description": "Default financial configuration"
+          },
+          "default_duration_days": {
+            "type": "integer",
+            "description": "Default duration in days",
+            "minimum": 30,
+            "maximum": 365
+          },
+          "is_public": {
+            "type": "boolean",
+            "description": "Whether template is public",
+            "default": false
+          }
+        }
+      },
+      "CreateTemplateResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "template": {
+            "$ref": "#/components/schemas/ContractTemplateFull"
+          }
+        }
+      },
+      "ApproveContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        }
+      },
+      "RejectContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ExtendContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "action": {
+            "$ref": "#/components/schemas/ContractAction"
+          }
+        }
+      },
+      "StartNextStageRequest": {
+        "type": "object",
+        "required": ["new_contract_type", "duration_days"],
+        "properties": {
+          "new_contract_type": {
+            "type": "string",
+            "description": "New contract type",
+            "enum": ["preliminary", "main"]
+          },
+          "duration_days": {
+            "type": "integer",
+            "description": "New duration in days",
+            "minimum": 30,
+            "maximum": 365
+          },
+          "monthly_amount": {
+            "type": "number",
+            "description": "New monthly amount",
+            "minimum": 0
+          },
+          "financial_settings": {
+            "type": "object",
+            "description": "New financial configuration"
+          }
+        }
+      },
+      "StartNextStageResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "action": {
+            "$ref": "#/components/schemas/ContractAction"
+          }
+        }
+      },
+      "ChangeContractRequest": {
+        "type": "object",
+        "properties": {
+          "duration_days": {
+            "type": "integer",
+            "description": "New duration in days",
+            "minimum": 30,
+            "maximum": 365
+          },
+          "monthly_amount": {
+            "type": "number",
+            "description": "New monthly amount",
+            "minimum": 0
+          },
+          "financial_settings": {
+            "type": "object",
+            "description": "New financial configuration"
+          }
+        }
+      },
+      "ChangeContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "action": {
+            "$ref": "#/components/schemas/ContractAction"
+          }
+        }
+      },
+      "StopContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "cool_off_ends_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RestartContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        }
+      },
+      "ApproveActionResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        }
+      },
+      "RejectActionResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
