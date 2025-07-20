@@ -44,6 +44,10 @@
     {
       "name": "Contracts",
       "description": "Endpoints for managing contracts between sponsors and seekers, including contract creation, approval, modification, and lifecycle management."
+    },
+    {
+      "name": "People",
+      "description": "Endpoints for viewing public user profiles and their information. These endpoints allow authenticated users to view other users' profiles using their public username."
     }
   ],
   "paths": {
@@ -9635,6 +9639,43 @@
         }
       }
     },
+    "/contracts/has-active-contracts": {
+      "get": {
+        "summary": "Check Active Contracts",
+        "description": "Checks if the authenticated user has any active contracts.",
+        "tags": ["Contracts"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HasActiveContractsResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "User has active contracts",
+                    "value": {
+                      "error": false,
+                      "active_contracts": 1,
+                      "has_active_contracts": true
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "User has no active contracts",
+                    "value": {
+                      "error": false,
+                      "active_contracts": 0,
+                      "has_active_contracts": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/contracts": {
       "get": {
         "summary": "Get All Contracts",
@@ -9653,7 +9694,7 @@
           {
             "name": "per_page",
             "in": "query",
-            "description": "Number of items per page",
+            "description": "Number of items per page (default: 10)",
             "required": false,
             "schema": {
               "type": "integer",
@@ -9676,6 +9717,94 @@
                       "$ref": "#/components/schemas/ContractListResponse"
                     }
                   }
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contracts list with pagination",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "data": [
+                          {
+                            "id": 1,
+                            "contract_id": "ABC12345",
+                            "contract_type": "test_moon",
+                            "contract_type_str": "Test Moon",
+                            "sponsor_id": 1,
+                            "seeker_id": 2,
+                            "duration_days": 30,
+                            "monthly_amount": 1000.00,
+                            "monthly_amount_formatted": "1,000.00",
+                            "currency": "USD",
+                            "financial_settings": {
+                              "payment_schedule": "monthly",
+                              "payment_method": "bank_transfer"
+                            },
+                            "start_date": "2024-01-15T10:00:00Z",
+                            "start_date_str": "Jan 15, 2024",
+                            "end_date": null,
+                            "end_date_str": "Ongoing",
+                            "expiration_date": "2024-02-14T10:00:00Z",
+                            "expiration_date_str": "Feb 14, 2024",
+                            "paused_at": null,
+                            "stopped_at": null,
+                            "status": "active",
+                            "status_str": "Active",
+                            "status_classes_str": "bg-green-100 text-green-800",
+                            "is_test_moon": true,
+                            "is_preliminary": false,
+                            "is_main": false,
+                            "official_agreement_signed": false,
+                            "created_at": "2024-01-15T10:00:00Z",
+                            "updated_at": "2024-01-15T10:00:00Z",
+                            "sponsor": {
+                              "id": 1,
+                              "first_name": "John",
+                              "last_name": "Doe",
+                              "public_username": "johndoe"
+                            },
+                            "seeker": {
+                              "id": 2,
+                              "first_name": "Jane",
+                              "last_name": "Smith",
+                              "public_username": "janesmith"
+                            },
+                            "template": {
+                              "id": 1,
+                              "name": "Standard Test Moon",
+                              "description": "Standard test moon contract template",
+                              "contract_type": "test_moon",
+                              "monthly_amount": 1000.00,
+                              "currency": "USD",
+                              "financial_settings": {
+                                "payment_schedule": "monthly",
+                                "payment_method": "bank_transfer"
+                              },
+                              "default_duration_days": 30
+                            },
+                            "partner": {
+                              "id": 2,
+                              "first_name": "Jane",
+                              "last_name": "Smith",
+                              "public_username": "janesmith"
+                            },
+                            "is_sponsor": true,
+                            "is_seeker": false,
+                            "can_be_changed": true,
+                            "can_be_extended": true,
+                            "can_be_upgraded": true,
+                            "can_be_stopped": true,
+                            "can_be_restarted": false,
+                            "total_duration_days": 30
+                          }
+                        ],
+                        "total": 1,
+                        "per_page": 15,
+                        "current_page": 1,
+                        "last_page": 1
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -9692,6 +9821,22 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateContractRequest"
+              },
+              "examples": {
+                "Example 1": {
+                  "summary": "Create test moon contract",
+                  "value": {
+                    "partner_username": "janesmith",
+                    "duration_days": 30,
+                    "monthly_amount": 1000.00,
+                    "currency": "USD",
+                    "financial_settings": {
+                      "payment_schedule": "monthly",
+                      "payment_method": "bank_transfer"
+                    },
+                    "template_id": 1
+                  }
+                }
               }
             }
           }
@@ -9703,6 +9848,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract created successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Contract offer sent successfully",
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "sponsor_id": 1,
+                        "seeker_id": 2,
+                        "duration_days": 30,
+                        "monthly_amount": 1000.00,
+                        "monthly_amount_formatted": "1,000.00",
+                        "currency": "USD",
+                        "financial_settings": {
+                          "payment_schedule": "monthly",
+                          "payment_method": "bank_transfer"
+                        },
+                        "status": "awaiting_seeker_approval",
+                        "status_str": "Awaiting Seeker Approval",
+                        "is_test_moon": true,
+                        "created_at": "2024-01-15T10:00:00Z",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe",
+                          "public_username": "johndoe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith",
+                          "public_username": "janesmith"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -9713,6 +9899,19 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ValidationErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Validation failed",
+                    "value": {
+                      "error": true,
+                      "message": "Validation failed",
+                      "errors": {
+                        "partner_username": ["The selected partner username is invalid."],
+                        "duration_days": ["The duration days must be at least 30."]
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -9784,6 +9983,37 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetTemplatesResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Templates list",
+                    "value": {
+                      "error": false,
+                      "templates": [
+                        {
+                          "id": 1,
+                          "name": "Standard Test Moon",
+                          "description": "Standard test moon contract template",
+                          "contract_type": "test_moon",
+                          "monthly_amount": 1000.00,
+                          "currency": "USD",
+                          "financial_settings": {
+                            "payment_schedule": "monthly",
+                            "payment_method": "bank_transfer"
+                          },
+                          "default_duration_days": 30,
+                          "is_public": true,
+                          "created_by": 1,
+                          "created_at": "2024-01-15T10:00:00Z",
+                          "created_by_user": {
+                            "id": 1,
+                            "first_name": "John",
+                            "last_name": "Doe"
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -9800,6 +10030,24 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateTemplateRequest"
+              },
+              "examples": {
+                "Example 1": {
+                  "summary": "Create custom template",
+                  "value": {
+                    "name": "Custom Test Moon",
+                    "description": "My custom test moon template",
+                    "contract_type": "test_moon",
+                    "monthly_amount": 1500.00,
+                    "currency": "USD",
+                    "financial_settings": {
+                      "payment_schedule": "monthly",
+                      "payment_method": "bank_transfer"
+                    },
+                    "default_duration_days": 60,
+                    "is_public": false
+                  }
+                }
               }
             }
           }
@@ -9811,6 +10059,31 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateTemplateResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Template created successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Template saved successfully",
+                      "template": {
+                        "id": 2,
+                        "name": "Custom Test Moon",
+                        "description": "My custom test moon template",
+                        "contract_type": "test_moon",
+                        "monthly_amount": 1500.00,
+                        "currency": "USD",
+                        "financial_settings": {
+                          "payment_schedule": "monthly",
+                          "payment_method": "bank_transfer"
+                        },
+                        "default_duration_days": 60,
+                        "is_public": false,
+                        "created_by": 1,
+                        "created_at": "2024-01-15T10:00:00Z"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -9851,6 +10124,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApproveContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract approved successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Congratulations, It's a Match!",
+                      "sub_messages": "You've accepted the relationship contract. You're now officially connected — let the journey begin",
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "status": "active",
+                        "status_str": "Active",
+                        "start_date": "2024-01-15T10:00:00Z",
+                        "start_date_str": "Jan 15, 2024",
+                        "expiration_date": "2024-02-14T10:00:00Z",
+                        "expiration_date_str": "Feb 14, 2024",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -9956,6 +10261,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExtendContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Extension request sent successfully",
+                    "value": {
+                      "error": false,
+                      "message": "The extension request has been sent to the partner for approval. You will be notified of the result.",
+                      "action": {
+                        "id": 2,
+                        "contract_id": 1,
+                        "action_type": "extend",
+                        "status": "pending",
+                        "action_data": {
+                          "extension_days": 30
+                        },
+                        "description": "Request to extend contract by 30 days",
+                        "performed_by": 1,
+                        "created_at": "2024-01-15T10:00:00Z",
+                        "updated_at": "2024-01-15T10:00:00Z"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -10066,6 +10393,37 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StopContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract stopped successfully",
+                    "value": {
+                      "error": false,
+                      "message": "The cool off period has been started.",
+                      "sub_messages": "It will end by <b>10:00 am</b> of <b>18 Jan 2024</b>. If restarted, the skipped time will be added to the billing. If not, you will receive the last transfer until the current moment at the next billing date following the 3-day cool-off period.",
+                      "cool_off_ends_at": "2024-01-18 10:00:00",
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "status": "paused",
+                        "status_str": "Paused",
+                        "paused_at": "2024-01-15T10:00:00Z",
+                        "end_date": "2024-01-15",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -10096,6 +10454,37 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RestartContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract restarted successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Congratulations! Contract ABC12345 is now active again!",
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "status": "active",
+                        "status_str": "Active",
+                        "paused_at": null,
+                        "end_date": null,
+                        "expiration_date": "2024-03-15T10:00:00Z",
+                        "expiration_date_str": "Mar 15, 2024",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -10135,6 +10524,125 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApproveActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contractId}/actions/{actionId}/confirm-changes": {
+      "post": {
+        "summary": "Confirm Changes",
+        "description": "Confirms or rejects specific changes in a contract change request.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "The unique contract identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "The action ID to confirm",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["changes"],
+                "properties": {
+                  "changes": {
+                    "type": "object",
+                    "description": "Object containing field names as keys",
+                    "additionalProperties": {
+                      "type": "object",
+                      "required": ["accepted", "rejected"],
+                      "properties": {
+                        "accepted": {
+                          "type": "string",
+                          "description": "\"Y\" if accepted, \"N\" if rejected",
+                          "enum": ["Y", "N"]
+                        },
+                        "rejected": {
+                          "type": "string",
+                          "description": "\"Y\" if rejected, \"N\" if accepted",
+                          "enum": ["Y", "N"]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "Example 1": {
+                  "summary": "Confirm some changes, reject others",
+                  "value": {
+                    "changes": {
+                      "duration_days": {
+                        "accepted": "Y",
+                        "rejected": "N"
+                      },
+                      "monthly_amount": {
+                        "accepted": "N",
+                        "rejected": "Y"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmChangesResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Changes confirmed successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Contract changes confirmed successfully",
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "status": "active",
+                        "status_str": "Active",
+                        "duration_days": 120,
+                        "monthly_amount": 1000.00,
+                        "expiration_date": "2024-05-15T10:00:00Z",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -10190,6 +10698,249 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RejectActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/{public_username}": {
+      "get": {
+        "summary": "Get User Profile",
+        "description": "Retrieve a user's basic profile information.",
+        "tags": ["People"],
+        "parameters": [
+          {
+            "name": "public_username",
+            "in": "path",
+            "description": "The public username of the user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserProfile"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/{public_username}/relationship": {
+      "get": {
+        "summary": "Get User Relationship Information",
+        "description": "Retrieve a user's relationship preferences and goals.",
+        "tags": ["People"],
+        "parameters": [
+          {
+            "name": "public_username",
+            "in": "path",
+            "description": "The public username of the user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserRelationshipInfo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/{public_username}/financial": {
+      "get": {
+        "summary": "Get User Financial Information",
+        "description": "Retrieve a user's financial profile information.",
+        "tags": ["People"],
+        "parameters": [
+          {
+            "name": "public_username",
+            "in": "path",
+            "description": "The public username of the user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserFinancialInfo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/{public_username}/living": {
+      "get": {
+        "summary": "Get User Living Information",
+        "description": "Retrieve a user's living preferences and arrangements.",
+        "tags": ["People"],
+        "parameters": [
+          {
+            "name": "public_username",
+            "in": "path",
+            "description": "The public username of the user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserLivingInfo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/{public_username}/images": {
+      "get": {
+        "summary": "Get User Images",
+        "description": "Retrieve a user's profile images and album photos.",
+        "tags": ["People"],
+        "parameters": [
+          {
+            "name": "public_username",
+            "in": "path",
+            "description": "The public username of the user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserImage"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -10471,6 +11222,9 @@
             "type": "string",
             "enum": ["test_moon", "preliminary", "main"]
           },
+          "contract_type_str": {
+            "type": "string"
+          },
           "sponsor_id": {
             "type": "integer"
           },
@@ -10483,6 +11237,9 @@
           "monthly_amount": {
             "type": "number"
           },
+          "monthly_amount_formatted": {
+            "type": "string"
+          },
           "currency": {
             "type": "string"
           },
@@ -10493,13 +11250,43 @@
             "type": "string",
             "format": "date-time"
           },
+          "start_date_str": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "end_date_str": {
+            "type": "string"
+          },
           "expiration_date": {
             "type": "string",
             "format": "date-time"
           },
+          "expiration_date_str": {
+            "type": "string"
+          },
+          "paused_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "stopped_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "status": {
             "type": "string",
             "enum": ["awaiting_sponsor_approval", "awaiting_seeker_approval", "active", "paused", "expired", "stopped"]
+          },
+          "status_str": {
+            "type": "string"
+          },
+          "status_classes_str": {
+            "type": "string"
           },
           "is_test_moon": {
             "type": "boolean"
@@ -10508,6 +11295,9 @@
             "type": "boolean"
           },
           "is_main": {
+            "type": "boolean"
+          },
+          "official_agreement_signed": {
             "type": "boolean"
           },
           "created_at": {
@@ -10526,6 +11316,33 @@
           },
           "template": {
             "$ref": "#/components/schemas/ContractTemplate"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/ContractUser"
+          },
+          "is_sponsor": {
+            "type": "boolean"
+          },
+          "is_seeker": {
+            "type": "boolean"
+          },
+          "can_be_changed": {
+            "type": "boolean"
+          },
+          "can_be_extended": {
+            "type": "boolean"
+          },
+          "can_be_upgraded": {
+            "type": "boolean"
+          },
+          "can_be_stopped": {
+            "type": "boolean"
+          },
+          "can_be_restarted": {
+            "type": "boolean"
+          },
+          "total_duration_days": {
+            "type": "integer"
           }
         }
       },
@@ -10557,14 +11374,30 @@
           },
           "description": {
             "type": "string"
+          },
+          "contract_type": {
+            "type": "string",
+            "enum": ["test_moon", "preliminary", "main"]
+          },
+          "monthly_amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "financial_settings": {
+            "type": "object"
+          },
+          "default_duration_days": {
+            "type": "integer"
           }
         }
       },
       "CreateContractRequest": {
         "type": "object",
-        "required": ["seeker_username", "duration_days"],
+        "required": ["partner_username", "duration_days"],
         "properties": {
-          "seeker_username": {
+          "partner_username": {
             "type": "string",
             "description": "Public username of the partner to offer contract to"
           },
@@ -10649,17 +11482,66 @@
           },
           "action_type": {
             "type": "string",
-            "enum": ["extend", "start_next_stage", "change", "stop", "restart"]
+            "enum": ["offer", "extend", "start_next_stage", "change", "stop", "restart"]
           },
           "status": {
             "type": "string",
             "enum": ["pending", "approved", "completed", "rejected"]
+          },
+          "status_str": {
+            "type": "string"
+          },
+          "status_classes_str": {
+            "type": "string"
           },
           "action_data": {
             "type": "object"
           },
           "description": {
             "type": "string"
+          },
+          "performed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "performed_at_local": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "performed_at_local_date_formatted": {
+            "type": "string"
+          },
+          "approved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "approved_at_local": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "approved_at_local_date_formatted": {
+            "type": "string",
+            "nullable": true
+          },
+          "rejected_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rejected_at_local": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rejected_at_local_date_formatted": {
+            "type": "string",
+            "nullable": true
+          },
+          "rejection_reason": {
+            "type": "string",
+            "nullable": true
           },
           "performed_by": {
             "type": "integer"
@@ -10675,7 +11557,19 @@
             "$ref": "#/components/schemas/ContractUser",
             "nullable": true
           },
+          "rejected_by": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rejected_by_user": {
+            "$ref": "#/components/schemas/ContractUser",
+            "nullable": true
+          },
           "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
             "type": "string",
             "format": "date-time"
           }
@@ -10807,6 +11701,9 @@
           "message": {
             "type": "string"
           },
+          "sub_messages": {
+            "type": "string"
+          },
           "contract": {
             "$ref": "#/components/schemas/Contract"
           }
@@ -10824,6 +11721,20 @@
         }
       },
       "ExtendContractResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "action": {
+            "$ref": "#/components/schemas/ContractAction"
+          }
+        }
+      },
+      "ChangeContractResponse": {
         "type": "object",
         "properties": {
           "error": {
@@ -10897,20 +11808,6 @@
           }
         }
       },
-      "ChangeContractResponse": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "boolean"
-          },
-          "message": {
-            "type": "string"
-          },
-          "action": {
-            "$ref": "#/components/schemas/ContractAction"
-          }
-        }
-      },
       "StopContractResponse": {
         "type": "object",
         "properties": {
@@ -10920,9 +11817,15 @@
           "message": {
             "type": "string"
           },
+          "sub_messages": {
+            "type": "string"
+          },
           "cool_off_ends_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
           }
         }
       },
@@ -10962,6 +11865,34 @@
           },
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "ConfirmChangesResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        }
+      },
+      "HasActiveContractsResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean"
+          },
+          "active_contracts": {
+            "type": "integer"
+          },
+          "has_active_contracts": {
+            "type": "boolean"
           }
         }
       },
