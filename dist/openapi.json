@@ -48,6 +48,10 @@
     {
       "name": "People",
       "description": "Endpoints for viewing public user profiles and their information. These endpoints allow authenticated users to view other users' profiles using their public username."
+    },
+    {
+      "name": "Support Tickets",
+      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, and retrieving categories and statuses. Supports both authenticated users and guest access. Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
     }
   ],
   "paths": {
@@ -8442,6 +8446,84 @@
         }
       }
     },
+    "/chats/unread-count": {
+      "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Get unread messages count",
+        "description": "Retrieves the total count of unread messages across all chat rooms for the authenticated user.",
+        "tags": [
+          "Chat"
+        ],
+        "responses": {
+          "200": {
+            "description": "Unread count retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "unread_count": {
+                          "type": "integer",
+                          "description": "Total number of unread messages across all chat rooms",
+                          "example": 12
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - RocketChat authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to authenticate user in RocketChat"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/chats/{publicUsername}": {
       "parameters": [
         {
@@ -10947,6 +11029,431 @@
           }
         }
       }
+    },
+    "/support-tickets/categories": {
+      "get": {
+        "summary": "Get Support Ticket Categories",
+        "description": "Retrieve all available support ticket categories.",
+        "tags": ["Support Tickets"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-tickets/statuses": {
+      "get": {
+        "summary": "Get Support Ticket Statuses",
+        "description": "Retrieve all available support ticket statuses.",
+        "tags": ["Support Tickets"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-tickets": {
+      "get": {
+        "summary": "Get Support Tickets",
+        "description": "Retrieve support tickets for the authenticated user or guest.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SupportTicket"
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Support Ticket",
+        "description": "Create a new support ticket.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["category", "title", "content"],
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "Ticket category",
+                    "enum": ["general", "account_issues", "finance_issues", "legal_issues", "affiliate_issues", "partnership_proposal", "vip_requests", "abuse_report", "complaint", "rule_violation"]
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Ticket title",
+                    "maxLength": 255
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Ticket content",
+                    "maxLength": 3000
+                  },
+                  "notify_via_email": {
+                    "type": "boolean",
+                    "description": "Whether to notify via email",
+                    "default": true
+                  },
+                  "notification_options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["response_only", "include_title"]
+                    },
+                    "description": "Notification preferences"
+                  },
+                  "guest_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Guest email (required if not authenticated)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicket"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-tickets/{id}": {
+      "get": {
+        "summary": "Get Specific Support Ticket",
+        "description": "Retrieve a specific support ticket by ID.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicket"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Support Ticket",
+        "description": "Update an existing support ticket.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Ticket title",
+                    "maxLength": 255
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Ticket content",
+                    "maxLength": 3000
+                  },
+                  "notify_via_email": {
+                    "type": "boolean",
+                    "description": "Whether to notify via email"
+                  },
+                  "notification_options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["response_only", "include_title"]
+                    },
+                    "description": "Notification preferences"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicket"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -11926,6 +12433,114 @@
             }
           }
         }
+      },
+      "SupportTicket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Support ticket ID"
+          },
+          "ticket_number": {
+            "type": "string",
+            "description": "Auto-generated ticket number"
+          },
+          "user_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "User ID (null for guest tickets)"
+          },
+          "guest_email": {
+            "type": "string",
+            "nullable": true,
+            "description": "Guest email address (null for authenticated user tickets)"
+          },
+          "ip_address": {
+            "type": "string",
+            "description": "IP address of the ticket creator"
+          },
+          "user_agent": {
+            "type": "string",
+            "description": "User agent string"
+          },
+          "category": {
+            "type": "string",
+            "description": "Ticket category key"
+          },
+          "title": {
+            "type": "string",
+            "description": "Ticket title"
+          },
+          "content": {
+            "type": "string",
+            "description": "Ticket content"
+          },
+          "notify_via_email": {
+            "type": "boolean",
+            "description": "Whether to notify via email"
+          },
+          "notification_options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Notification preferences"
+          },
+          "status": {
+            "type": "string",
+            "description": "Ticket status key"
+          },
+          "responded_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the ticket was first responded to"
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the ticket was resolved"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "File attachments (currently not supported via API)"
+          },
+          "captcha_session_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "CAPTCHA session ID for spam protection"
+          },
+          "is_spam": {
+            "type": "boolean",
+            "description": "Whether the ticket was flagged as spam"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the ticket was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the ticket was last updated"
+          },
+          "category_display_name": {
+            "type": "string",
+            "description": "Human-readable category name"
+          },
+          "status_display_name": {
+            "type": "string",
+            "description": "Human-readable status name"
+          },
+          "is_guest": {
+            "type": "boolean",
+            "description": "Whether this is a guest ticket"
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -11933,6 +12548,12 @@
         "name": "Authorization",
         "type": "apiKey",
         "in": "header"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token authentication for API access"
       }
     }
   }
