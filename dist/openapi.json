@@ -51,7 +51,7 @@
     },
     {
       "name": "Support Tickets",
-      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, retrieving categories and statuses, and managing ticket messages with file attachments. Supports both authenticated users and guest access. Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
+      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, retrieving categories, statuses, and notification options, and managing ticket messages with file attachments. Supports both authenticated users and guest access with pagination. File attachments support PDF, JPG, JPEG, PNG (max 15MB each). Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
     }
   ],
   "paths": {
@@ -11112,6 +11112,44 @@
         }
       }
     },
+    "/support-tickets/notify-options": {
+      "get": {
+        "summary": "Get Notification Options",
+        "description": "Retrieve all available notification options for support tickets.",
+        "tags": ["Support Tickets"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-tickets": {
       "get": {
         "summary": "Get Support Tickets",
@@ -11123,6 +11161,26 @@
           }
         ],
         "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of tickets per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
           {
             "name": "X-Guest-Email",
             "in": "header",
@@ -11146,9 +11204,26 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/SupportTicket"
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SupportTicket"
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": "integer"
+                        },
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "last_page": {
+                          "type": "integer"
+                        }
                       }
                     },
                     "message": {
@@ -11200,26 +11275,66 @@
                   },
                   "content": {
                     "type": "string",
-                    "description": "Ticket content",
-                    "maxLength": 3000
+                    "description": "Ticket content"
+                  },
+                  "notification_option": {
+                    "type": "string",
+                    "description": "Notification preference (required if notify_via_email is true)",
+                    "enum": ["response_only", "include_title", "include_content"]
                   },
                   "notify_via_email": {
                     "type": "boolean",
                     "description": "Whether to notify via email",
-                    "default": true
-                  },
-                  "notification_options": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": ["response_only", "include_title"]
-                    },
-                    "description": "Notification preferences"
+                    "default": false
                   },
                   "guest_email": {
                     "type": "string",
                     "format": "email",
                     "description": "Guest email (required if not authenticated)"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["category", "title", "content"],
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "Ticket category",
+                    "enum": ["general", "account_issues", "finance_issues", "legal_issues", "affiliate_issues", "partnership_proposal", "vip_requests", "abuse_report", "complaint", "rule_violation"]
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Ticket title",
+                    "maxLength": 255
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Ticket content"
+                  },
+                  "notification_option": {
+                    "type": "string",
+                    "description": "Notification preference (required if notify_via_email is true)",
+                    "enum": ["response_only", "include_title", "include_content"]
+                  },
+                  "notify_via_email": {
+                    "type": "string",
+                    "description": "Whether to notify via email"
+                  },
+                  "guest_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Guest email (required if not authenticated)"
+                  },
+                  "attachments[]": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "File attachments (PDF, JPG, JPEG, PNG, max 15MB each)"
                   }
                 }
               }
@@ -11397,13 +11512,10 @@
                     "type": "boolean",
                     "description": "Whether to notify via email"
                   },
-                  "notification_options": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": ["response_only", "include_title"]
-                    },
-                    "description": "Notification preferences"
+                  "notification_option": {
+                    "type": "string",
+                    "description": "Notification preference",
+                    "enum": ["response_only", "include_title", "include_content"]
                   }
                 }
               }
@@ -11576,10 +11688,13 @@
                     "description": "The message content (minimum 1 character)",
                     "minLength": 1
                   },
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "Optional file attachment"
+                  "attachments[]": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "File attachments (PDF, JPG, JPEG, PNG, max 15MB each)"
                   }
                 }
               }
@@ -12678,12 +12793,9 @@
             "type": "boolean",
             "description": "Whether to notify via email"
           },
-          "notification_options": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Notification preferences"
+          "notification_option": {
+            "type": "string",
+            "description": "Notification preference"
           },
           "status": {
             "type": "string",
@@ -12704,9 +12816,9 @@
           "attachments": {
             "type": "array",
             "items": {
-              "type": "object"
+              "$ref": "#/components/schemas/SupportTicketAttachment"
             },
-            "description": "File attachments (currently not supported via API)"
+            "description": "File attachments"
           },
           "captcha_session_id": {
             "type": "string",
@@ -12738,6 +12850,15 @@
           "is_guest": {
             "type": "boolean",
             "description": "Whether this is a guest ticket"
+          },
+          "created_at_local": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created date in local timezone"
+          },
+          "created_at_local_formatted": {
+            "type": "string",
+            "description": "Human-readable formatted creation date"
           }
         }
       },
