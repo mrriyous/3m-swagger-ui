@@ -51,7 +51,7 @@
     },
     {
       "name": "Support Tickets",
-      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, and retrieving categories and statuses. Supports both authenticated users and guest access. Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
+      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, retrieving categories and statuses, and managing ticket messages with file attachments. Supports both authenticated users and guest access. Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
     }
   ],
   "paths": {
@@ -11454,6 +11454,205 @@
           }
         }
       }
+    },
+    "/support-tickets/{id}/messages": {
+      "get": {
+        "summary": "Get Support Ticket Messages",
+        "description": "Retrieve all messages for a specific support ticket.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SupportTicketMessage"
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Message to Support Ticket",
+        "description": "Add a new message to a support ticket. This endpoint also supports file attachments.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "The message content (minimum 1 character)",
+                    "minLength": 1
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Optional file attachment"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "The message content (minimum 1 character)",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SupportTicketMessage"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12539,6 +12738,113 @@
           "is_guest": {
             "type": "boolean",
             "description": "Whether this is a guest ticket"
+          }
+        }
+      },
+      "SupportTicketMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Message ID"
+          },
+          "support_ticket_id": {
+            "type": "integer",
+            "description": "Support ticket ID"
+          },
+          "user_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "User ID (null for admin messages)"
+          },
+          "sender_type": {
+            "type": "string",
+            "description": "Type of sender (user or admin)",
+            "enum": ["user", "admin"]
+          },
+          "sender_name": {
+            "type": "string",
+            "description": "Name of the sender"
+          },
+          "sender_email": {
+            "type": "string",
+            "description": "Email of the sender"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message content"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupportTicketAttachment"
+            },
+            "description": "File attachments"
+          },
+          "is_internal": {
+            "type": "boolean",
+            "description": "Whether this is an internal message"
+          },
+          "is_read": {
+            "type": "boolean",
+            "description": "Whether the message has been read"
+          },
+          "read_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the message was read"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the message was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the message was last updated"
+          },
+          "formatted_created_at": {
+            "type": "string",
+            "description": "Human-readable formatted creation date"
+          },
+          "is_sent_by_user": {
+            "type": "boolean",
+            "description": "Whether this message was sent by a user"
+          },
+          "is_sent_by_admin": {
+            "type": "boolean",
+            "description": "Whether this message was sent by an admin"
+          }
+        }
+      },
+      "SupportTicketAttachment": {
+        "type": "object",
+        "properties": {
+          "original_name": {
+            "type": "string",
+            "description": "Original filename"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Stored filename"
+          },
+          "path": {
+            "type": "string",
+            "description": "File path"
+          },
+          "url": {
+            "type": "string",
+            "description": "Download URL"
+          },
+          "size": {
+            "type": "integer",
+            "description": "File size in bytes"
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "MIME type of the file"
           }
         }
       }
