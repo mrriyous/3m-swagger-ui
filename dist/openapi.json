@@ -12316,7 +12316,77 @@
             "type": "string"
           },
           "action_data": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "example": "change"
+              },
+              "updates": {
+                "type": "object",
+                "properties": {
+                  "duration_days": {
+                    "type": "object",
+                    "properties": {
+                      "new": {
+                        "type": "integer",
+                        "example": 65
+                      },
+                      "old": {
+                        "type": "integer",
+                        "example": 35
+                      },
+                      "label": {
+                        "type": "string",
+                        "example": "Duration (Days)"
+                      }
+                    }
+                  },
+                  "monthly_amount": {
+                    "type": "object",
+                    "properties": {
+                      "new": {
+                        "type": "integer",
+                        "example": 75000
+                      },
+                      "old": {
+                        "type": "string",
+                        "example": "25000.00"
+                      },
+                      "label": {
+                        "type": "string",
+                        "example": "Monthly Budget"
+                      },
+                      "old_formatted": {
+                        "type": "string",
+                        "example": "25,000"
+                      },
+                      "new_formatted": {
+                        "type": "string",
+                        "example": "75,000"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "example": {
+              "action": "change",
+              "updates": {
+                "duration_days": {
+                  "new": 65,
+                  "old": 35,
+                  "label": "Duration (Days)"
+                },
+                "monthly_amount": {
+                  "new": 75000,
+                  "old": "25000.00",
+                  "label": "Monthly Budget",
+                  "old_formatted": "25,000",
+                  "new_formatted": "75,000"
+                }
+              }
+            }
           },
           "description": {
             "type": "string"
