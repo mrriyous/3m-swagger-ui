@@ -11149,44 +11149,6 @@
         }
       }
     },
-    "/support-tickets/importance-levels": {
-      "get": {
-        "summary": "Get Support Ticket Importance Levels",
-        "description": "Retrieve all available support ticket importance levels.",
-        "tags": ["Support Tickets"],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "label": {
-                            "type": "string"
-                          },
-                          "value": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/support-tickets/notify-options": {
       "get": {
         "summary": "Get Notification Options",
@@ -11545,11 +11507,10 @@
             }
           }
         }
-      }
-    },
-    "/support-tickets/{id}/messages": {
-      "get": {
-        "summary": "Get Support Ticket Messages",
+      },
+      "/support-tickets/{id}/messages": {
+        "get": {
+          "summary": "Get Support Ticket Messages",
         "description": "Retrieve all messages for a specific support ticket.",
         "tags": ["Support Tickets"],
         "security": [
