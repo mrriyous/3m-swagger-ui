@@ -52,6 +52,10 @@
     {
       "name": "Support Tickets",
       "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, retrieving categories, statuses, and notification options, and managing ticket messages with file attachments. Supports both authenticated users and guest access with pagination. File attachments support PDF, JPG, JPEG, PNG (max 15MB each). Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
+    },
+    {
+      "name": "Notifications",
+      "description": "Endpoints for managing user notifications, including listing, filtering, marking as read, updating importance, and managing user preferences. All endpoints require Bearer token authentication."
     }
   ],
   "paths": {
@@ -11187,6 +11191,575 @@
         }
       }
     },
+    "/notifications": {
+      "get": {
+        "summary": "Get Notifications List",
+        "description": "Retrieve user notifications with filtering and pagination support.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "importance",
+            "in": "query",
+            "description": "Filter by importance: low, medium, high",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["low", "medium", "high"]
+            }
+          },
+          {
+            "name": "categories",
+            "in": "query",
+            "description": "Filter by categories (comma-separated): Notice,Chat,Profile,BalanceIncrease,BalanceDecrease",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "read",
+            "in": "query",
+            "description": "Filter by read status: true for read, false for unread",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 15
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Notification"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/filter": {
+      "get": {
+        "summary": "Get Notification Filters",
+        "description": "Get available filter options for notifications.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/NotificationFilters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/{id}": {
+      "get": {
+        "summary": "Get Single Notification",
+        "description": "Retrieve a specific notification by ID.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Notification UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Notification"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/{id}/mark-read": {
+      "post": {
+        "summary": "Mark Notification as Read",
+        "description": "Mark a specific notification as read.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Notification UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/mark-all-read": {
+      "post": {
+        "summary": "Mark All Notifications as Read",
+        "description": "Mark all user notifications as read.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/{id}/importance": {
+      "put": {
+        "summary": "Update Notification Importance",
+        "description": "Update the importance of a notification. Note: This is not allowed for 'Notice' category notifications.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Notification UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["importance"],
+                "properties": {
+                  "importance": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "New importance level"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/unread-count": {
+      "get": {
+        "summary": "Get Unread Count",
+        "description": "Get the count of unread notifications.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "unread_count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/preferences": {
+      "get": {
+        "summary": "Get User Preferences",
+        "description": "Get user notification preferences.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/NotificationPreferences"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update User Preferences",
+        "description": "Update user notification preferences.",
+        "tags": ["Notifications"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "important_notices_email": {
+                    "type": "boolean",
+                    "description": "Receive important notices via email"
+                  },
+                  "important_notices_push": {
+                    "type": "boolean",
+                    "description": "Receive important notices via push"
+                  },
+                  "content_type": {
+                    "type": "string",
+                    "enum": ["header", "header_content"],
+                    "description": "Content type preference"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/NotificationPreferences"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-tickets": {
       "get": {
         "summary": "Get Support Tickets",
@@ -12982,6 +13555,250 @@
           "mime_type": {
             "type": "string",
             "description": "MIME type of the file"
+          }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique notification UUID"
+          },
+          "icon_image_url": {
+            "type": "string",
+            "description": "URL to the icon image"
+          },
+          "icon_styling": {
+            "type": "string",
+            "description": "CSS classes for icon styling"
+          },
+          "icon_bg_color": {
+            "type": "string",
+            "description": "Hex color for icon background"
+          },
+          "category": {
+            "type": "string",
+            "description": "Notification category"
+          },
+          "category_group": {
+            "type": "string",
+            "description": "Grouped category for UI organization"
+          },
+          "category_styling": {
+            "type": "string",
+            "description": "CSS classes for category badge"
+          },
+          "category_bg_color": {
+            "type": "string",
+            "description": "Hex color for category background"
+          },
+          "category_text_color": {
+            "type": "string",
+            "description": "Hex color for category text"
+          },
+          "importance": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Importance level"
+          },
+          "importance_styling": {
+            "type": "string",
+            "description": "CSS classes for importance badge"
+          },
+          "importance_bg_color": {
+            "type": "string",
+            "description": "Hex color for importance background"
+          },
+          "importance_text_color": {
+            "type": "string",
+            "description": "Hex color for importance text"
+          },
+          "header": {
+            "type": "string",
+            "description": "Notification header/title"
+          },
+          "message": {
+            "type": "string",
+            "description": "Full notification message"
+          },
+          "preview": {
+            "type": "string",
+            "description": "Short preview of the message"
+          },
+          "read_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Timestamp when marked as read"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (UTC)"
+          },
+          "created_at_formatted": {
+            "type": "string",
+            "description": "Human-readable formatted date (UTC)"
+          },
+          "created_at_local": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp in user's timezone"
+          },
+          "created_at_local_formatted": {
+            "type": "string",
+            "description": "Human-readable formatted date in user's timezone"
+          },
+          "is_system_notice": {
+            "type": "boolean",
+            "description": "Whether it's a system notice"
+          },
+          "interested_user_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "ID of the interested user (for Profile notifications)"
+          },
+          "interested_user_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Name of the interested user"
+          },
+          "interested_user_avatar": {
+            "type": "string",
+            "nullable": true,
+            "description": "Avatar URL of the interested user"
+          }
+        }
+      },
+      "NotificationFilters": {
+        "type": "object",
+        "properties": {
+          "importances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the importance level"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Value for filtering"
+                }
+              }
+            },
+            "description": "Available importance filter options"
+          },
+          "filter_topics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the category"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Value for filtering"
+                }
+              }
+            },
+            "description": "Available category filter options"
+          },
+          "notify_methods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the notification method"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Value for the notification method"
+                }
+              }
+            },
+            "description": "Available notification methods"
+          },
+          "notification_content": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the content type"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Value for the content type"
+                }
+              }
+            },
+            "description": "Available content type options"
+          }
+        }
+      },
+      "NotificationPreferences": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Preferences ID"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "User ID"
+          },
+          "important_notices_email": {
+            "type": "boolean",
+            "description": "Receive important notices via email"
+          },
+          "important_notices_push": {
+            "type": "boolean",
+            "description": "Receive important notices via push"
+          },
+          "content_type": {
+            "type": "string",
+            "enum": ["header", "header_content"],
+            "description": "Content type preference"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When preferences were created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When preferences were last updated"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Total number of items"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "last_page": {
+            "type": "integer",
+            "description": "Last page number"
           }
         }
       }
