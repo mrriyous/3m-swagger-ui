@@ -9844,7 +9844,7 @@
     "/contracts": {
       "get": {
         "summary": "Get All Contracts",
-        "description": "Retrieves all contracts for the authenticated user (both as sponsor and seeker).",
+        "description": "Retrieves all contracts for the authenticated user (both as sponsor and seeker). Supports pagination and search functionality.",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -9978,7 +9978,7 @@
       },
       "post": {
         "summary": "Create New Contract",
-        "description": "Creates a new contract offer to a partner.",
+        "description": "Creates a new contract offer to a partner. The user cannot offer contract to themselves, cannot have active contracts while offering new ones, and the partner cannot have active contracts. Cannot have pending contracts with the same partner. Partner must exist and have the opposite role (sponsor/seeker).",
         "tags": ["Contracts"],
         "requestBody": {
           "required": true,
@@ -10052,6 +10052,53 @@
                           "public_username": "janesmith"
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Cannot offer contract to yourself",
+                    "value": {
+                      "error": true,
+                      "message": "You cannot offer a contract to yourself"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Active contracts exist",
+                    "value": {
+                      "error": true,
+                      "message": "Please stop the latest contract before you can make new offers"
+                    }
+                  },
+                  "Example 3": {
+                    "summary": "Partner not found",
+                    "value": {
+                      "error": true,
+                      "message": "Partner not found"
+                    }
+                  },
+                  "Example 4": {
+                    "summary": "Pending contract exists",
+                    "value": {
+                      "error": true,
+                      "message": "A contract with this partner is already pending. Please approve or wait for it to be resolved before creating a new offer."
+                    }
+                  },
+                  "Example 5": {
+                    "summary": "Partner has active contract",
+                    "value": {
+                      "error": true,
+                      "message": "Partner already has an active contract"
                     }
                   }
                 }
@@ -10187,7 +10234,7 @@
       },
       "post": {
         "summary": "Save Contract Template",
-        "description": "Creates a new contract template.",
+        "description": "Creates a new contract template. Templates can be public or private and include default financial settings and duration.",
         "tags": ["Contracts"],
         "requestBody": {
           "required": true,
@@ -10269,7 +10316,7 @@
     "/contracts/{contractId}/approve": {
       "post": {
         "summary": "Approve Contract",
-        "description": "Approves a pending contract.",
+        "description": "Approves a pending contract. Can optionally override the contract duration in days (30-365).",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -10282,6 +10329,32 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "duration_days": {
+                    "type": "integer",
+                    "description": "Override the contract duration in days",
+                    "minimum": 30,
+                    "maximum": 365
+                  }
+                }
+              },
+              "examples": {
+                "Example 1": {
+                  "summary": "Approve with custom duration",
+                  "value": {
+                    "duration_days": 45
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -10331,6 +10404,22 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract cannot be extended",
+                    "value": {
+                      "error": true,
+                      "message": "Contract cannot be extended"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Duration exceeds limit",
+                    "value": {
+                      "error": true,
+                      "message": "The total contract duration cannot exceed 365 days. Please reduce the number of extension days."
+                    }
+                  }
                 }
               }
             }
@@ -10458,7 +10547,7 @@
     "/contracts/{contractId}/start-next-stage": {
       "post": {
         "summary": "Start Next Stage",
-        "description": "Requests to upgrade contract to the next stage (test_moon → preliminary → main).",
+        "description": "Requests to upgrade contract to the next stage (test_moon → preliminary → main). Contract type progression rules: test_moon can upgrade to preliminary or main, preliminary can upgrade to main, main cannot be upgraded further.",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -10488,6 +10577,91 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StartNextStageResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Upgrade request sent successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Well done! Now let's wait for the partner's response.",
+                      "action": {
+                        "id": 3,
+                        "contract_id": 1,
+                        "action_type": "start_next_stage",
+                        "status": "pending",
+                        "action_data": {
+                          "action": "start_next_stage",
+                          "updates": {
+                            "contract_type": {
+                              "label": "Contract Type",
+                              "old": "test_moon",
+                              "new": "preliminary"
+                            },
+                            "monthly_amount": {
+                              "label": "Monthly Budget",
+                              "old": 1000.00,
+                              "new": 2000.00
+                            },
+                            "monthly_budget_per_child": {
+                              "label": "Monthly Budget Per Child",
+                              "old": 0,
+                              "new": 500.00
+                            },
+                            "financial_gift_per_milestone": {
+                              "label": "Financial Gift Per Milestone",
+                              "old": 0,
+                              "new": 1000.00
+                            },
+                            "financial_gift_upon_marriage": {
+                              "label": "Financial Gift Upon Marriage",
+                              "old": 0,
+                              "new": 5000.00
+                            },
+                            "relationship_termination_compensation": {
+                              "label": "Relationship Termination Compensation",
+                              "old": 0,
+                              "new": 2000.00
+                            },
+                            "capital_growth_bonus": {
+                              "label": "Capital Growth Bonus",
+                              "old": 0,
+                              "new": 10.5
+                            }
+                          }
+                        },
+                        "description": "Request to upgrade contract to preliminary",
+                        "performed_by": 1,
+                        "created_at": "2024-01-15T10:00:00Z",
+                        "updated_at": "2024-01-15T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Invalid upgrade path",
+                    "value": {
+                      "error": true,
+                      "message": "You can only upgrade from 'Test Moon' to: Preliminary or Main"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Pending actions exist",
+                    "value": {
+                      "error": true,
+                      "message": "You have pending contract actions that need to be resolved first: Extension, Next Stage"
+                    }
+                  }
                 }
               }
             }
@@ -10528,6 +10702,91 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ChangeContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Change request sent successfully",
+                    "value": {
+                      "error": false,
+                      "message": "All done! Let's wait for your partner's approval of the changes.",
+                      "action": {
+                        "id": 4,
+                        "contract_id": 1,
+                        "action_type": "change",
+                        "status": "pending",
+                        "action_data": {
+                          "action": "change",
+                          "updates": {
+                            "duration_days": {
+                              "label": "Duration (Days)",
+                              "old": 30,
+                              "new": 120
+                            },
+                            "monthly_amount": {
+                              "label": "Monthly Budget",
+                              "old": 1000.00,
+                              "new": 2500.00
+                            },
+                            "monthly_budget_per_child": {
+                              "label": "Monthly Budget Per Child",
+                              "old": 500.00,
+                              "new": 600.00
+                            },
+                            "financial_gift_per_milestone": {
+                              "label": "Financial Gift Per Milestone",
+                              "old": 1000.00,
+                              "new": 1200.00
+                            },
+                            "financial_gift_upon_marriage": {
+                              "label": "Financial Gift Upon Marriage",
+                              "old": 5000.00,
+                              "new": 6000.00
+                            },
+                            "relationship_termination_compensation": {
+                              "label": "Relationship Termination Compensation",
+                              "old": 2000.00,
+                              "new": 2500.00
+                            },
+                            "capital_growth_bonus": {
+                              "label": "Capital Growth Bonus",
+                              "old": 10.5,
+                              "new": 12.5
+                            }
+                          }
+                        },
+                        "description": "Request to change contract terms",
+                        "performed_by": 1,
+                        "created_at": "2024-01-15T10:00:00Z",
+                        "updated_at": "2024-01-15T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "No changes made",
+                    "value": {
+                      "error": true,
+                      "message": "Please make sure there are changes in the contract terms"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Conflicting changes",
+                    "value": {
+                      "error": true,
+                      "message": "You have a pending change request that conflicts with the current request. Please wait for approval of the pending changes for: Monthly Budget, Duration (Days)"
+                    }
+                  }
                 }
               }
             }
@@ -10587,6 +10846,25 @@
                           "last_name": "Smith"
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract cannot be stopped",
+                    "value": {
+                      "error": true,
+                      "message": "Contract cannot be stopped"
                     }
                   }
                 }
@@ -10653,6 +10931,32 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract cannot be restarted",
+                    "value": {
+                      "error": true,
+                      "message": "Contract cannot be restarted"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Cannot restart partner's contract",
+                    "value": {
+                      "error": true,
+                      "message": "You cannot restart this contract. Please contact your partner to restart the contract."
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -10689,6 +10993,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApproveActionResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Action approved successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Action approved successfully",
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "status": "active",
+                        "status_str": "Active",
+                        "expiration_date": "2024-03-15T10:00:00Z",
+                        "expiration_date_str": "Mar 15, 2024",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Action not found or not pending",
+                    "value": {
+                      "error": true,
+                      "message": "Action not found or not pending"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Cannot approve own action",
+                    "value": {
+                      "error": true,
+                      "message": "You cannot approve your own action"
+                    }
+                  }
                 }
               }
             }
@@ -10863,6 +11222,41 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RejectActionResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Action rejected successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Action rejected successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Action not found or not pending",
+                    "value": {
+                      "error": true,
+                      "message": "Action not found or not pending"
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Cannot reject own action",
+                    "value": {
+                      "error": true,
+                      "message": "You cannot reject your own action"
+                    }
+                  }
                 }
               }
             }
@@ -12881,6 +13275,21 @@
           "monthly_amount_formatted": {
             "type": "string"
           },
+          "monthly_budget_per_child": {
+            "type": "number"
+          },
+          "financial_gift_per_milestone": {
+            "type": "number"
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number"
+          },
+          "relationship_termination_compensation": {
+            "type": "number"
+          },
+          "capital_growth_bonus": {
+            "type": "number"
+          },
           "currency": {
             "type": "string"
           },
@@ -13023,6 +13432,21 @@
           "monthly_amount": {
             "type": "number"
           },
+          "monthly_budget_per_child": {
+            "type": "number"
+          },
+          "financial_gift_per_milestone": {
+            "type": "number"
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number"
+          },
+          "relationship_termination_compensation": {
+            "type": "number"
+          },
+          "capital_growth_bonus": {
+            "type": "number"
+          },
           "currency": {
             "type": "string"
           },
@@ -13052,6 +13476,32 @@
             "type": "number",
             "description": "Monthly payment amount",
             "minimum": 0
+          },
+          "monthly_budget_per_child": {
+            "type": "number",
+            "description": "Monthly budget per child",
+            "minimum": 0
+          },
+          "financial_gift_per_milestone": {
+            "type": "number",
+            "description": "Financial gift per milestone",
+            "minimum": 0
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number",
+            "description": "Financial gift upon marriage",
+            "minimum": 0
+          },
+          "relationship_termination_compensation": {
+            "type": "number",
+            "description": "Relationship termination compensation",
+            "minimum": 0
+          },
+          "capital_growth_bonus": {
+            "type": "number",
+            "description": "Capital growth bonus percentage",
+            "minimum": 0,
+            "maximum": 100
           },
           "currency": {
             "type": "string",
@@ -13319,6 +13769,21 @@
           "monthly_amount": {
             "type": "number"
           },
+          "monthly_budget_per_child": {
+            "type": "number"
+          },
+          "financial_gift_per_milestone": {
+            "type": "number"
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number"
+          },
+          "relationship_termination_compensation": {
+            "type": "number"
+          },
+          "capital_growth_bonus": {
+            "type": "number"
+          },
           "currency": {
             "type": "string"
           },
@@ -13365,6 +13830,32 @@
             "type": "number",
             "description": "Default monthly amount",
             "minimum": 0
+          },
+          "monthly_budget_per_child": {
+            "type": "number",
+            "description": "Monthly budget per child",
+            "minimum": 0
+          },
+          "financial_gift_per_milestone": {
+            "type": "number",
+            "description": "Financial gift per milestone",
+            "minimum": 0
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number",
+            "description": "Financial gift upon marriage",
+            "minimum": 0
+          },
+          "relationship_termination_compensation": {
+            "type": "number",
+            "description": "Relationship termination compensation",
+            "minimum": 0
+          },
+          "capital_growth_bonus": {
+            "type": "number",
+            "description": "Capital growth bonus percentage",
+            "minimum": 0,
+            "maximum": 100
           },
           "currency": {
             "type": "string",
@@ -13461,27 +13952,43 @@
       },
       "StartNextStageRequest": {
         "type": "object",
-        "required": ["new_contract_type", "duration_days"],
+        "required": ["new_contract_type"],
         "properties": {
           "new_contract_type": {
             "type": "string",
             "description": "New contract type",
             "enum": ["preliminary", "main"]
           },
-          "duration_days": {
-            "type": "integer",
-            "description": "New duration in days",
-            "minimum": 30,
-            "maximum": 365
-          },
           "monthly_amount": {
             "type": "number",
             "description": "New monthly amount",
             "minimum": 0
           },
-          "financial_settings": {
-            "type": "object",
-            "description": "New financial configuration"
+          "monthly_budget_per_child": {
+            "type": "number",
+            "description": "Monthly budget per child",
+            "minimum": 0
+          },
+          "financial_gift_per_milestone": {
+            "type": "number",
+            "description": "Financial gift per milestone",
+            "minimum": 0
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number",
+            "description": "Financial gift upon marriage",
+            "minimum": 0
+          },
+          "relationship_termination_compensation": {
+            "type": "number",
+            "description": "Relationship termination compensation",
+            "minimum": 0
+          },
+          "capital_growth_bonus": {
+            "type": "number",
+            "description": "Capital growth bonus percentage",
+            "minimum": 0,
+            "maximum": 100
           }
         }
       },
@@ -13513,9 +14020,31 @@
             "description": "New monthly amount",
             "minimum": 0
           },
-          "financial_settings": {
-            "type": "object",
-            "description": "New financial configuration"
+          "monthly_budget_per_child": {
+            "type": "number",
+            "description": "Monthly budget per child",
+            "minimum": 0
+          },
+          "financial_gift_per_milestone": {
+            "type": "number",
+            "description": "Financial gift per milestone",
+            "minimum": 0
+          },
+          "financial_gift_upon_marriage": {
+            "type": "number",
+            "description": "Financial gift upon marriage",
+            "minimum": 0
+          },
+          "relationship_termination_compensation": {
+            "type": "number",
+            "description": "Relationship termination compensation",
+            "minimum": 0
+          },
+          "capital_growth_bonus": {
+            "type": "number",
+            "description": "Capital growth bonus percentage",
+            "minimum": 0,
+            "maximum": 100
           }
         }
       },
