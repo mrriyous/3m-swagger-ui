@@ -12468,10 +12468,6 @@
                         "users_referred": 15,
                         "affiliate_earning_balance": 1250.50,
                         "affiliate_earning_balance_trimmed": "1,250.50",
-                        "affiliate_purchase_earning_balance": 850.25,
-                        "affiliate_purchase_earning_balance_trimmed": "850.25",
-                        "affiliate_purchase_power": 4250.75,
-                        "affiliate_purchase_power_trimmed": "4,250.75",
                         "total_earnings_count": 23,
                         "currency": "USD"
                       }
@@ -14158,22 +14154,6 @@
           "affiliate_earning_balance_trimmed": {
             "type": "string",
             "description": "Formatted earnings balance with commas"
-          },
-          "affiliate_purchase_earning_balance": {
-            "type": "number",
-            "description": "Earnings from purchases (numeric)"
-          },
-          "affiliate_purchase_earning_balance_trimmed": {
-            "type": "string",
-            "description": "Formatted purchase earnings"
-          },
-          "affiliate_purchase_power": {
-            "type": "number",
-            "description": "Total purchase power generated (numeric)"
-          },
-          "affiliate_purchase_power_trimmed": {
-            "type": "string",
-            "description": "Formatted purchase power"
           },
           "total_earnings_count": {
             "type": "integer",
