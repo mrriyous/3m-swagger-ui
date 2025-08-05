@@ -60,6 +60,10 @@
     {
       "name": "Affiliate",
       "description": "Endpoints for managing affiliate links, statistics, and earnings. All endpoints require Bearer token authentication using Laravel Sanctum."
+    },
+    {
+      "name": "Wallet",
+      "description": "Endpoints for managing user wallet and balance information, including retrieving current balance, affiliate earnings, and purchase power. All endpoints require Bearer token authentication."
     }
   ],
   "paths": {
@@ -5265,114 +5269,174 @@
     },
     "/wallet/balance": {
       "get": {
-        "summary": "Get User Balance Detail",
-        "tags": [],
+        "summary": "Get Current Balance",
+        "description": "Retrieves the current balance information for the authenticated user, including active balance, affiliate earnings, total available balance, and purchase power.",
+        "tags": [
+          "Wallet"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Balance information retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "active_balance": {
-                      "type": "string"
-                    },
-                    "pending_balance": {
-                      "type": "string"
+                      "type": "number",
+                      "format": "decimal",
+                      "description": "Current active balance (numeric)",
+                      "example": 1250.50
                     },
                     "active_balance_trimmed": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Formatted active balance with commas",
+                      "example": "1,250.50"
                     },
-                    "pending_balance_trimmed": {
-                      "type": "null"
+                    "total_available_balance": {
+                      "type": "number",
+                      "format": "decimal",
+                      "description": "Total available balance (active + affiliate earnings)",
+                      "example": 2100.75
+                    },
+                    "total_available_balance_trimmed": {
+                      "type": "string",
+                      "description": "Formatted total available balance",
+                      "example": "2,100.75"
+                    },
+                    "affiliate_earning_balance": {
+                      "type": "number",
+                      "format": "decimal",
+                      "description": "Earnings from affiliate program (numeric)",
+                      "example": 850.25
+                    },
+                    "affiliate_earning_balance_trimmed": {
+                      "type": "string",
+                      "description": "Formatted affiliate earnings balance",
+                      "example": "850.25"
+                    },
+                    "purchase_power": {
+                      "type": "number",
+                      "format": "decimal",
+                      "description": "Total purchase power (active + affiliate earnings)",
+                      "example": 2100.75
+                    },
+                    "purchase_power_trimmed": {
+                      "type": "string",
+                      "description": "Formatted purchase power",
+                      "example": "2,100.75"
                     },
                     "currency": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Currency code (e.g., USD, EUR, GBP)",
+                      "example": "USD"
                     },
                     "currency_detail": {
                       "type": "object",
+                      "description": "Currency information object",
                       "properties": {
                         "id": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Currency ID",
+                          "example": 1
                         },
                         "code": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Currency code",
+                          "example": "USD"
                         },
                         "name": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Currency name",
+                          "example": "US Dollar"
                         },
                         "symbol": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Currency symbol",
+                          "example": "$"
                         },
-                        "prefix": {
-                          "type": "string"
+                        "exchange_rate": {
+                          "type": "number",
+                          "format": "decimal",
+                          "description": "Exchange rate to base currency",
+                          "example": 1.0
                         },
-                        "suffix": {
-                          "type": "string"
-                        },
-                        "icon": {
-                          "type": "string"
+                        "is_default": {
+                          "type": "boolean",
+                          "description": "Whether this is the default currency",
+                          "example": true
                         },
                         "created_at": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Creation timestamp",
+                          "example": "2024-01-01T00:00:00.000000Z"
                         },
                         "updated_at": {
-                          "type": "string"
-                        },
-                        "deleted_at": {
-                          "type": "null"
-                        },
-                        "icon_url": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp",
+                          "example": "2024-01-01T00:00:00.000000Z"
                         }
-                      }
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "active_balance": "28166.00",
-                      "pending_balance": "0.00",
-                      "active_balance_trimmed": "28,166",
-                      "pending_balance_trimmed": null,
-                      "currency": "USD",
-                      "currency_detail": {
-                        "id": 10,
-                        "code": "USD",
-                        "name": "US Dollar",
-                        "symbol": "$",
-                        "prefix": "$",
-                        "suffix": "",
-                        "icon": "/static/icons/currency/usd.png",
-                        "created_at": "2025-06-03T12:31:20.000000Z",
-                        "updated_at": "2025-06-03T12:31:20.000000Z",
-                        "deleted_at": null,
-                        "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
                       }
                     }
                   }
                 },
                 "examples": {
-                  "Example 1": {
+                  "Success Response": {
                     "value": {
-                      "active_balance": "28166.00",
-                      "pending_balance": "0.00",
-                      "active_balance_trimmed": "28,166",
-                      "pending_balance_trimmed": null,
+                      "active_balance": 1250.50,
+                      "active_balance_trimmed": "1,250.50",
+                      "total_available_balance": 2100.75,
+                      "total_available_balance_trimmed": "2,100.75",
+                      "affiliate_earning_balance": 850.25,
+                      "affiliate_earning_balance_trimmed": "850.25",
+                      "purchase_power": 2100.75,
+                      "purchase_power_trimmed": "2,100.75",
                       "currency": "USD",
                       "currency_detail": {
-                        "id": 10,
+                        "id": 1,
                         "code": "USD",
                         "name": "US Dollar",
                         "symbol": "$",
-                        "prefix": "$",
-                        "suffix": "",
-                        "icon": "/static/icons/currency/usd.png",
-                        "created_at": "2025-06-03T12:31:20.000000Z",
-                        "updated_at": "2025-06-03T12:31:20.000000Z",
-                        "deleted_at": null,
-                        "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
+                        "exchange_rate": 1.0,
+                        "is_default": true,
+                        "created_at": "2024-01-01T00:00:00.000000Z",
+                        "updated_at": "2024-01-01T00:00:00.000000Z"
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error."
                     }
                   }
                 }
@@ -5385,7 +5449,10 @@
           {
             "Authorization": []
           }
-        ]
+        ],
+        "x-rate-limit": {
+          "description": "Rate limiting: 60 requests per minute per user, 1000 requests per hour per user"
+        }
       }
     },
     "/subscription/current": {
