@@ -6401,14 +6401,14 @@
         }
       }
     },
-    "/withdraw/submit": {
+    "/withdrawal/submit": {
       "post": {
-        "summary": "Submit a Withdraw Request",
+        "summary": "Submit a Withdrawal Request",
         "tags": [
           "Wallet"
         ],
         "responses": {},
-        "operationId": "post-withdraw-submit",
+        "operationId": "post-withdrawal-submit",
         "security": [
           {
             "Authorization": []
