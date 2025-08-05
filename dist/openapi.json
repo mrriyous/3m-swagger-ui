@@ -56,15 +56,15 @@
     {
       "name": "Notifications",
       "description": "Endpoints for managing user notifications, including listing, filtering, marking as read, updating importance, and managing user preferences. All endpoints require Bearer token authentication."
-    },
-    {
-      "name": "Affiliate",
-      "description": "Endpoints for managing affiliate links, statistics, and earnings. All endpoints require Bearer token authentication using Laravel Sanctum."
-    },
-    {
-      "name": "Wallet",
-      "description": "Endpoints for managing user wallet and balance information, including retrieving current balance, affiliate earnings, and purchase power. All endpoints require Bearer token authentication."
-    }
+          },
+      {
+        "name": "Affiliate",
+        "description": "Endpoints for managing affiliate links, statistics, and earnings. All endpoints require Bearer token authentication using Laravel Sanctum."
+      },
+            {
+        "name": "Wallet",
+        "description": "Endpoints for managing user wallet and balance information, including retrieving current balance, deposits, withdrawals, and purchase power. All endpoints require Bearer token authentication."
+      }
   ],
   "paths": {
     "/login": {
@@ -6348,7 +6348,9 @@
     "/deposit/submit": {
       "post": {
         "summary": "Submit a Deposit Transaction",
-        "tags": [],
+        "tags": [
+          "Wallet"
+        ],
         "responses": {},
         "operationId": "post-deposit-submit",
         "security": [
@@ -6402,7 +6404,9 @@
     "/withdraw/submit": {
       "post": {
         "summary": "Submit a Withdraw Request",
-        "tags": [],
+        "tags": [
+          "Wallet"
+        ],
         "responses": {},
         "operationId": "post-withdraw-submit",
         "security": [
