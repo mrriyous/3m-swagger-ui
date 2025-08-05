@@ -61,10 +61,14 @@
         "name": "Affiliate",
         "description": "Endpoints for managing affiliate links, statistics, and earnings. All endpoints require Bearer token authentication using Laravel Sanctum."
       },
-            {
-        "name": "Wallet",
-        "description": "Endpoints for managing user wallet and balance information, including retrieving current balance, deposits, withdrawals, and purchase power. All endpoints require Bearer token authentication."
-      }
+                {
+      "name": "Wallet",
+      "description": "Endpoints for managing user wallet and balance information, including retrieving current balance, deposits, withdrawals, and purchase power. All endpoints require Bearer token authentication."
+    },
+    {
+      "name": "Search",
+      "description": "Endpoints for searching user profiles with advanced filtering options including location, budget, languages, and custom parameters. Supports pagination, sorting, and role-based filtering. All endpoints require Bearer token authentication."
+    }
   ],
   "paths": {
     "/login": {
@@ -4195,7 +4199,9 @@
     "/search-templates": {
       "get": {
         "summary": "Get User's Search Templates",
-        "tags": [],
+        "tags": [
+          "Search"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4419,7 +4425,9 @@
       },
       "post": {
         "summary": "Create New Search Template",
-        "tags": [],
+        "tags": [
+          "Search"
+        ],
         "responses": {},
         "operationId": "post-search-templates",
         "security": [
@@ -4634,7 +4642,9 @@
       ],
       "get": {
         "summary": "Get Search Template Details",
-        "tags": [],
+        "tags": [
+          "Search"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4862,7 +4872,9 @@
       },
       "put": {
         "summary": "Update Search Template",
-        "tags": [],
+        "tags": [
+          "Search"
+        ],
         "responses": {},
         "operationId": "put-search-templates-id",
         "security": [
@@ -5075,8 +5087,10 @@
     "/search": {
       "post": {
         "summary": "Search Profiles",
-        "tags": [],
-        "responses": {},
+        "description": "Search for user profiles with advanced filtering options. Supports location-based search, budget filtering, language matching, and custom parameter filtering. Results are automatically filtered based on user role and mutual interest settings.",
+        "tags": [
+          "Search"
+        ],
         "operationId": "post-search",
         "security": [
           {
@@ -5084,137 +5098,606 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
+                  "pagination": {
+                    "type": "object",
+                    "description": "Pagination settings for search results",
+                    "properties": {
+                      "page": {
+                        "type": "integer",
+                        "description": "The page number for pagination",
+                        "default": 1,
+                        "minimum": 1
+                      },
+                      "per_page": {
+                        "type": "integer",
+                        "description": "Number of results per page",
+                        "default": 10,
+                        "minimum": 1,
+                        "maximum": 100
+                      }
+                    }
+                  },
                   "sort": {
                     "type": "object",
+                    "description": "Sorting configuration for search results",
                     "properties": {
                       "by": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Field to sort by",
+                        "enum": ["monthly_budget", "age", "created_at"],
+                        "default": "created_at"
                       },
                       "order": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Sort direction",
+                        "enum": ["asc", "desc"],
+                        "default": "desc"
                       }
                     }
                   },
                   "location": {
                     "type": "object",
+                    "description": "Location-based search configuration",
                     "properties": {
+                      "is_worldwide": {
+                        "type": "boolean",
+                        "description": "If true, search worldwide. If false, use specific locations or user's location",
+                        "default": false
+                      },
                       "places": {
                         "type": "array",
+                        "description": "Array of location objects for specific location search",
                         "items": {
                           "type": "object",
-                          "properties": {}
+                          "properties": {
+                            "location": {
+                              "type": "object",
+                              "required": ["latitude", "longitude"],
+                              "properties": {
+                                "latitude": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "description": "Location latitude",
+                                  "minimum": -90,
+                                  "maximum": 90
+                                },
+                                "longitude": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "description": "Location longitude",
+                                  "minimum": -180,
+                                  "maximum": 180
+                                }
+                              }
+                            },
+                            "radius": {
+                              "type": "number",
+                              "format": "double",
+                              "description": "Search radius in kilometers",
+                              "minimum": 0.1,
+                              "maximum": 1000
+                            }
+                          }
                         }
-                      },
-                      "is_worldwide": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  "languages": {
-                    "type": "object",
-                    "properties": {
-                      "selected": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {}
-                        }
-                      },
-                      "match_mode": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "pagination": {
-                    "type": "object",
-                    "properties": {
-                      "page": {
-                        "type": "integer"
-                      },
-                      "per_page": {
-                        "type": "integer"
                       }
                     }
                   },
                   "monthly_budget": {
                     "type": "object",
+                    "description": "Monthly budget filtering configuration",
                     "properties": {
-                      "max": {
-                        "type": "string"
-                      },
                       "min": {
-                        "type": "string"
+                        "type": "number",
+                        "format": "double",
+                        "description": "Minimum monthly budget"
+                      },
+                      "max": {
+                        "type": "number",
+                        "format": "double",
+                        "description": "Maximum monthly budget (required for sponsor users)"
                       },
                       "currency": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Currency code (e.g., 'USD', 'AED'). Defaults to system default currency",
+                        "pattern": "^[A-Z]{3}$"
+                      }
+                    }
+                  },
+                  "languages": {
+                    "type": "object",
+                    "description": "Language filtering configuration",
+                    "properties": {
+                      "selected": {
+                        "type": "array",
+                        "description": "Array of language names to search for",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "match_mode": {
+                        "type": "string",
+                        "description": "How to match languages",
+                        "enum": ["any", "all"]
                       }
                     }
                   },
                   "custom_parameters": {
                     "type": "array",
+                    "description": "Array of custom parameter objects for advanced filtering",
                     "items": {
                       "type": "object",
-                      "properties": {}
+                      "required": ["category_key", "field_key", "value"],
+                      "properties": {
+                        "category_key": {
+                          "type": "string",
+                          "description": "Custom parameter category key"
+                        },
+                        "field_key": {
+                          "type": "string",
+                          "description": "Custom parameter field key"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Value to match against"
+                        },
+                        "value_range": {
+                          "type": "object",
+                          "description": "Range object with min/max values for range-based searches",
+                          "properties": {
+                            "min": {
+                              "type": "string"
+                            },
+                            "max": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 },
                 "x-examples": {
-                  "Example 1": {
+                  "Comprehensive Search Example": {
+                    "pagination": {
+                      "page": 1,
+                      "per_page": 10
+                    },
                     "sort": {
                       "by": "monthly_budget",
                       "order": "desc"
                     },
                     "location": {
-                      "places": [],
-                      "is_worldwide": true
-                    },
-                    "languages": {
-                      "selected": [],
-                      "match_mode": "any"
-                    },
-                    "pagination": {
-                      "page": 1,
-                      "per_page": 10
+                      "is_worldwide": false,
+                      "places": [
+                        {
+                          "location": {
+                            "latitude": 25.276987,
+                            "longitude": 55.296249
+                          },
+                          "radius": 10
+                        }
+                      ]
                     },
                     "monthly_budget": {
-                      "max": "49997",
-                      "min": "0",
+                      "min": 1000,
+                      "max": 10000,
                       "currency": "USD"
                     },
-                    "custom_parameters": []
+                    "languages": {
+                      "selected": ["English", "Arabic"],
+                      "match_mode": "any"
+                    },
+                    "custom_parameters": [
+                      {
+                        "category_key": "general_info",
+                        "field_key": "education_level",
+                        "value": "bachelor"
+                      },
+                      {
+                        "category_key": "general_info",
+                        "field_key": "age",
+                        "value": "25-35"
+                      }
+                    ]
                   }
                 }
               },
               "examples": {
-                "Example 1": {
+                "Comprehensive Search Example": {
+                  "summary": "Search for profiles in Dubai with specific criteria",
+                  "description": "Search for profiles within 10km of Dubai with budget between $1,000-$10,000, who speak English or Arabic, with bachelor's education and age 25-35",
                   "value": {
+                    "pagination": {
+                      "page": 1,
+                      "per_page": 10
+                    },
                     "sort": {
                       "by": "monthly_budget",
                       "order": "desc"
                     },
                     "location": {
-                      "places": [],
-                      "is_worldwide": true
-                    },
-                    "languages": {
-                      "selected": [],
-                      "match_mode": "any"
-                    },
-                    "pagination": {
-                      "page": 1,
-                      "per_page": 10
+                      "is_worldwide": false,
+                      "places": [
+                        {
+                          "location": {
+                            "latitude": 25.276987,
+                            "longitude": 55.296249
+                          },
+                          "radius": 10
+                        }
+                      ]
                     },
                     "monthly_budget": {
-                      "max": "49997",
-                      "min": "0",
+                      "min": 1000,
+                      "max": 10000,
                       "currency": "USD"
                     },
-                    "custom_parameters": []
+                    "languages": {
+                      "selected": ["English", "Arabic"],
+                      "match_mode": "any"
+                    },
+                    "custom_parameters": [
+                      {
+                        "category_key": "general_info",
+                        "field_key": "education_level",
+                        "value": "bachelor"
+                      },
+                      {
+                        "category_key": "general_info",
+                        "field_key": "age",
+                        "value": "25-35"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "Array of user profile objects",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "User ID"
+                          },
+                          "public_username": {
+                            "type": "string",
+                            "description": "Public username for the profile"
+                          },
+                          "login_name": {
+                            "type": "string",
+                            "description": "Login name"
+                          },
+                          "first_name": {
+                            "type": "string",
+                            "description": "User's first name"
+                          },
+                          "last_name": {
+                            "type": "string",
+                            "description": "User's last name"
+                          },
+                          "full_name": {
+                            "type": "string",
+                            "description": "User's full name"
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email",
+                            "description": "User's email address"
+                          },
+                          "gender": {
+                            "type": "string",
+                            "enum": ["male", "female"],
+                            "description": "User's gender"
+                          },
+                          "partner_preference": {
+                            "type": "string",
+                            "enum": ["male", "female"],
+                            "description": "Preferred partner gender"
+                          },
+                          "relationship_goals": {
+                            "type": "string",
+                            "description": "Relationship goals (e.g., 'marriage')"
+                          },
+                          "role": {
+                            "type": "string",
+                            "enum": ["rs", "srs"],
+                            "description": "User role (rs=sponsor, srs=seeker)"
+                          },
+                          "profile_picture_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "URL to profile picture"
+                          },
+                          "hide_images": {
+                            "type": "boolean",
+                            "description": "Whether images are hidden"
+                          },
+                          "initials": {
+                            "type": "string",
+                            "description": "User's initials"
+                          },
+                          "profile": {
+                            "type": "object",
+                            "description": "Detailed profile information",
+                            "properties": {
+                              "birth_date": {
+                                "type": "string",
+                                "format": "date",
+                                "description": "User's birth date"
+                              },
+                              "gender": {
+                                "type": "string",
+                                "enum": ["male", "female"],
+                                "description": "User's gender"
+                              },
+                              "location_residence_latitude": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "Residence latitude"
+                              },
+                              "location_residence_longitude": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "Residence longitude"
+                              },
+                              "weight": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "Weight in kg"
+                              },
+                              "height": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "Height in cm"
+                              },
+                              "orientation": {
+                                "type": "string",
+                                "description": "Sexual orientation"
+                              },
+                              "education_level": {
+                                "type": "string",
+                                "description": "Education level"
+                              },
+                              "profession": {
+                                "type": "string",
+                                "description": "Profession or occupation"
+                              },
+                              "religion": {
+                                "type": "string",
+                                "description": "Religious affiliation"
+                              },
+                              "ethnicity": {
+                                "type": "string",
+                                "description": "Ethnic background"
+                              }
+                            }
+                          },
+                          "financialProfile": {
+                            "type": "object",
+                            "description": "Financial profile information",
+                            "properties": {
+                              "lifestyle_support_budget": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "Monthly lifestyle support budget"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "description": "Currency code"
+                              },
+                              "capital_level_less_precise": {
+                                "type": "string",
+                                "description": "Capital level (less precise)"
+                              },
+                              "monthly_income_less_precise": {
+                                "type": "string",
+                                "description": "Monthly income (less precise)"
+                              }
+                            }
+                          },
+                          "lifestyle_support_budget": {
+                            "type": "number",
+                            "format": "double",
+                            "description": "Monthly lifestyle support budget"
+                          },
+                          "lifestyle_support_budget_trimmed": {
+                            "type": "string",
+                            "description": "Formatted lifestyle support budget"
+                          },
+                          "profileImages": {
+                            "type": "array",
+                            "description": "Array of profile images",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer",
+                                  "description": "Image ID"
+                                },
+                                "url": {
+                                  "type": "string",
+                                  "format": "uri",
+                                  "description": "Image URL"
+                                },
+                                "thumbnail_url": {
+                                  "type": "string",
+                                  "format": "uri",
+                                  "description": "Thumbnail URL"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "description": "Pagination metadata",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Current page number"
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Last page number"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Results per page"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of results"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "summary": "Successful search results",
+                    "description": "Search results with user profiles and pagination metadata",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "public_username": "johndoe",
+                          "login_name": "johndoe",
+                          "first_name": "John",
+                          "last_name": "Doe",
+                          "full_name": "John Doe",
+                          "email": "john@example.com",
+                          "gender": "male",
+                          "partner_preference": "female",
+                          "relationship_goals": "marriage",
+                          "role": "srs",
+                          "profile_picture_url": "https://example.com/profile.jpg",
+                          "hide_images": false,
+                          "initials": "JD",
+                          "profile": {
+                            "birth_date": "1990-01-01",
+                            "gender": "male",
+                            "location_residence_latitude": 25.276987,
+                            "location_residence_longitude": 55.296249,
+                            "weight": 70,
+                            "height": 175,
+                            "orientation": "straight",
+                            "education_level": "bachelor",
+                            "profession": "engineer",
+                            "religion": "muslim",
+                            "ethnicity": "arab"
+                          },
+                          "financialProfile": {
+                            "lifestyle_support_budget": 5000,
+                            "currency": "USD",
+                            "capital_level_less_precise": "high",
+                            "monthly_income_less_precise": "high"
+                          },
+                          "lifestyle_support_budget": 5000,
+                          "lifestyle_support_budget_trimmed": "5,000",
+                          "profileImages": [
+                            {
+                              "id": 1,
+                              "url": "https://example.com/image1.jpg",
+                              "thumbnail_url": "https://example.com/thumb1.jpg"
+                            }
+                          ]
+                        }
+                      ],
+                      "meta": {
+                        "current_page": 1,
+                        "last_page": 5,
+                        "per_page": 10,
+                        "total": 50
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid search parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User location not found. Please update your location in your profile."
+                    },
+                    "currentUser": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "public_username": {
+                          "type": "string",
+                          "example": "currentuser"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "Error Response": {
+                    "summary": "Error when user location is not found",
+                    "description": "Error response when the user's location is not available for search",
+                    "value": {
+                      "error": true,
+                      "message": "User location not found. Please update your location in your profile.",
+                      "currentUser": {
+                        "id": 1,
+                        "public_username": "currentuser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
                   }
                 }
               }
@@ -5226,8 +5709,10 @@
     "/search/check-custom-parameter": {
       "post": {
         "summary": "Check Custom Parameter",
-        "tags": [],
-        "responses": {},
+        "description": "Validate and check custom parameter values for search functionality. This endpoint helps verify if custom parameter values are valid before using them in search queries.",
+        "tags": [
+          "Search"
+        ],
         "operationId": "post-search-check-custom-parameter",
         "security": [
           {
@@ -5235,30 +5720,138 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["value", "category"],
                 "properties": {
                   "value": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The value to validate for the custom parameter"
                   },
                   "category": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The category of the custom parameter to validate",
+                    "enum": ["general_info", "relationship", "financial", "living", "profession"]
                   }
                 },
                 "x-examples": {
-                  "Example 1": {
+                  "Profession Example": {
                     "value": "Software Engineer",
                     "category": "profession"
+                  },
+                  "Education Example": {
+                    "value": "bachelor",
+                    "category": "general_info"
                   }
                 }
               },
               "examples": {
-                "Example 1": {
+                "Profession Example": {
+                  "summary": "Check profession parameter",
+                  "description": "Validate a profession value for search",
                   "value": {
                     "value": "Software Engineer",
                     "category": "profession"
+                  }
+                },
+                "Education Example": {
+                  "summary": "Check education parameter",
+                  "description": "Validate an education level value for search",
+                  "value": {
+                    "value": "bachelor",
+                    "category": "general_info"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Custom parameter validation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean",
+                      "description": "Whether the parameter value is valid"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Validation message"
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "description": "Suggested values if the provided value is not exact",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "Valid Parameter": {
+                    "summary": "Valid parameter value",
+                    "description": "Response when the parameter value is valid",
+                    "value": {
+                      "valid": true,
+                      "message": "Parameter value is valid",
+                      "suggestions": []
+                    }
+                  },
+                  "Invalid Parameter": {
+                    "summary": "Invalid parameter value with suggestions",
+                    "description": "Response when the parameter value is invalid but suggestions are provided",
+                    "value": {
+                      "valid": false,
+                      "message": "Parameter value not found",
+                      "suggestions": ["Software Engineer", "Software Developer", "Programmer"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid category or value provided"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
                   }
                 }
               }
