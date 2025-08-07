@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "This contains all API for 3M Platform",
+    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read",
     "version": "1.0.0",
     "title": "3M Api",
     "contact": {
@@ -35,7 +35,7 @@
     },
     {
       "name": "Chat",
-      "description": "Related endpoints for Chat features"
+      "description": "The Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging. Features include AI-powered content moderation, file attachments, real-time events, and rate limiting."
     },
     {
       "name": "Reports & Interactions",
@@ -9058,26 +9058,31 @@
             "Authorization": []
           }
         ],
-        "summary": "Get the list of available chats",
+        "summary": "Get All Chats",
+        "description": "Retrieves all chat rooms for the authenticated user with filtering options. Supports filtering by chat type and read status.",
         "tags": [
           "Chat"
         ],
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": ["all", "archived", "deleted"],
+              "default": "all"
             },
             "in": "query",
             "name": "type",
-            "description": "Accept: all, archived, deleted"
+            "description": "Filter by chat type: all, archived, deleted (default: all)"
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": ["all", "read", "unread"],
+              "default": "all"
             },
             "in": "query",
             "name": "read_status",
-            "description": "Accept: all, read, unread"
+            "description": "Filter by read status: all, read, unread (default: all)"
           }
         ],
         "responses": {
@@ -9208,7 +9213,8 @@
           },
           "name": "publicUsername",
           "in": "path",
-          "required": true
+          "required": true,
+          "description": "Public username of the chat partner"
         }
       ],
       "get": {
@@ -9217,7 +9223,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Get chat room information",
+        "summary": "Get Chat Room",
+        "description": "Retrieves information about a specific chat room with a user.",
         "tags": [
           "Chat"
         ],
@@ -9358,7 +9365,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "get": {
@@ -9367,9 +9374,21 @@
             "Authorization": []
           }
         ],
-        "summary": "Get subscription info of the room (for read status)",
+        "summary": "Get Room Subscription Info",
+        "description": "Retrieves detailed subscription information for a specific chat room.",
         "tags": [
           "Chat"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["Y", "N"]
+            },
+            "in": "query",
+            "name": "mark_as_read",
+            "description": "Set to 'Y' to mark as read when fetching info"
+          }
         ],
         "responses": {
           "200": {
@@ -9558,7 +9577,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "get": {
@@ -9567,7 +9586,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Get list messages",
+        "summary": "Get Messages",
+        "description": "Retrieves messages from a specific chat room with pagination.",
         "tags": [
           "Chat"
         ],
@@ -9814,7 +9834,8 @@
           },
           "name": "publicUsername",
           "in": "path",
-          "required": true
+          "required": true,
+          "description": "Public username of the recipient"
         }
       ],
       "post": {
@@ -9823,23 +9844,47 @@
             "Authorization": []
           }
         ],
-        "summary": "Send message",
+        "summary": "Send Message",
+        "description": "Sends a message to a specific user. Supports text messages and file attachments. AI moderation is applied to all messages.",
         "tags": [
           "Chat"
         ],
         "requestBody": {
           "required": true,
           "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Text message content (required if no file)"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File attachment (required if no message)"
+                  },
+                  "replying_message_id": {
+                    "type": "string",
+                    "description": "ID of the message being replied to"
+                  }
+                }
+              }
+            },
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "message": {
                     "type": "string",
-                    "description": "The message content to send"
+                    "description": "Text message content (required if no file)"
+                  },
+                  "replying_message_id": {
+                    "type": "string",
+                    "description": "ID of the message being replied to"
                   }
-                },
-                "required": ["message"]
+                }
               }
             }
           }
@@ -9858,6 +9903,166 @@
                     "message": {
                       "$ref": "#/components/schemas/MessageObject"
                     }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": {
+                        "_id": "message_id_456",
+                        "rid": "room_id_123",
+                        "msg": "Hello! How are you doing?",
+                        "ts": "2024-01-01T12:00:00.000Z",
+                        "u": {
+                          "_id": "user_id_123",
+                          "username": "user1",
+                          "name": "John Doe"
+                        },
+                        "mentions": [],
+                        "channels": [],
+                        "editedAt": null,
+                        "editedBy": null,
+                        "reactions": {},
+                        "attachments": [],
+                        "ts_in_unix": 1704067200000,
+                        "has_been_read": false,
+                        "ts_formatted": "12:00 pm",
+                        "ts_formatted_full": "01 January 2024, 12:00pm",
+                        "ts_formatted_local": "12:00 pm",
+                        "ts_formatted_full_local": "01 January 2024, 12:00pm",
+                        "ts_date_formatted": "January 01, 2024",
+                        "is_sent_by_logged_in_user": true,
+                        "editable": true,
+                        "is_edited": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please type a message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User blocked or chat disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You have blocked this user and cannot send messages to them"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - AI moderation blocked message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Your message contains inappropriate content and has been blocked."
+                    },
+                    "moderation_reason": {
+                      "type": "string",
+                      "example": "Inappropriate language detected"
+                    },
+                    "message_strike_count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "chat_disabled": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Failed to send message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to send message"
+                    }
                   }
                 }
               }
@@ -9875,7 +10080,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "post": {
@@ -9884,7 +10089,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Edit message",
+        "summary": "Edit Message",
+        "description": "Edits an existing message (only within 6 minutes of sending). AI moderation is applied to edited messages.",
         "tags": [
           "Chat"
         ],
@@ -9897,11 +10103,11 @@
                 "properties": {
                   "message_id": {
                     "type": "string",
-                    "description": "The ID of the message to edit"
+                    "description": "ID of the message to edit"
                   },
                   "message": {
                     "type": "string",
-                    "description": "The new message content"
+                    "description": "New message content (max 1000 characters)"
                   }
                 },
                 "required": ["message_id", "message"]
@@ -9923,6 +10129,161 @@
                     "data": {
                       "$ref": "#/components/schemas/MessageObject"
                     }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "data": {
+                        "_id": "message_id_123",
+                        "rid": "room_id_123",
+                        "msg": "Updated message content",
+                        "ts": "2024-01-01T12:00:00.000Z",
+                        "editedAt": "2024-01-01T12:05:00.000Z",
+                        "editedBy": {
+                          "_id": "user_id_123",
+                          "username": "user1"
+                        },
+                        "u": {
+                          "_id": "user_id_123",
+                          "username": "user1",
+                          "name": "John Doe"
+                        },
+                        "mentions": [],
+                        "channels": [],
+                        "reactions": {},
+                        "attachments": [],
+                        "ts_in_unix": 1704067200000,
+                        "has_been_read": false,
+                        "ts_formatted": "12:00 pm",
+                        "ts_formatted_full": "01 January 2024, 12:00pm",
+                        "ts_formatted_local": "12:00 pm",
+                        "ts_formatted_full_local": "01 January 2024, 12:00pm",
+                        "ts_date_formatted": "January 01, 2024",
+                        "is_sent_by_logged_in_user": true,
+                        "editable": true,
+                        "is_edited": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message content is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Cannot edit this message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You can only edit your own messages within 6 minutes of sending"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Message not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - AI moderation blocked edited message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Your edited message contains inappropriate content and has been blocked."
+                    },
+                    "moderation_reason": {
+                      "type": "string",
+                      "example": "Inappropriate language detected"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Failed to edit message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to edit message"
+                    }
                   }
                 }
               }
@@ -9940,7 +10301,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "post": {
@@ -9949,7 +10310,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Delete message",
+        "summary": "Delete Message",
+        "description": "Deletes a message from the chat. Only the message sender can delete their own messages.",
         "tags": [
           "Chat"
         ],
@@ -9984,6 +10346,108 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Message deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message ID is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Cannot delete this message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You can only delete your own messages"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Message not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Message not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Failed to delete message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to delete message"
+                    }
                   }
                 }
               }
@@ -10001,7 +10465,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "post": {
@@ -10010,7 +10474,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Mark room as read",
+        "summary": "Mark as Read",
+        "description": "Marks a chat room as read and updates the user's last seen timestamp.",
         "tags": [
           "Chat"
         ],
@@ -10114,7 +10579,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "post": {
@@ -10123,7 +10588,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Archive a chat room",
+        "summary": "Archive Chat",
+        "description": "Archives a chat room (moves it to archived list). Archived chats can be restored by sending a new message.",
         "tags": [
           "Chat"
         ],
@@ -10164,7 +10630,7 @@
           "name": "publicUsername",
           "in": "path",
           "required": true,
-          "description": "The public username of the chat partner"
+          "description": "Public username of the chat partner"
         }
       ],
       "post": {
@@ -10173,7 +10639,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Delete room",
+        "summary": "Delete Chat",
+        "description": "Permanently deletes a chat room. Deleted chats cannot be recovered.",
         "tags": [
           "Chat"
         ],
@@ -10196,6 +10663,342 @@
                     "Example 1": {
                       "error": false,
                       "message": "Successfully deleted chat room"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/room-subscriptions": {
+      "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Get All Subscriptions",
+        "description": "Retrieves all room subscriptions for the authenticated user.",
+        "tags": [
+          "Chat"
+        ],
+        "responses": {
+          "200": {
+            "description": "Room subscriptions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rid": {
+                            "type": "string"
+                          },
+                          "u": {
+                            "type": "object",
+                            "properties": {
+                              "_id": {
+                                "type": "string"
+                              },
+                              "username": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "open": {
+                            "type": "boolean"
+                          },
+                          "alert": {
+                            "type": "boolean"
+                          },
+                          "unread": {
+                            "type": "integer"
+                          },
+                          "ts": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "ls": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "data": [
+                        {
+                          "rid": "room_id_123",
+                          "u": {
+                            "_id": "user_id_123",
+                            "username": "user1"
+                          },
+                          "open": true,
+                          "alert": false,
+                          "unread": 5,
+                          "ts": "2024-01-01T00:00:00.000Z",
+                          "ls": "2024-01-01T11:00:00.000Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{publicUsername}/search-messages": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "Public username of the chat partner"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Search Messages",
+        "description": "Searches for messages in a specific chat room.",
+        "tags": [
+          "Chat"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "in": "query",
+            "name": "search_text",
+            "required": true,
+            "description": "Text to search for (1-100 characters)"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            },
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of results (1-50, default: 10)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MessageObject"
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "messages": [
+                        {
+                          "_id": "ZrvLFnKgyogFhCL6C",
+                          "rid": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                          "msg": "halo dek",
+                          "attachments": [],
+                          "ts": "2025-08-03T15:51:25.305Z",
+                          "u": {
+                            "_id": "JrLpEa6BqoncKDyy4",
+                            "username": "nuaira",
+                            "name": "Nuaira Nadira"
+                          },
+                          "_updatedAt": "2025-08-03T15:51:25.346Z",
+                          "urls": [],
+                          "mentions": [],
+                          "channels": [],
+                          "md": [
+                            {
+                              "type": "PARAGRAPH",
+                              "value": [
+                                {
+                                  "type": "PLAIN_TEXT",
+                                  "value": "halo dek"
+                                }
+                              ]
+                            }
+                          ],
+                          "score": 0.75,
+                          "ts_in_unix": 1754236285305,
+                          "has_been_read": false,
+                          "ts_formatted": "03:51 pm",
+                          "ts_formatted_full": "03 August 2025, 03:51pm",
+                          "ts_formatted_local": "10:51 pm",
+                          "ts_formatted_full_local": "03 August 2025, 10:51pm",
+                          "ts_date_formatted": "August 03, 2025",
+                          "is_sent_by_logged_in_user": false,
+                          "editable": false,
+                          "is_edited": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{publicUsername}/mute-notifications": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "Public username of the chat partner"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Mute Notifications",
+        "description": "Toggles mute status for chat notifications.",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mute": {
+                    "type": "boolean",
+                    "description": "Whether to mute (true) or unmute (false) notifications"
+                  }
+                },
+                "required": ["mute"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification mute status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "mute": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Notifications muted successfully",
+                      "data": {
+                        "mute": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{publicUsername}/request-webview": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "Public username of the chat partner"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Request Webview",
+        "description": "Generates a webview URL for accessing the chat in a web browser.",
+        "tags": [
+          "Chat"
+        ],
+        "responses": {
+          "200": {
+            "description": "Webview URL generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "webview_url": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "webview_url": "https://startup2050.com/chats/john_doe?webview_token=abc123def456"
                     }
                   }
                 }
