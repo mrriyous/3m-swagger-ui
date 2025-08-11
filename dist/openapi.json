@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read",
+    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read\n\n## Support Tickets API Overview\n\nThe Support Tickets API provides comprehensive ticket management functionality, supporting both authenticated users and guest access. The system includes spam protection, file validation, and comprehensive ticket lifecycle management.\n\n### Key Features\n\n- **Dual Authentication**: Works with Bearer tokens or X-Guest-Email headers\n- **File Attachments**: Support for PDF, JPG, JPEG, PNG files (max 15MB each)\n- **Spam Protection**: Built-in spam detection and rate limiting\n- **Ticket Lifecycle**: Complete management from creation to resolution\n- **Message Threading**: Support for threaded conversations with file attachments\n- **Status Management**: Comprehensive status tracking and filtering\n\n### Authentication\n\nAll support ticket endpoints use optional authentication middleware, working with:\n\n- **Bearer Token**: `Authorization: Bearer {your_token}`\n- **Guest Access**: `X-Guest-Email: guest@example.com`\n\n### Rate Limiting\n\n- **Individual IP**: 10 requests per day\n- **IP Network**: 20 requests per day\n\n### File Attachments\n\n- **Supported Formats**: PDF, JPG, JPEG, PNG\n- **File Size Limit**: 15MB per file\n- **Validation**: File extension and content signature validation\n- **Storage**: Secure file storage with download URLs",
     "version": "1.0.0",
     "title": "3M Api",
     "contact": {
@@ -51,7 +51,7 @@
     },
     {
       "name": "Support Tickets",
-      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, retrieving categories, statuses, and notification options, and managing ticket messages with file attachments. Supports both authenticated users and guest access with pagination. File attachments support PDF, JPG, JPEG, PNG (max 15MB each). Rate limited: 10 requests per day per IP, 20 requests per day per IP network."
+      "description": "Endpoints for managing support tickets, including creating, viewing, updating tickets, retrieving categories, statuses, and notification options, and managing ticket messages with file attachments. Supports both authenticated users and guest access with pagination. File attachments support PDF, JPG, JPEG, PNG (max 15MB each). Rate limited: 10 requests per day per IP, 20 requests per day per IP network. All endpoints use optional authentication middleware, working with Bearer tokens or X-Guest-Email headers. Includes spam protection, file validation, and comprehensive ticket lifecycle management."
     },
     {
       "name": "Notifications",
@@ -12936,6 +12936,54 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": [
+                        {
+                          "key": "general",
+                          "name": "General"
+                        },
+                        {
+                          "key": "account_issues",
+                          "name": "Account issues"
+                        },
+                        {
+                          "key": "finance_issues",
+                          "name": "Finance issues"
+                        },
+                        {
+                          "key": "legal_issues",
+                          "name": "Legal issues"
+                        },
+                        {
+                          "key": "affiliate_issues",
+                          "name": "Affiliate issues"
+                        },
+                        {
+                          "key": "partnership_proposal",
+                          "name": "Partnership proposal"
+                        },
+                        {
+                          "key": "vip_requests",
+                          "name": "VIP requests"
+                        },
+                        {
+                          "key": "abuse_report",
+                          "name": "Abuse report"
+                        },
+                        {
+                          "key": "complaint",
+                          "name": "Complaint"
+                        },
+                        {
+                          "key": "rule_violation",
+                          "name": "Report a violation of rules"
+                        }
+                      ],
+                      "message": "Support ticket categories retrieved successfully"
+                    }
                   }
                 }
               }
@@ -12977,6 +13025,30 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": [
+                        {
+                          "key": "open",
+                          "name": "Open"
+                        },
+                        {
+                          "key": "in_progress",
+                          "name": "In Progress"
+                        },
+                        {
+                          "key": "resolved",
+                          "name": "Resolved"
+                        },
+                        {
+                          "key": "closed",
+                          "name": "Closed"
+                        }
+                      ],
+                      "message": "Support ticket statuses retrieved successfully"
+                    }
                   }
                 }
               }
@@ -13015,6 +13087,29 @@
                         }
                       }
                     }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": [
+                        {
+                          "label": "Urgent",
+                          "value": "urgent"
+                        },
+                        {
+                          "label": "Critical",
+                          "value": "critical"
+                        },
+                        {
+                          "label": "Important",
+                          "value": "important"
+                        },
+                        {
+                          "label": "Normal",
+                          "value": "normal"
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -13052,6 +13147,25 @@
                           }
                         }
                       }
+                    }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": [
+                        {
+                          "label": "Notify about response only",
+                          "value": "response_only"
+                        },
+                        {
+                          "label": "Include the title",
+                          "value": "include_title"
+                        },
+                        {
+                          "label": "Include the response's content",
+                          "value": "include_content"
+                        }
+                      ]
                     }
                   }
                 }
@@ -13662,6 +13776,16 @@
             }
           },
           {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status (open, in_progress, resolved, closed, unread, read, all)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["open", "in_progress", "resolved", "closed", "unread", "read", "all"]
+            }
+          },
+          {
             "name": "X-Guest-Email",
             "in": "header",
             "description": "Guest email address (required for guest access)",
@@ -13708,6 +13832,47 @@
                     },
                     "message": {
                       "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": {
+                        "data": [
+                          {
+                            "id": 1,
+                            "ticket_number": "ST 001 234",
+                            "user_id": 123,
+                            "guest_email": null,
+                            "ip_address": "192.168.1.1",
+                            "user_agent": "Mozilla/5.0...",
+                            "category": "general",
+                            "importance_level": "normal",
+                            "title": "How do I reset my password?",
+                            "content": "I forgot my password and need help resetting it.",
+                            "notify_via_email": true,
+                            "notification_option": "response_only",
+                            "status": "open",
+                            "responded_at": null,
+                            "resolved_at": null,
+                            "attachments": [],
+                            "captcha_session_id": null,
+                            "is_spam": false,
+                            "created_at": "2024-01-15T10:30:00.000000Z",
+                            "updated_at": "2024-01-15T10:30:00.000000Z",
+                            "category_display_name": "General",
+                            "status_display_name": "Open",
+                            "is_guest": false,
+                            "created_at_local": "2024-01-15T10:30:00.000000Z",
+                            "created_at_local_formatted": "Jan 15, 2024 10:30 AM"
+                          }
+                        ],
+                        "total": 1,
+                        "per_page": 20,
+                        "current_page": 1,
+                        "last_page": 1
+                      },
+                      "message": "Support tickets retrieved successfully"
                     }
                   }
                 }
@@ -13848,6 +14013,48 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": {
+                        "id": 2,
+                        "ticket_number": "ST 002 567",
+                        "user_id": 123,
+                        "guest_email": null,
+                        "ip_address": "192.168.1.1",
+                        "user_agent": "Mozilla/5.0...",
+                        "category": "general",
+                        "importance_level": "normal",
+                        "title": "Need help with account setup",
+                        "content": "I am having trouble setting up my account and would appreciate assistance.",
+                        "notify_via_email": true,
+                        "notification_option": "response_only",
+                        "status": "open",
+                        "responded_at": null,
+                        "resolved_at": null,
+                        "attachments": [
+                          {
+                            "original_name": "screenshot.png",
+                            "filename": "1705312800_screenshot.png",
+                            "path": "support-tickets/1705312800_screenshot.png",
+                            "size": 1024000,
+                            "mime_type": "image/png",
+                            "url": "https://your-domain.com/storage/support-tickets/1705312800_screenshot.png"
+                          }
+                        ],
+                        "captcha_session_id": null,
+                        "is_spam": false,
+                        "created_at": "2024-01-15T11:00:00.000000Z",
+                        "updated_at": "2024-01-15T11:00:00.000000Z",
+                        "category_display_name": "General",
+                        "status_display_name": "Open",
+                        "is_guest": false,
+                        "created_at_local": "2024-01-15T11:00:00.000000Z",
+                        "created_at_local_formatted": "Jan 15, 2024 11:00 AM"
+                      },
+                      "message": "Support ticket created successfully"
+                    }
                   }
                 }
               }
@@ -13950,6 +14157,77 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete Support Ticket",
+        "description": "Delete a support ticket.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/support-tickets/{id}/messages": {
@@ -14002,6 +14280,50 @@
                     },
                     "message": {
                       "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": [
+                        {
+                          "id": 1,
+                          "support_ticket_id": 1,
+                          "user_id": 123,
+                          "sender_type": "user",
+                          "sender_name": "John Doe",
+                          "sender_email": "john@example.com",
+                          "message": "I need help with my account setup.",
+                          "attachments": [],
+                          "is_internal": false,
+                          "is_read": true,
+                          "read_at": "2024-01-15T10:35:00.000000Z",
+                          "created_at": "2024-01-15T10:30:00.000000Z",
+                          "updated_at": "2024-01-15T10:30:00.000000Z",
+                          "formatted_created_at": "Jan 15, 2024 10:30 AM",
+                          "is_sent_by_user": true,
+                          "is_sent_by_admin": false
+                        },
+                        {
+                          "id": 2,
+                          "support_ticket_id": 1,
+                          "user_id": null,
+                          "sender_type": "admin",
+                          "sender_name": "Support Team",
+                          "sender_email": "support@example.com",
+                          "message": "Thank you for contacting us. We'll help you with your account setup. Please provide more details about the specific issue you're facing.",
+                          "attachments": [],
+                          "is_internal": false,
+                          "is_read": false,
+                          "read_at": null,
+                          "created_at": "2024-01-15T11:00:00.000000Z",
+                          "updated_at": "2024-01-15T11:00:00.000000Z",
+                          "formatted_created_at": "Jan 15, 2024 11:00 AM",
+                          "is_sent_by_user": false,
+                          "is_sent_by_admin": true
+                        }
+                      ],
+                      "message": "Messages retrieved successfully"
                     }
                   }
                 }
@@ -14154,6 +14476,299 @@
         }
       }
     },
+    "/support-tickets/{id}/send-email": {
+      "post": {
+        "summary": "Send Email for Support Ticket",
+        "description": "Send an email notification for a support ticket.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-tickets/{id}/mark-read": {
+      "post": {
+        "summary": "Mark Support Ticket as Read",
+        "description": "Mark a support ticket as read.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-tickets/{id}/mark-unread": {
+      "post": {
+        "summary": "Mark Support Ticket as Unread",
+        "description": "Mark a support ticket as unread.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-tickets/{id}/archive": {
+      "post": {
+        "summary": "Archive Support Ticket",
+        "description": "Archive a support ticket.",
+        "tags": ["Support Tickets"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Support ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Guest-Email",
+            "in": "header",
+            "description": "Guest email address (required for guest access)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Support ticket not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/affiliate/links": {
       "get": {
         "summary": "Get Affiliate Links",
