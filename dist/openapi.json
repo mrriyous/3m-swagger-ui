@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read\n\n## Support Tickets API Overview\n\nThe Support Tickets API provides comprehensive ticket management functionality, supporting both authenticated users and guest access. The system includes spam protection, file validation, and comprehensive ticket lifecycle management.\n\n### Key Features\n\n- **Dual Authentication**: Works with Bearer tokens or X-Guest-Email headers\n- **File Attachments**: Support for PDF, JPG, JPEG, PNG files (max 15MB each)\n- **Spam Protection**: Built-in spam detection and rate limiting\n- **Ticket Lifecycle**: Complete management from creation to resolution\n- **Message Threading**: Support for threaded conversations with file attachments\n- **Status Management**: Comprehensive status tracking and filtering\n\n### Authentication\n\nAll support ticket endpoints use optional authentication middleware, working with:\n\n- **Bearer Token**: `Authorization: Bearer {your_token}`\n- **Guest Access**: `X-Guest-Email: guest@example.com`\n\n### Rate Limiting\n\n- **Individual IP**: 10 requests per day\n- **IP Network**: 20 requests per day\n\n### File Attachments\n\n- **Supported Formats**: PDF, JPG, JPEG, PNG\n- **File Size Limit**: 15MB per file\n- **Validation**: File extension and content signature validation\n- **Storage**: Secure file storage with download URLs",
+    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read\n\n## Support Tickets API Overview\n\nThe Support Tickets API provides comprehensive ticket management functionality, supporting both authenticated users and guest access. The system includes spam protection, file validation, and comprehensive ticket lifecycle management.\n\n### Key Features\n\n- **Dual Authentication**: Works with Bearer tokens or X-Guest-Email headers\n- **File Attachments**: Support for PDF, JPG, JPEG, PNG files (max 15MB each)\n- **Spam Protection**: Built-in spam detection and rate limiting\n- **Ticket Lifecycle**: Complete management from creation to resolution\n- **Message Threading**: Support for threaded conversations with file attachments\n- **Status Management**: Comprehensive status tracking and filtering\n- **Visual Styling**: Built-in CSS classes and color schemes for categories and importance levels\n- **User Information**: Complete user profile data when available\n\n### Authentication\n\nAll support ticket endpoints use optional authentication middleware, working with:\n\n- **Bearer Token**: `Authorization: Bearer {your_token}`\n- **Guest Access**: `X-Guest-Email: guest@example.com`\n\n### Rate Limiting\n\n- **Individual IP**: 10 requests per day\n- **IP Network**: 20 requests per day\n\n### File Attachments\n\n- **Supported Formats**: PDF, JPG, JPEG, PNG\n- **File Size Limit**: 15MB per file\n- **Validation**: File extension and content signature validation\n- **Storage**: Secure file storage with download URLs\n\n### Response Features\n\n- **Ticket Numbers**: Auto-generated in format `{PREFIX}-{6-digit-number}` (e.g., GEN-123456, FINT-789012)\n- **Styling Information**: CSS classes and color codes for categories and importance levels\n- **User Details**: Profile information including names, username, and profile picture\n- **Message Counts**: Total message count and latest message preview\n- **Formatted Dates**: Human-readable local timezone dates",
     "version": "1.0.0",
     "title": "3M Api",
     "contact": {
@@ -13841,30 +13841,38 @@
                         "data": [
                           {
                             "id": 1,
-                            "ticket_number": "ST 001 234",
-                            "user_id": 123,
-                            "guest_email": null,
-                            "ip_address": "192.168.1.1",
-                            "user_agent": "Mozilla/5.0...",
-                            "category": "general",
-                            "importance_level": "normal",
+                            "ticket_number": "GEN-123456",
                             "title": "How do I reset my password?",
                             "content": "I forgot my password and need help resetting it.",
-                            "notify_via_email": true,
-                            "notification_option": "response_only",
-                            "status": "open",
-                            "responded_at": null,
-                            "resolved_at": null,
-                            "attachments": [],
-                            "captcha_session_id": null,
-                            "is_spam": false,
-                            "created_at": "2024-01-15T10:30:00.000000Z",
-                            "updated_at": "2024-01-15T10:30:00.000000Z",
+                            "category": "general",
                             "category_display_name": "General",
+                            "category_styling": "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200",
+                            "category_bg_color": "#F3F4F6",
+                            "category_text_color": "#374151",
+                            "importance_level": "normal",
+                            "importance_styling": "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200",
+                            "importance_bg_color": "#DBEAFE",
+                            "importance_text_color": "#1D4ED8",
+                            "status": "open",
                             "status_display_name": "Open",
-                            "is_guest": false,
-                            "created_at_local": "2024-01-15T10:30:00.000000Z",
-                            "created_at_local_formatted": "Jan 15, 2024 10:30 AM"
+                            "is_unread": false,
+                            "message_count": 1,
+                            "latest_message": {
+                              "id": 1,
+                              "message": "I need help with my account setup.",
+                              "created_at": "2024-01-15T10:30:00.000000Z"
+                            },
+                            "user": {
+                              "id": 123,
+                              "first_name": "John",
+                              "last_name": "Doe",
+                              "public_username": "johndoe",
+                              "profile_picture_url": "https://your-domain.com/storage/profile-pictures/john.jpg"
+                            },
+                            "created_at": "2024-01-15T10:30:00.000000Z",
+                            "created_at_local_formatted": "Jan 15, 2024 10:30 AM",
+                            "updated_at": "2024-01-15T10:30:00.000000Z",
+                            "updated_at_local_formatted": "Jan 15, 2024 10:30 AM"
                           }
                         ],
                         "total": 1,
@@ -14019,17 +14027,18 @@
                       "error": false,
                       "data": {
                         "id": 2,
-                        "ticket_number": "ST 002 567",
+                        "ticket_number": "FINT-789012",
                         "user_id": 123,
                         "guest_email": null,
                         "ip_address": "192.168.1.1",
                         "user_agent": "Mozilla/5.0...",
-                        "category": "general",
+                        "category": "finance_issues",
                         "importance_level": "normal",
                         "title": "Need help with account setup",
                         "content": "I am having trouble setting up my account and would appreciate assistance.",
                         "notify_via_email": true,
                         "notification_option": "response_only",
+                        "email_sent": false,
                         "status": "open",
                         "responded_at": null,
                         "resolved_at": null,
@@ -14046,12 +14055,7 @@
                         "captcha_session_id": null,
                         "is_spam": false,
                         "created_at": "2024-01-15T11:00:00.000000Z",
-                        "updated_at": "2024-01-15T11:00:00.000000Z",
-                        "category_display_name": "General",
-                        "status_display_name": "Open",
-                        "is_guest": false,
-                        "created_at_local": "2024-01-15T11:00:00.000000Z",
-                        "created_at_local_formatted": "Jan 15, 2024 11:00 AM"
+                        "updated_at": "2024-01-15T11:00:00.000000Z"
                       },
                       "message": "Support ticket created successfully"
                     }
@@ -14520,6 +14524,30 @@
                     },
                     "message": {
                       "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Email already sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Email Already Sent": {
+                      "error": true,
+                      "message": "Email has already been sent for this ticket"
                     }
                   }
                 }
@@ -16231,6 +16259,10 @@
             "type": "string",
             "description": "Notification preference"
           },
+          "email_sent": {
+            "type": "boolean",
+            "description": "Whether email notification has been sent"
+          },
           "status": {
             "type": "string",
             "description": "Ticket status key"
@@ -16277,9 +16309,84 @@
             "type": "string",
             "description": "Human-readable category name"
           },
+          "category_styling": {
+            "type": "string",
+            "description": "CSS classes for category styling"
+          },
+          "category_bg_color": {
+            "type": "string",
+            "description": "Background color hex code for category"
+          },
+          "category_text_color": {
+            "type": "string",
+            "description": "Text color hex code for category"
+          },
+          "importance_styling": {
+            "type": "string",
+            "description": "CSS classes for importance level styling"
+          },
+          "importance_bg_color": {
+            "type": "string",
+            "description": "Background color hex code for importance level"
+          },
+          "importance_text_color": {
+            "type": "string",
+            "description": "Text color hex code for importance level"
+          },
           "status_display_name": {
             "type": "string",
             "description": "Human-readable status name"
+          },
+          "is_unread": {
+            "type": "boolean",
+            "description": "Whether the ticket is unread"
+          },
+          "message_count": {
+            "type": "integer",
+            "description": "Total number of messages in the ticket"
+          },
+          "latest_message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "Latest message ID"
+              },
+              "message": {
+                "type": "string",
+                "description": "Latest message content"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Latest message creation date"
+              }
+            }
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "User ID"
+              },
+              "first_name": {
+                "type": "string",
+                "description": "User's first name"
+              },
+              "last_name": {
+                "type": "string",
+                "description": "User's last name"
+              },
+              "public_username": {
+                "type": "string",
+                "description": "User's public username"
+              },
+              "profile_picture_url": {
+                "type": "string",
+                "description": "User's profile picture URL"
+              }
+            }
           },
           "is_guest": {
             "type": "boolean",
@@ -16293,6 +16400,10 @@
           "created_at_local_formatted": {
             "type": "string",
             "description": "Human-readable formatted creation date"
+          },
+          "updated_at_local_formatted": {
+            "type": "string",
+            "description": "Human-readable formatted update date"
           }
         }
       },
