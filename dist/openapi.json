@@ -15011,6 +15011,316 @@
           }
         }
       }
+    },
+    "/help-center/faqs": {
+      "get": {
+        "summary": "Get All FAQs",
+        "description": "Retrieves all available frequently asked questions and their answers.",
+        "tags": ["Help Center"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved FAQs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "faqs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FAQ"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/help-center/ai-response": {
+      "post": {
+        "summary": "Get AI Response",
+        "description": "Generates an AI-powered response to user questions using OpenAI's GPT model.",
+        "tags": ["Help Center"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["question"],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "description": "The user's question",
+                    "example": "How do I reset my password?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully generated AI response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "response": {
+                      "type": "string",
+                      "description": "AI-generated response in HTML format with Tailwind CSS classes",
+                      "example": "<p class=\"text-base text-gray-800 mb-4\">To reset your password, follow these steps:</p><p class=\"text-base text-gray-800 mb-4\">1. Go to the login page</p><p class=\"text-base text-gray-800 mb-4\">2. Click on \"Forgot Password\"</p><p class=\"text-base text-gray-800\">3. Enter your email address</p>"
+                    },
+                    "question_data": {
+                      "$ref": "#/components/schemas/HelpdeskQuestion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - AI service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unable to generate response at this time. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/help-center/faq-suggestions": {
+      "post": {
+        "summary": "Get FAQ Suggestions",
+        "description": "Provides real-time FAQ suggestions based on user input for better search experience.",
+        "tags": ["Help Center"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Search query for FAQ suggestions",
+                    "example": "password reset"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved FAQ suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FAQ"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/help-center/mark-resolved": {
+      "post": {
+        "summary": "Mark Question as Resolved",
+        "description": "Marks a helpdesk question as resolved by the user.",
+        "tags": ["Help Center"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["question_id"],
+                "properties": {
+                  "question_id": {
+                    "type": "integer",
+                    "description": "ID of the question to mark as resolved",
+                    "example": 123
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully marked question as resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Question marked as resolved"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Question not found or unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Question not found or unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -17072,6 +17382,74 @@
           "pagination": {
             "$ref": "#/components/schemas/Pagination",
             "description": "Pagination information"
+          }
+        }
+      },
+      "FAQ": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the FAQ",
+            "example": "password-reset"
+          },
+          "question": {
+            "type": "string",
+            "description": "The frequently asked question",
+            "example": "How do I reset my password?"
+          },
+          "answer": {
+            "type": "string",
+            "description": "The answer to the question",
+            "example": "To reset your password, go to the login page and click on \"Forgot Password\". Enter your email address and follow the instructions sent to your email. Make sure to check your spam folder if you don't receive the email immediately."
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the FAQ",
+            "enum": ["password", "account", "profile", "payment", "chat", "subscription", "privacy"],
+            "example": "password"
+          }
+        }
+      },
+      "HelpdeskQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the helpdesk question",
+            "example": 123
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "ID of the user who asked the question",
+            "example": 456
+          },
+          "question": {
+            "type": "string",
+            "description": "The user's question",
+            "example": "How do I reset my password?"
+          },
+          "ai_response": {
+            "type": "string",
+            "description": "AI-generated response in HTML format",
+            "example": "<p class=\"text-base text-gray-800 mb-4\">To reset your password, follow these steps:</p><p class=\"text-base text-gray-800 mb-4\">1. Go to the login page</p><p class=\"text-base text-gray-800 mb-4\">2. Click on \"Forgot Password\"</p><p class=\"text-base text-gray-800\">3. Enter your email address</p>"
+          },
+          "resolved": {
+            "type": "boolean",
+            "description": "Whether the question has been marked as resolved",
+            "example": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the question was created",
+            "example": "2024-01-15T10:30:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the question was last updated",
+            "example": "2024-01-15T10:30:00.000000Z"
           }
         }
       }
