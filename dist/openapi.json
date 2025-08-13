@@ -11311,6 +11311,8 @@
                             "stopped_at": null,
                             "status": "active",
                             "status_str": "Active",
+                            "status_bg_color": "#DCFCE7",
+                            "status_text_color": "#15803D",
                             "status_classes_str": "bg-green-100 text-green-800",
                             "is_test_moon": true,
                             "is_preliminary": false,
@@ -11433,6 +11435,8 @@
                         },
                         "status": "awaiting_seeker_approval",
                         "status_str": "Awaiting Seeker Approval",
+                        "status_bg_color": "#FEF3C7",
+                        "status_text_color": "#A16207",
                         "is_test_moon": true,
                         "created_at": "2024-01-15T10:00:00Z",
                         "sponsor": {
@@ -15355,10 +15359,18 @@
           },
           "status": {
             "type": "string",
-            "enum": ["awaiting_sponsor_approval", "awaiting_seeker_approval", "active", "paused", "expired", "stopped"]
+            "enum": ["awaiting_sponsor_approval", "awaiting_seeker_approval", "active", "paused", "expired", "stopped", "rejected"]
           },
           "status_str": {
             "type": "string"
+          },
+          "status_bg_color": {
+            "type": "string",
+            "description": "Background color for status styling"
+          },
+          "status_text_color": {
+            "type": "string",
+            "description": "Text color for status styling"
           },
           "status_classes_str": {
             "type": "string"
@@ -15464,7 +15476,7 @@
             "type": "number"
           },
           "financial_gift_upon_marriage": {
-            "type": "number"
+            "type": "string"
           },
           "relationship_termination_compensation": {
             "type": "number"
@@ -15480,6 +15492,19 @@
           },
           "default_duration_days": {
             "type": "integer"
+          },
+          "is_public": {
+            "type": "boolean"
+          },
+          "created_by": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by_user": {
+            "$ref": "#/components/schemas/ContractUser"
           }
         }
       },
@@ -15606,6 +15631,14 @@
           },
           "status_str": {
             "type": "string"
+          },
+          "status_bg_color": {
+            "type": "string",
+            "description": "Background color for status styling"
+          },
+          "status_text_color": {
+            "type": "string",
+            "description": "Text color for status styling"
           },
           "status_classes_str": {
             "type": "string"
