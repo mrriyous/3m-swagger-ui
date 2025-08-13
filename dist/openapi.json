@@ -13775,13 +13775,13 @@
             }
           },
           {
-            "name": "status",
+            "name": "type",
             "in": "query",
-            "description": "Filter by status (open, in_progress, resolved, closed, unread, read, all)",
+            "description": "Filter by type (unread, read, archived, deleted)",
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["open", "in_progress", "resolved", "closed", "unread", "read", "all"]
+              "enum": ["unread", "read", "archived", "deleted"]
             }
           }
         ],
