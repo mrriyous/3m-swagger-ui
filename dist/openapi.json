@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read\n\n## Interactions API Overview\n\nThe Interactions API provides comprehensive user interaction functionality including profile management, user blocking, zoom call requests, and user reporting. All endpoints require Bearer token authentication.\n\n### Key Features\n\n- **Profile Management**: Archive, save, and mark profiles as interested\n- **User Blocking**: Block and unblock users with comprehensive blocking management\n- **Zoom Call Requests**: Request video calls with partner users\n- **User Reporting**: Report inappropriate behavior with optional blocking\n- **Pagination**: List endpoints support pagination with meta information\n- **Real-time Updates**: User notifications for interest and zoom call requests\n\n### Authentication\n\nAll interactions endpoints require authentication using Laravel Sanctum:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Profile Management\n\n- **Archived Profiles**: Store profiles for later review without permanent deletion\n- **Saved Profiles**: Bookmark interesting profiles for quick access\n- **Interested Profiles**: Express interest in potential partners with notifications\n\n### User Blocking\n\n- **Block Management**: Block users to prevent further interactions\n- **Block Status**: Check if specific users are blocked\n- **Blocked Users List**: View all blocked users with timestamps\n\n### Zoom Call Requests\n\n- **Request Management**: Send and manage video call requests\n- **Partner Notifications**: Users are notified of pending requests\n- **Request Status**: Track pending and completed requests\n\n### User Reporting\n\n- **Content Reporting**: Report inappropriate messages or behavior\n- **User Blocking**: Optionally block users after reporting\n- **Admin Review**: Reports are reviewed by the platform team\n\n## Support Tickets API Overview\n\nThe Support Tickets API provides comprehensive ticket management functionality, supporting both authenticated users and guest access. The system includes spam protection, file validation, and comprehensive ticket lifecycle management.\n\n### Key Features\n\n- **Dual Authentication**: Works with Bearer tokens or X-Guest-Email headers\n- **File Attachments**: Support for PDF, JPG, JPEG, PNG files (max 15MB each)\n- **Spam Protection**: Built-in spam detection and rate limiting\n- **Ticket Lifecycle**: Complete management from creation to resolution\n- **Message Threading**: Support for threaded conversations with file attachments\n- **Status Management**: Comprehensive status tracking and filtering\n- **Visual Styling**: Built-in CSS classes and color schemes for categories and importance levels\n- **User Information**: Complete user profile data when available\n\n### Authentication\n\nAll support ticket endpoints use optional authentication middleware, working with:\n\n- **Bearer Token**: `Authorization: Bearer {your_token}`\n- **Guest Access**: `X-Guest-Email: guest@example.com`\n\n### Rate Limiting\n\n- **Individual IP**: 10 requests per day\n- **IP Network**: 20 requests per day\n\n### File Attachments\n\n- **Supported Formats**: PDF, JPG, JPEG, PNG\n- **File Size Limit**: 15MB per file\n- **Validation**: File extension and content signature validation\n- **Storage**: Secure file storage with download URLs\n\n### Response Features\n\n- **Ticket Numbers**: Auto-generated in format `{PREFIX}-{6-digit-number}` (e.g., GEN-123456, FINT-789012)\n- **Styling Information**: CSS classes and color codes for categories and importance levels\n- **User Details**: Profile information including names, username, and profile picture\n- **Message Counts**: Total message count and latest message preview\n- **Formatted Dates**: Human-readable local timezone dates",
+    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read\n\n## Interactions API Overview\n\nThe Interactions API provides comprehensive user interaction functionality including profile management, user blocking, zoom call requests, and user reporting. All endpoints require Bearer token authentication.\n\n### Key Features\n\n- **Profile Management**: Archive, save, and mark profiles as interested\n- **User Blocking**: Block and unblock users with comprehensive blocking management\n- **Zoom Call Requests**: Request video calls with partner users\n- **User Reporting**: Report inappropriate behavior with optional blocking\n- **Pagination**: List endpoints support pagination with meta information\n- **Real-time Updates**: User notifications for interest and zoom call requests\n\n### Authentication\n\nAll interactions endpoints require authentication using Laravel Sanctum:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Profile Management\n\n- **Archived Profiles**: Store profiles for later review without permanent deletion\n- **Saved Profiles**: Bookmark interesting profiles for quick access\n- **Interested Profiles**: Express interest in potential partners with notifications\n\n### User Blocking\n\n- **Block Management**: Block users to prevent further interactions\n- **Block Status**: Check if specific users are blocked\n- **Blocked Users List**: View all blocked users with timestamps\n\n### Zoom Call Requests\n\n- **Request Management**: Send and manage video call requests\n- **Partner Notifications**: Users are notified of pending requests\n- **Request Status**: Track pending and completed requests\n\n### User Reporting\n\n- **Content Reporting**: Report inappropriate messages or behavior\n- **User Blocking**: Optionally block users after reporting\n- **Admin Review**: Reports are reviewed by the platform team\n\n## Transaction API Overview\n\nThe Transaction API provides comprehensive transaction management functionality including transaction history, details, status tracking, and cancellation. All endpoints require Bearer token authentication.\n\n### Key Features\n\n- **Transaction History**: Paginated list with filtering by status and type\n- **Transaction Details**: Complete transaction information with relationships\n- **Status Management**: Real-time status tracking and updates\n- **Transaction Control**: Cancel pending transactions\n- **Payment Integration**: Comprehensive payment method support\n- **Subscription Management**: Subscription plan and feature details\n- **Status Styling**: Built-in CSS classes and color codes for UI\n\n### Authentication\n\nAll transaction endpoints require authentication using Laravel Sanctum:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Transaction Types\n\n- **Deposit**: Money added to user account balance\n- **Subscription**: Subscription plan purchase\n- **Budget Upgrade**: Payment for lifestyle support budget increase\n- **Withdrawal**: Money withdrawn from user account\n\n### Transaction Statuses\n\n- **Pending**: Transaction is being processed\n- **Completed**: Transaction has been successfully processed\n- **Failed**: Transaction processing failed\n- **Cancelled**: Transaction was cancelled by user or system\n\n### Status Styling\n\nEach transaction status includes styling information for UI display:\n- **status_label**: Human-readable status name\n- **status_classes_str**: Tailwind CSS classes for styling\n- **status_bg_color**: Hex color code for background\n- **status_text_color**: Hex color code for text\n\n### Payment Methods\n\n- **BALANCE**: Uses available user balance\n- **COINGATE**: Cryptocurrency payment gateway\n- **SWIFT**: International bank transfer\n- **SEPA**: European bank transfer\n- **CARD**: Credit/debit card payment\n- **USDT**: Tether cryptocurrency\n\n### Currency Handling\n\n- **Currency**: Transaction currency (may differ from user's preferred currency)\n- **User Currency**: User's preferred currency\n- **Exchange Rate**: Rate used to convert between currencies\n- **Amount in LC**: Amount in local currency (system default)\n\n### Amount Fields\n\n- **Amount**: Base transaction amount\n- **Grand Total**: Total amount including fees\n- **Balance Used**: Amount deducted from user balance\n- **Deposited Amount**: Actual amount deposited/withdrawn\n- **All amounts have both raw and trimmed versions for display**\n\n### Transaction Relationships\n\n- **Subscription Plan**: Related subscription plan for subscription transactions\n- **Payments**: Collection of payment attempts for the transaction\n- **Deposit Transaction**: Original deposit transaction for subscription transactions\n- **Subscription Transaction**: Resulting subscription transaction from deposit\n\n### Security Features\n\n- Users can only access their own transactions\n- Transaction ownership is verified before any operation\n- Soft deletes are used to maintain transaction history\n- All transactions are logged for audit purposes\n\n### Pagination\n\n- Default page size is 10 transactions\n- Pagination metadata includes total count, current page, and last page\n- Results are ordered by creation date (newest first)\n\n### Filtering Options\n\n- **Status**: Filter by transaction status\n- **Type**: Filter by transaction type\n- **Per Page**: Customize number of results per page\n\n### Timezone Handling\n\n- All timestamps are stored in UTC\n- Local time conversion is provided for user convenience\n- Formatted local time is available for display purposes\n\n## Support Tickets API Overview\n\nThe Support Tickets API provides comprehensive ticket management functionality, supporting both authenticated users and guest access. The system includes spam protection, file validation, and comprehensive ticket lifecycle management.\n\n### Key Features\n\n- **Dual Authentication**: Works with Bearer tokens or X-Guest-Email headers\n- **File Attachments**: Support for PDF, JPG, JPEG, PNG files (max 15MB each)\n- **Spam Protection**: Built-in spam detection and rate limiting\n- **Ticket Lifecycle**: Complete management from creation to resolution\n- **Message Threading**: Support for threaded conversations with file attachments\n- **Status Management**: Comprehensive status tracking and filtering\n- **Visual Styling**: Built-in CSS classes and color schemes for categories and importance levels\n- **User Information**: Complete user profile data when available\n\n### Authentication\n\nAll support ticket endpoints use optional authentication middleware, working with:\n\n- **Bearer Token**: `Authorization: Bearer {your_token}`\n- **Guest Access**: `X-Guest-Email: guest@example.com`\n\n### Rate Limiting\n\n- **Individual IP**: 10 requests per day\n- **IP Network**: 20 requests per day\n\n### File Attachments\n\n- **Supported Formats**: PDF, JPG, JPEG, PNG\n- **File Size Limit**: 15MB per file\n- **Validation**: File extension and content signature validation\n- **Storage**: Secure file storage with download URLs\n\n### Response Features\n\n- **Ticket Numbers**: Auto-generated in format `{PREFIX}-{6-digit-number}` (e.g., GEN-123456, FINT-789012)\n- **Styling Information**: CSS classes and color codes for categories and importance levels\n- **User Details**: Profile information including names, username, and profile picture\n- **Message Counts**: Total message count and latest message preview\n- **Formatted Dates**: Human-readable local timezone dates",
     "version": "1.0.0",
     "title": "3M Api",
     "contact": {
@@ -79,7 +79,7 @@
     },
     {
       "name": "Transactions",
-      "description": "Endpoints for managing user transactions, including viewing transaction history, details, status, and cancellation. All endpoints require Bearer token authentication using Laravel Sanctum. Supports filtering by status and type, with comprehensive transaction data including payments, subscription plans, and counterparty information."
+      "description": "Endpoints for managing user transactions, including viewing transaction history, details, status, and cancellation. All endpoints require Bearer token authentication using Laravel Sanctum. Supports filtering by status and type, with comprehensive transaction data including payments, subscription plans, and counterparty information. Features include status styling with CSS classes and color codes, pagination, and detailed transaction relationships."
     }
   ],
   "paths": {
@@ -7175,7 +7175,7 @@
     "/transactions": {
       "get": {
         "summary": "Get Transactions List",
-        "description": "Retrieves a paginated list of the authenticated user's transactions with optional filtering.",
+        "description": "Retrieves a paginated list of the authenticated user's transactions with optional filtering by status and type. Supports pagination with customizable page size.",
         "tags": [
           "Transactions"
         ],
@@ -7228,184 +7228,250 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "integer"
+                            "type": "integer",
+                            "description": "Transaction ID"
                           },
                           "user_id": {
-                            "type": "integer"
+                            "type": "integer",
+                            "description": "User ID"
                           },
                           "transaction_type": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Transaction type"
                           },
                           "type_label": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Human-readable transaction type"
                           },
                           "status": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Transaction status"
+                          },
+                          "status_label": {
+                            "type": "string",
+                            "description": "Human-readable status"
+                          },
+                          "status_classes_str": {
+                            "type": "string",
+                            "description": "Tailwind CSS classes for styling"
+                          },
+                          "status_bg_color": {
+                            "type": "string",
+                            "description": "Hex color code for background"
+                          },
+                          "status_text_color": {
+                            "type": "string",
+                            "description": "Hex color code for text"
                           },
                           "amount": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Base transaction amount"
                           },
                           "amount_in_lc": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Amount in local currency"
                           },
                           "grand_total": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Total amount including fees"
                           },
                           "grand_total_in_lc": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Grand total in local currency"
                           },
                           "exchange_rate": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Currency exchange rate"
                           },
                           "balance_used": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Amount deducted from user balance"
                           },
                           "deposited_amount": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Actual amount deposited/withdrawn"
                           },
                           "deposited_amount_in_lc": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "Deposited amount in local currency"
                           },
                           "amount_trimmed": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Formatted amount for display"
                           },
                           "grand_total_trimmed": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Formatted grand total for display"
                           },
                           "grand_total_in_lc_trimmed": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Formatted grand total in local currency"
                           },
                           "balance_used_trimmed": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Formatted balance used for display"
                           },
                           "deposited_amount_trimmed": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Formatted deposited amount for display"
                           },
                           "deposited_amount_in_lc_trimmed": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Formatted deposited amount in local currency"
                           },
                           "currency": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Transaction currency"
                           },
                           "subscription_error": {
-                            "type": [
-                              "null",
-                              "string"
-                            ]
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Subscription error message if any"
                           },
                           "user_currency": {
-                            "type": [
-                              "null",
-                              "string"
-                            ]
+                            "type": "string",
+                            "nullable": true,
+                            "description": "User's preferred currency"
                           },
                           "description": {
-                            "type": [
-                              "null",
-                              "string"
-                            ]
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Transaction description"
                           },
                           "counterparty": {
                             "type": "object",
+                            "description": "Counterparty user information",
                             "properties": {
                               "id": {
-                                "type": [
-                                  "null",
-                                  "integer"
-                                ]
+                                "type": "integer",
+                                "nullable": true,
+                                "description": "Counterparty user ID"
                               },
                               "first_name": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Counterparty first name"
                               },
                               "last_name": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Counterparty last name"
                               },
                               "public_username": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Counterparty public username"
                               },
                               "profile_picture_url": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Counterparty profile picture URL"
                               }
                             }
                           },
                           "payments": {
                             "type": "array",
+                            "description": "Collection of payment attempts for the transaction",
                             "items": {
                               "type": "object",
                               "properties": {
                                 "id": {
-                                  "type": "integer"
+                                  "type": "integer",
+                                  "description": "Payment ID"
                                 },
                                 "transaction_id": {
-                                  "type": "integer"
+                                  "type": "integer",
+                                  "description": "Transaction ID"
                                 },
                                 "amount": {
-                                  "type": "number"
+                                  "type": "number",
+                                  "description": "Payment amount"
                                 },
                                 "amount_trimmed": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "description": "Formatted payment amount"
                                 },
                                 "currency": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "description": "Payment currency"
                                 },
                                 "status": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "description": "Payment status"
                                 },
                                 "payment_method": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "description": "Payment method used"
                                 },
                                 "created_at": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "description": "Payment creation timestamp"
                                 },
                                 "updated_at": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "description": "Payment last update timestamp"
                                 }
                               }
                             }
                           },
                           "created_at": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Transaction creation timestamp"
                           },
                           "updated_at": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Transaction last update timestamp"
                           },
                           "subscription_plan": {
                             "type": "object",
+                            "description": "Subscription plan information",
                             "properties": {
                               "id": {
-                                "type": "integer"
+                                "type": "integer",
+                                "description": "Subscription plan ID"
                               },
                               "name": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Subscription plan name"
                               },
                               "price": {
-                                "type": "number"
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Subscription plan price"
                               }
                             }
                           },
                           "created_at_local": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Transaction creation time in local timezone"
                           },
                           "created_at_local_formatted": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Human-readable local creation time"
                           }
                         }
                       }
                     },
                     "pagination": {
                       "type": "object",
+                      "description": "Pagination metadata",
                       "properties": {
                         "total": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Total number of transactions"
                         },
                         "per_page": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Number of transactions per page"
                         },
                         "current_page": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Current page number"
                         },
                         "last_page": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Last page number"
                         }
                       }
                     }
@@ -7420,6 +7486,10 @@
                           "transaction_type": "subscription",
                           "type_label": "Subscription",
                           "status": "completed",
+                          "status_label": "Completed",
+                          "status_classes_str": "bg-green-100 text-green-700",
+                          "status_bg_color": "#dcfce7",
+                          "status_text_color": "#15803d",
                           "amount": 464.00,
                           "amount_in_lc": 464.00,
                           "grand_total": 464.00,
@@ -8378,186 +8448,220 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Transaction ID"
                         },
                         "user_id": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "User ID"
                         },
                         "transaction_type": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Transaction type"
                         },
                         "subscription_transaction_type": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Subscription transaction type"
                         },
                         "currency": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Transaction currency"
                         },
                         "user_currency": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "User's preferred currency"
                         },
                         "status": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Transaction status"
+                        },
+                        "status_label": {
+                          "type": "string",
+                          "description": "Human-readable status"
+                        },
+                        "status_classes_str": {
+                          "type": "string",
+                          "description": "Tailwind CSS classes for styling"
+                        },
+                        "status_bg_color": {
+                          "type": "string",
+                          "description": "Hex color code for background"
+                        },
+                        "status_text_color": {
+                          "type": "string",
+                          "description": "Hex color code for text"
                         },
                         "payment_method": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Payment method used"
                         },
                         "amount": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Base transaction amount"
                         },
                         "amount_in_lc": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Amount in local currency"
                         },
                         "grand_total": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Total amount including fees"
                         },
                         "grand_total_in_lc": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Grand total in local currency"
                         },
                         "exchange_rate": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Currency exchange rate"
                         },
                         "balance_used": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Amount deducted from user balance"
                         },
                         "deposited_amount": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Actual amount deposited/withdrawn"
                         },
                         "deposited_amount_in_lc": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Deposited amount in local currency"
                         },
                         "subscription_plan_id": {
-                          "type": [
-                            "null",
-                            "integer"
-                          ]
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Subscription plan ID"
                         },
                         "comment": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Additional comment"
                         },
                         "deposit_transaction_id": {
-                          "type": [
-                            "null",
-                            "integer"
-                          ]
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Original deposit transaction ID"
                         },
                         "subscription_transaction_id": {
-                          "type": [
-                            "null",
-                            "integer"
-                          ]
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Resulting subscription transaction ID"
                         },
                         "description": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Transaction description"
                         },
                         "created_at": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Transaction creation timestamp"
                         },
                         "updated_at": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Transaction last update timestamp"
                         },
                         "deleted_at": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "Transaction deletion timestamp"
                         },
                         "withdrawal_bank_name": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Bank name for withdrawal"
                         },
                         "withdrawal_bank_swift_code": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Bank SWIFT code for withdrawal"
                         },
                         "withdrawal_bank_account_number": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Bank account number for withdrawal"
                         },
                         "withdrawal_bank_receiver_name": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Receiver name for withdrawal"
                         },
                         "withdrawal_wallet_address": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Wallet address for withdrawal"
                         },
                         "subscription_error": {
-                          "type": [
-                            "null",
-                            "string"
-                          ]
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Subscription error message if any"
                         },
                         "balance_used_trimmed": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Formatted balance used for display"
                         },
                         "amount_trimmed": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Formatted amount for display"
                         },
                         "grand_total_trimmed": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Formatted grand total for display"
                         },
                         "grand_total_in_lc_trimmed": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Formatted grand total in local currency"
                         },
                         "deposited_amount_in_lc_trimmed": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Formatted deposited amount in local currency"
                         },
                         "deposited_amount_trimmed": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Formatted deposited amount for display"
                         },
                         "subscription_plan": {
                           "type": "object",
+                          "description": "Subscription plan information",
                           "properties": {
                             "id": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Subscription plan ID"
                             },
                             "level": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Subscription plan level"
                             },
                             "name": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "Subscription plan name"
                             },
                             "description": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "Subscription plan description"
                             },
                             "duration": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Subscription duration in days"
                             },
                             "features": {
                               "type": "array",
+                              "description": "Subscription plan features",
                               "items": {
                                 "type": "object",
                                 "properties": {
                                   "title": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "description": "Feature title"
                                   },
                                   "support": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "description": "Feature support level"
                                   }
                                 }
                               }
@@ -8565,78 +8669,99 @@
                           }
                         },
                         "stripe_checkout_session": {
-                          "type": [
-                            "null",
-                            "object"
-                          ]
+                          "type": "object",
+                          "nullable": true,
+                          "description": "Stripe checkout session information"
                         },
                         "payments": {
                           "type": "array",
+                          "description": "Collection of payment attempts for the transaction",
                           "items": {
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "integer"
+                                "type": "integer",
+                                "description": "Payment ID"
                               },
                               "transaction_id": {
-                                "type": "integer"
+                                "type": "integer",
+                                "description": "Transaction ID"
                               },
                               "payment_method": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Payment method used"
                               },
                               "amount": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "Payment amount"
                               },
                               "amount_in_lc": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "Payment amount in local currency"
                               },
                               "currency": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Payment currency"
                               },
                               "status": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Payment status"
                               },
                               "payment_session_id": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Payment session ID"
                               },
                               "payment_url": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "Payment URL"
                               },
                               "created_at": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Payment creation timestamp"
                               },
                               "updated_at": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Payment last update timestamp"
                               }
                             }
                           }
                         },
                         "deposit_transaction": {
-                          "type": [
-                            "null",
-                            "object"
-                          ]
+                          "type": "object",
+                          "nullable": true,
+                          "description": "Original deposit transaction information"
                         },
                         "subscription": {
                           "type": "object",
+                          "description": "Subscription information",
                           "properties": {
                             "id": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Subscription ID"
                             },
                             "user_id": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "User ID"
                             },
                             "subscription_plan_id": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Subscription plan ID"
                             },
                             "status": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "Subscription status"
                             },
                             "start_date": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "Subscription start date"
                             },
                             "end_date": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "Subscription end date"
                             }
                           }
                         }
