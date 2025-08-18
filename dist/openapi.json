@@ -30,6 +30,10 @@
       "description": "Endpoints for viewing, updating, and managing the authenticated user's profile information, such as personal details, preferences, photos, and account settings."
     },
     {
+      "name": "Financial Profile",
+      "description": "Endpoints for managing user financial profile information including budget, capital level, income, milestone settings, and financial options. All endpoints require Bearer token authentication."
+    },
+    {
       "name": "Currencies",
       "description": "Get all the available currencies data"
     },
@@ -68,6 +72,10 @@
     {
       "name": "Search",
       "description": "Endpoints for searching user profiles with advanced filtering options including location, budget, languages, and custom parameters. Supports pagination, sorting, and role-based filtering. All endpoints require Bearer token authentication."
+    },
+    {
+      "name": "Subscription",
+      "description": "Endpoints for managing user subscriptions, including viewing current subscription, available plans, submitting subscriptions, and managing budget upgrades. All endpoints require Bearer token authentication using Laravel Sanctum."
     }
   ],
   "paths": {
@@ -1384,294 +1392,49 @@
     },
     "/profile/financial-info": {
       "get": {
-        "summary": "Get Financial Info",
+        "summary": "Get Financial Profile",
+        "description": "Retrieve the authenticated user's financial profile information including budget, capital level, income, and milestone settings.",
         "tags": [
-          "Profile"
+          "Financial Profile"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Financial profile retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "currency": {
-                          "type": "string"
-                        },
-                        "lifestyle_support_budget": {
-                          "type": "string"
-                        },
-                        "lifestyle_support_budget_in_sc": {
-                          "type": "string"
-                        },
-                        "lifestyle_support_budget_trimmed": {
-                          "type": "string"
-                        },
-                        "lifestyle_support_budget_trimmed_in_sc": {
-                          "type": "string"
-                        },
-                        "capital_level_precise": {
-                          "type": "string"
-                        },
-                        "capital_level_less_precise": {
-                          "type": "string"
-                        },
-                        "monthly_income_precise": {
-                          "type": "string"
-                        },
-                        "monthly_income_less_precise": {
-                          "type": "string"
-                        },
-                        "first_child_payment": {
-                          "type": "string"
-                        },
-                        "second_child_payment": {
-                          "type": "string"
-                        },
-                        "subsequent_child_payment": {
-                          "type": "string"
-                        },
-                        "monthly_child_budget": {
-                          "type": "string"
-                        },
-                        "marriage_gift": {
-                          "type": "string"
-                        },
-                        "growth_bonus": {
-                          "type": "string"
-                        },
-                        "growth_clause": {
-                          "type": "string"
-                        },
-                        "termination_comp": {
-                          "type": "string"
-                        },
-                        "termination_clause": {
-                          "type": "string"
-                        },
-                        "milestone_gifts": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "integer"
-                              },
-                              "amount": {
-                                "type": "string"
-                              },
-                              "period": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        },
-                        "currency_detail": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "symbol": {
-                              "type": "string"
-                            },
-                            "prefix": {
-                              "type": "string"
-                            },
-                            "suffix": {
-                              "type": "string"
-                            },
-                            "icon": {
-                              "type": "string"
-                            },
-                            "created_at": {
-                              "type": "string"
-                            },
-                            "updated_at": {
-                              "type": "string"
-                            },
-                            "deleted_at": {
-                              "type": "null"
-                            },
-                            "icon_url": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "data": {
-                        "id": 1,
-                        "currency": "USD",
-                        "lifestyle_support_budget": "2500.00",
-                        "lifestyle_support_budget_in_sc": "2500.00",
-                        "lifestyle_support_budget_trimmed": "2,500",
-                        "lifestyle_support_budget_trimmed_in_sc": "2,500",
-                        "capital_level_precise": "$1,000-1,999",
-                        "capital_level_less_precise": "below $1,000",
-                        "monthly_income_precise": "$100-199",
-                        "monthly_income_less_precise": "below $100",
-                        "first_child_payment": "1000.00",
-                        "second_child_payment": "10200.00",
-                        "subsequent_child_payment": "20.00",
-                        "monthly_child_budget": "2323.00",
-                        "marriage_gift": "123.00",
-                        "growth_bonus": "50.00",
-                        "growth_clause": "20",
-                        "termination_comp": "2000.00",
-                        "termination_clause": "6",
-                        "milestone_gifts": [
-                          {
-                            "id": 47,
-                            "amount": "500.00",
-                            "period": "1y"
-                          },
-                          {
-                            "id": 48,
-                            "amount": "1000.00",
-                            "period": "2y"
-                          },
-                          {
-                            "id": 49,
-                            "amount": "1500.00",
-                            "period": "2y"
-                          },
-                          {
-                            "id": 50,
-                            "amount": "400.00",
-                            "period": "20y"
-                          },
-                          {
-                            "id": 51,
-                            "amount": "23.00",
-                            "period": "1y"
-                          }
-                        ],
-                        "currency_detail": {
-                          "id": 10,
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "symbol": "$",
-                          "prefix": "$",
-                          "suffix": "",
-                          "icon": "/static/icons/currency/usd.png",
-                          "created_at": "2025-06-03T12:31:20.000000Z",
-                          "updated_at": "2025-06-03T12:31:20.000000Z",
-                          "deleted_at": null,
-                          "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                        },
-                        "created_at": "2025-04-17T15:04:05.000000Z",
-                        "updated_at": "2025-04-17T15:40:19.000000Z"
-                      }
-                    }
-                  }
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "error": false,
-                      "data": {
-                        "id": 1,
-                        "currency": "USD",
-                        "lifestyle_support_budget": "2500.00",
-                        "lifestyle_support_budget_in_sc": "2500.00",
-                        "lifestyle_support_budget_trimmed": "2,500",
-                        "lifestyle_support_budget_trimmed_in_sc": "2,500",
-                        "capital_level_precise": "$1,000-1,999",
-                        "capital_level_less_precise": "below $1,000",
-                        "monthly_income_precise": "$100-199",
-                        "monthly_income_less_precise": "below $100",
-                        "first_child_payment": "1000.00",
-                        "second_child_payment": "10200.00",
-                        "subsequent_child_payment": "20.00",
-                        "monthly_child_budget": "2323.00",
-                        "marriage_gift": "123.00",
-                        "growth_bonus": "50.00",
-                        "growth_clause": "20",
-                        "termination_comp": "2000.00",
-                        "termination_clause": "6",
-                        "milestone_gifts": [
-                          {
-                            "id": 47,
-                            "amount": "500.00",
-                            "period": "1y"
-                          },
-                          {
-                            "id": 48,
-                            "amount": "1000.00",
-                            "period": "2y"
-                          },
-                          {
-                            "id": 49,
-                            "amount": "1500.00",
-                            "period": "2y"
-                          },
-                          {
-                            "id": 50,
-                            "amount": "400.00",
-                            "period": "20y"
-                          },
-                          {
-                            "id": 51,
-                            "amount": "23.00",
-                            "period": "1y"
-                          }
-                        ],
-                        "currency_detail": {
-                          "id": 10,
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "symbol": "$",
-                          "prefix": "$",
-                          "suffix": "",
-                          "icon": "/static/icons/currency/usd.png",
-                          "created_at": "2025-06-03T12:31:20.000000Z",
-                          "updated_at": "2025-06-03T12:31:20.000000Z",
-                          "deleted_at": null,
-                          "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                        },
-                        "created_at": "2025-04-17T15:04:05.000000Z",
-                        "updated_at": "2025-04-17T15:40:19.000000Z"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/FinancialProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           }
         },
-        "operationId": "get-profile-financial-info",
-        "security": [
-          {
-            "Authorization": []
-          }
-        ]
+        "operationId": "get-profile-financial-info"
       }
     },
     "/profile/living-info": {
@@ -2392,12 +2155,11 @@
     },
     "/profile/financial": {
       "post": {
-        "summary": "Update Profile Financial Section",
+        "summary": "Update Financial Profile",
+        "description": "Update the authenticated user's financial profile information including budget, capital level, income, and milestone settings.",
         "tags": [
-          "Profile"
+          "Financial Profile"
         ],
-        "responses": {},
-        "operationId": "post-profile-financial",
         "security": [
           {
             "Authorization": []
@@ -2407,121 +2169,54 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "growth_bonus": {
-                    "type": "string"
-                  },
-                  "growth_clause": {
-                    "type": "string"
-                  },
-                  "marriage_gift": {
-                    "type": "string"
-                  },
-                  "termination_comp": {
-                    "type": "string"
-                  },
-                  "milestone_amounts": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "milestone_periods": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "termination_clause": {
-                    "type": "string"
-                  },
-                  "first_child_payment": {
-                    "type": "string"
-                  },
-                  "monthly_child_budget": {
-                    "type": "string"
-                  },
-                  "second_child_payment": {
-                    "type": "string"
-                  },
-                  "capital_level_precise": {
-                    "type": "string"
-                  },
-                  "monthly_income_precise": {
-                    "type": "string"
-                  },
-                  "lifestyle_support_budget": {
-                    "type": "string"
-                  },
-                  "subsequent_child_payment": {
-                    "type": "string"
-                  },
-                  "capital_level_less_precise": {
-                    "type": "string"
-                  },
-                  "monthly_income_less_precise": {
-                    "type": "string"
-                  }
-                },
-                "x-examples": {
-                  "Example 1": {
-                    "growth_bonus": "2.00",
-                    "growth_clause": "2",
-                    "marriage_gift": "323.00",
-                    "termination_comp": "12344.00",
-                    "milestone_amounts": [
-                      "23.00",
-                      "123.00"
-                    ],
-                    "milestone_periods": [
-                      "1y",
-                      "3y"
-                    ],
-                    "termination_clause": "2",
-                    "first_child_payment": "2400.00",
-                    "monthly_child_budget": "200.00",
-                    "second_child_payment": "2000.00",
-                    "capital_level_precise": "$1,000-1,999",
-                    "monthly_income_precise": "$1,000-1,999",
-                    "lifestyle_support_budget": "1200.00",
-                    "subsequent_child_payment": "122.00",
-                    "capital_level_less_precise": "$1,000-9,999",
-                    "monthly_income_less_precise": "$100-999"
-                  }
+                "$ref": "#/components/schemas/UpdateFinancialProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Financial profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateFinancialProfileResponse"
                 }
-              },
-              "examples": {
-                "Example 1": {
-                  "value": {
-                    "growth_bonus": "2.00",
-                    "growth_clause": "2",
-                    "marriage_gift": "323.00",
-                    "termination_comp": "12344.00",
-                    "milestone_amounts": [
-                      "23.00",
-                      "123.00"
-                    ],
-                    "milestone_periods": [
-                      "1y",
-                      "3y"
-                    ],
-                    "termination_clause": "2",
-                    "first_child_payment": "2400.00",
-                    "monthly_child_budget": "200.00",
-                    "second_child_payment": "2000.00",
-                    "capital_level_precise": "$1,000-1,999",
-                    "monthly_income_precise": "$1,000-1,999",
-                    "lifestyle_support_budget": "1200.00",
-                    "subsequent_child_payment": "122.00",
-                    "capital_level_less_precise": "$1,000-9,999",
-                    "monthly_income_less_precise": "$100-999"
-                  }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           }
-        }
+        },
+        "operationId": "post-profile-financial"
       }
     },
     "/profile/living": {
@@ -6050,8 +5745,11 @@
     },
     "/subscription/current": {
       "get": {
-        "summary": "Get Current Subscription Data",
-        "tags": [],
+        "summary": "Get Current Subscription",
+        "description": "Retrieves the authenticated user's current active subscription details.",
+        "tags": [
+          "Subscription"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -6069,35 +5767,29 @@
                         "id": {
                           "type": "integer"
                         },
-                        "transaction_id": {
-                          "type": "integer"
-                        },
                         "user_id": {
                           "type": "integer"
                         },
                         "subscription_plan_id": {
                           "type": "integer"
                         },
+                        "transaction_id": {
+                          "type": "integer"
+                        },
                         "start_date": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "date-time"
                         },
                         "end_date": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "date-time"
                         },
                         "status": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "deleted_at": {
-                          "type": "null"
+                          "type": "string",
+                          "enum": ["active", "expired", "cancelled"]
                         },
                         "price": {
-                          "type": "string"
+                          "type": "number"
                         },
                         "currency": {
                           "type": "string"
@@ -6107,6 +5799,26 @@
                         },
                         "used_months": {
                           "type": "integer"
+                        },
+                        "price_trimmed": {
+                          "type": "string"
+                        },
+                        "currency_details": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "symbol": {
+                              "type": "string"
+                            }
+                          }
                         },
                         "plan": {
                           "type": "object",
@@ -6127,16 +5839,8 @@
                               "type": "integer"
                             },
                             "features": {
-                              "type": "string"
-                            },
-                            "created_at": {
-                              "type": "string"
-                            },
-                            "updated_at": {
-                              "type": "string"
-                            },
-                            "deleted_at": {
-                              "type": "null"
+                              "type": "string",
+                              "description": "JSON string containing array of feature objects"
                             }
                           }
                         }
@@ -6147,20 +5851,18 @@
                     "Example 1": {
                       "error": false,
                       "active_subscription": {
-                        "id": 52,
-                        "transaction_id": 158,
-                        "user_id": 14,
-                        "subscription_plan_id": 15,
-                        "start_date": "2025-06-03T02:35:31.000000Z",
-                        "end_date": "2026-06-03T02:35:31.000000Z",
+                        "id": 1,
+                        "user_id": 1,
+                        "subscription_plan_id": 2,
+                        "transaction_id": 123,
+                        "start_date": "2024-01-01T00:00:00.000000Z",
+                        "end_date": "2024-12-31T23:59:59.000000Z",
                         "status": "active",
-                        "created_at": "2025-06-03T02:35:31.000000Z",
-                        "updated_at": "2025-06-03T02:35:31.000000Z",
-                        "deleted_at": null,
-                        "price": "464.00",
+                        "price": 464.00,
                         "currency": "USD",
-                        "days_left": "11 months 26 days",
-                        "used_months": 0,
+                        "days_left": "8 months 15 days 12 hours",
+                        "used_months": 3,
+                        "price_trimmed": "464",
                         "plan": {
                           "id": 15,
                           "level": 2,
@@ -6171,7 +5873,17 @@
                           "created_at": "2025-05-23T14:43:53.000000Z",
                           "updated_at": "2025-05-23T14:43:53.000000Z",
                           "deleted_at": null
+                        },
+                        "currency_details": {
+                          "id": 1,
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "symbol": "$"
                         }
+                      },
+                      "Example 2": {
+                        "error": false,
+                        "active_subscription": null
                       }
                     }
                   }
@@ -6192,7 +5904,10 @@
     "/subscription/plans": {
       "get": {
         "summary": "Get Subscription Plans",
-        "tags": [],
+        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget.",
+        "tags": [
+          "Subscription"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -6793,15 +6508,69 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "No Available Plans": {
+                    "value": {
+                      "error": true,
+                      "message": "There is no available plan for subscription at the moment. Please contact support."
+                    }
+                  }
+                }
+              }
+            }
           }
         },
-        "operationId": "get-subscription-plans"
+        "operationId": "get-subscription-plans",
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Currency code for pricing (defaults to user's preferred currency)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "upgrade",
+            "in": "query",
+            "description": "Set to \"yes\" to show only plans higher than current plan level",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
     "/subscription/submit": {
       "post": {
-        "summary": "Buy & Upgrade Subscription",
-        "tags": [],
+        "summary": "Submit Subscription",
+        "description": "Submits a subscription purchase request. The system will create a transaction and process the payment.",
+        "tags": [
+          "Subscription"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -6878,6 +6647,18 @@
                       "error": true,
                       "message": "You are already on this subscription plan."
                     }
+                  },
+                  "Invalid Plan": {
+                    "value": {
+                      "error": true,
+                      "message": "Subscription plan is not valid"
+                    }
+                  },
+                  "Insufficient Balance": {
+                    "value": {
+                      "error": true,
+                      "message": "Insufficient balance for the requested amount"
+                    }
                   }
                 }
               }
@@ -6885,6 +6666,11 @@
           }
         },
         "operationId": "post-subscription-submit",
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -6892,50 +6678,362 @@
                 "type": "object",
                 "x-examples": {
                   "Example 1": {
-                    "amount": 328,
-                    "method": "CARD",
-                    "comment": "Testing",
-                    "currency": "USD",
+                    "subscription_id": 14,
+                    "method": "BALANCE",
+                    "comment": "Testing subscription purchase",
                     "balance_amount": 20,
-                    "subscription_id": 14
+                    "currency": "USD",
+                    "amount": 328
                   }
                 },
                 "properties": {
-                  "amount": {
-                    "type": "number"
+                  "subscription_id": {
+                    "type": "integer",
+                    "description": "ID of the subscription plan to purchase",
+                    "minimum": 1
                   },
                   "method": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Payment method (e.g., \"BALANCE\", \"COINGATE\")",
+                    "enum": ["BALANCE", "COINGATE"]
                   },
                   "comment": {
-                    "type": "string"
-                  },
-                  "currency": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Additional comment for the transaction"
                   },
                   "balance_amount": {
-                    "type": "number"
+                    "type": "number",
+                    "description": "Amount to use from user balance",
+                    "minimum": 0
                   },
-                  "subscription_id": {
-                    "type": "integer"
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency for the transaction",
+                    "default": "USD"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Total transaction amount",
+                    "minimum": 0
                   }
-                }
+                },
+                "required": ["subscription_id", "method"]
               },
               "examples": {
                 "Example 1": {
                   "value": {
-                    "amount": 328,
-                    "method": "CARD",
-                    "comment": "Testing",
-                    "currency": "USD",
+                    "subscription_id": 14,
+                    "method": "BALANCE",
+                    "comment": "Testing subscription purchase",
                     "balance_amount": 20,
-                    "subscription_id": 14
+                    "currency": "USD",
+                    "amount": 328
                   }
                 }
               }
             }
           }
         }
+      }
+    },
+    "/subscription/budget-upgrade": {
+      "get": {
+        "summary": "Get Budget Upgrade Information",
+        "description": "Retrieves information about budget upgrade options for users with pending budget changes.",
+        "tags": [
+          "Subscription"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "active_subscription": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "user_id": {
+                          "type": "integer"
+                        },
+                        "subscription_plan_id": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": ["active", "expired", "cancelled"]
+                        },
+                        "plan": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "level": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "new_pricing": {
+                          "type": "number"
+                        },
+                        "new_pricing_trimmed": {
+                          "type": "string"
+                        },
+                        "upgrade_price": {
+                          "type": "number"
+                        },
+                        "upgrade_price_trimmed": {
+                          "type": "string"
+                        },
+                        "currency_details": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "symbol": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "financial_profile": {
+                      "type": "object",
+                      "properties": {
+                        "currency": {
+                          "type": "string"
+                        },
+                        "lifestyle_support_budget": {
+                          "type": "number"
+                        },
+                        "pending_lifestyle_support_budget": {
+                          "type": "number"
+                        },
+                        "budget_upgrade_payment": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "active_subscription": {
+                        "id": 1,
+                        "user_id": 1,
+                        "subscription_plan_id": 2,
+                        "status": "active",
+                        "plan": {
+                          "id": 2,
+                          "level": 2,
+                          "name": "Premium Annual Plan"
+                        },
+                        "new_pricing": 580.00,
+                        "new_pricing_trimmed": "580",
+                        "upgrade_price": 116.00,
+                        "upgrade_price_trimmed": "116",
+                        "currency_details": {
+                          "id": 1,
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "symbol": "$"
+                        }
+                      },
+                      "financial_profile": {
+                        "currency": "USD",
+                        "lifestyle_support_budget": 5000,
+                        "pending_lifestyle_support_budget": 1000,
+                        "budget_upgrade_payment": 1000
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "No Pending Budget": {
+                    "value": {
+                      "error": true,
+                      "message": "You don't have any pending budget upgrade."
+                    }
+                  },
+                  "No Active Subscription": {
+                    "value": {
+                      "error": true,
+                      "message": "You are not subscribed to any plan."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-subscription-budget-upgrade",
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Submit Budget Upgrade",
+        "description": "Submits a budget upgrade request for users with pending budget changes.",
+        "tags": [
+          "Subscription"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "transaction_id": {
+                      "type": "integer"
+                    },
+                    "redirect_url": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Budget upgrade submitted successfully",
+                      "transaction_id": 124,
+                      "redirect_url": "https://payment-gateway.com/pay/def456"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "Invalid Subscription": {
+                    "value": {
+                      "error": true,
+                      "message": "Subscription plan is not valid"
+                    }
+                  },
+                  "Insufficient Balance": {
+                    "value": {
+                      "error": true,
+                      "message": "Insufficient balance for the requested amount"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-subscription-budget-upgrade",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "description": "Payment method (e.g., \"BALANCE\", \"COINGATE\")",
+                    "enum": ["BALANCE", "COINGATE"]
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Additional comment for the transaction"
+                  },
+                  "balance_amount": {
+                    "type": "number",
+                    "description": "Amount to use from user balance",
+                    "minimum": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency for the transaction",
+                    "default": "USD"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Total transaction amount",
+                    "minimum": 0
+                  }
+                },
+                "required": ["method"]
+              },
+              "examples": {
+                "Example 1": {
+                  "value": {
+                    "method": "BALANCE",
+                    "comment": "Budget upgrade payment",
+                    "balance_amount": 50,
+                    "currency": "USD",
+                    "amount": 116
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/deposit/submit": {
@@ -12760,6 +12858,47 @@
         }
       }
     },
+    "/options/financial-profile": {
+      "get": {
+        "summary": "Get Financial Profile Options",
+        "description": "Retrieve available options for financial profile fields including capital level ranges, income ranges, and milestone durations.",
+        "tags": ["Financial Profile"],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Currency code for amount ranges (default: USD)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "USD"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Financial profile options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinancialProfileOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/people/{public_username}/financial": {
       "get": {
         "summary": "Get User Financial Information",
@@ -16515,26 +16654,7 @@
           }
         }
       },
-      "ValidationErrorResponse": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "boolean"
-          },
-          "message": {
-            "type": "string"
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
+
       "SupportTicket": {
         "type": "object",
         "properties": {
@@ -17450,6 +17570,675 @@
             "format": "date-time",
             "description": "Timestamp when the question was last updated",
             "example": "2024-01-15T10:30:00.000000Z"
+          }
+        }
+      },
+      "FinancialProfileResponse": {
+        "type": "object",
+        "description": "Response for financial profile information",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "$ref": "#/components/schemas/FinancialProfileData"
+          }
+        }
+      },
+      "FinancialProfileData": {
+        "type": "object",
+        "description": "Financial profile data structure",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "User's preferred currency code",
+            "example": "USD"
+          },
+          "pending_lifestyle_support_budget": {
+            "type": "number",
+            "description": "Pending lifestyle support budget for subscription upgrades",
+            "example": 0
+          },
+          "pending_lifestyle_support_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted pending lifestyle support budget",
+            "example": "0"
+          },
+          "lifestyle_support_budget": {
+            "type": "number",
+            "description": "Monthly lifestyle support budget amount",
+            "example": 5000
+          },
+          "lifestyle_support_budget_in_sc": {
+            "type": "number",
+            "description": "Lifestyle support budget in system currency",
+            "example": 5000
+          },
+          "lifestyle_support_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget with thousand separators",
+            "example": "5,000"
+          },
+          "lifestyle_support_budget_trimmed_in_sc": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget in system currency",
+            "example": "5,000"
+          },
+          "budget_upgrade_payment": {
+            "type": "number",
+            "description": "Payment amount for budget upgrade",
+            "example": 1000
+          },
+          "budget_upgrade_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted budget upgrade payment",
+            "example": "1,000"
+          },
+          "capital_level_precise": {
+            "type": "string",
+            "description": "Precise capital level value",
+            "example": "1000000"
+          },
+          "capital_level_less_precise": {
+            "type": "string",
+            "description": "Less precise capital level value",
+            "example": "1M+"
+          },
+          "monthly_income_precise": {
+            "type": "string",
+            "description": "Precise monthly income value",
+            "example": "50000"
+          },
+          "monthly_income_less_precise": {
+            "type": "string",
+            "description": "Less precise monthly income value",
+            "example": "50K+"
+          },
+          "first_child_payment": {
+            "type": "number",
+            "description": "Payment amount for first child",
+            "example": 10000
+          },
+          "first_child_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted first child payment",
+            "example": "10,000"
+          },
+          "second_child_payment": {
+            "type": "number",
+            "description": "Payment amount for second child",
+            "example": 8000
+          },
+          "second_child_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted second child payment",
+            "example": "8,000"
+          },
+          "subsequent_child_payment": {
+            "type": "number",
+            "description": "Payment amount for subsequent children",
+            "example": 5000
+          },
+          "subsequent_child_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted subsequent child payment",
+            "example": "5,000"
+          },
+          "monthly_child_budget": {
+            "type": "number",
+            "description": "Monthly budget for children",
+            "example": 2000
+          },
+          "monthly_child_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted monthly child budget",
+            "example": "2,000"
+          },
+          "marriage_gift": {
+            "type": "number",
+            "description": "Gift amount for marriage milestone",
+            "example": 50000
+          },
+          "marriage_gift_trimmed": {
+            "type": "string",
+            "description": "Formatted marriage gift amount",
+            "example": "50,000"
+          },
+          "termination_comp": {
+            "type": "number",
+            "description": "Termination compensation amount",
+            "example": 10000
+          },
+          "termination_comp_trimmed": {
+            "type": "string",
+            "description": "Formatted termination compensation",
+            "example": "10,000"
+          },
+          "termination_clause": {
+            "type": "integer",
+            "description": "Termination notice period in months",
+            "example": 6
+          },
+          "milestone_gifts": {
+            "type": "array",
+            "description": "Array of milestone gift configurations",
+            "items": {
+              "$ref": "#/components/schemas/MilestoneGift"
+            }
+          },
+          "milestone_gifts_total": {
+            "type": "number",
+            "description": "Total amount of all milestone gifts",
+            "example": 5000
+          },
+          "milestone_gifts_total_trimmed": {
+            "type": "string",
+            "description": "Formatted total milestone gifts amount",
+            "example": "5,000"
+          },
+          "currency_detail": {
+            "$ref": "#/components/schemas/CurrencyDetail"
+          },
+          "growth_bonus": {
+            "type": "integer",
+            "description": "Growth bonus percentage",
+            "example": 10
+          },
+          "growth_bonus_trimmed": {
+            "type": "string",
+            "description": "Formatted growth bonus percentage",
+            "example": "10"
+          },
+          "growth_clause": {
+            "type": "integer",
+            "description": "Growth clause duration in months",
+            "example": 12
+          }
+        }
+      },
+      "MilestoneGift": {
+        "type": "object",
+        "description": "Milestone gift configuration",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the milestone gift",
+            "example": 1
+          },
+          "amount": {
+            "type": "number",
+            "description": "Gift amount",
+            "example": 5000
+          },
+          "period": {
+            "type": "string",
+            "description": "Time period for the milestone",
+            "example": "6 months"
+          }
+        }
+      },
+      "CurrencyDetail": {
+        "type": "object",
+        "description": "Currency information details",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the currency",
+            "example": 1
+          },
+          "code": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "USD"
+          },
+          "name": {
+            "type": "string",
+            "description": "Currency name",
+            "example": "US Dollar"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Currency symbol",
+            "example": "$"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when currency was created",
+            "example": "2024-03-20T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when currency was last updated",
+            "example": "2024-03-20T10:00:00Z"
+          }
+        }
+      },
+      "FinancialProfileOptionsResponse": {
+        "type": "object",
+        "description": "Response for financial profile options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "$ref": "#/components/schemas/FinancialProfileOptionsData"
+          }
+        }
+      },
+      "FinancialProfileOptionsData": {
+        "type": "object",
+        "description": "Financial profile options data structure",
+        "properties": {
+          "capital_level_precise": {
+            "type": "array",
+            "description": "Available capital level precise options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "capital_level_less_precise": {
+            "type": "array",
+            "description": "Available capital level less precise options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "monthly_income_precise": {
+            "type": "array",
+            "description": "Available monthly income precise options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "monthly_income_less_precise": {
+            "type": "array",
+            "description": "Available monthly income less precise options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "relationship_milestone_durations": {
+            "type": "array",
+            "description": "Available milestone duration options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          }
+        }
+      },
+      "FinancialOption": {
+        "type": "object",
+        "description": "Financial option item",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique key for the option",
+            "example": "below_100k"
+          },
+          "value": {
+            "type": "string",
+            "description": "Value for the option",
+            "example": "below_100000"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for the option",
+            "example": "Below 100,000 USD"
+          }
+        }
+      },
+      "UserFinancialInfo": {
+        "type": "object",
+        "description": "Public user financial information",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "User's preferred currency code",
+            "example": "USD"
+          },
+          "lifestyle_support_budget": {
+            "type": "number",
+            "description": "Monthly lifestyle support budget amount",
+            "example": 5000
+          },
+          "lifestyle_support_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget with thousand separators",
+            "example": "5,000"
+          },
+          "capital_level_precise": {
+            "type": "string",
+            "description": "Precise capital level value",
+            "example": "1000000"
+          },
+          "capital_level_less_precise": {
+            "type": "string",
+            "description": "Less precise capital level value",
+            "example": "1M+"
+          },
+          "monthly_income_precise": {
+            "type": "string",
+            "description": "Precise monthly income value",
+            "example": "50000"
+          },
+          "monthly_income_less_precise": {
+            "type": "string",
+            "description": "Less precise monthly income value",
+            "example": "50K+"
+          },
+          "first_child_payment": {
+            "type": "number",
+            "description": "Payment amount for first child",
+            "example": 10000
+          },
+          "second_child_payment": {
+            "type": "number",
+            "description": "Payment amount for second child",
+            "example": 8000
+          },
+          "subsequent_child_payment": {
+            "type": "number",
+            "description": "Payment amount for subsequent children",
+            "example": 5000
+          },
+          "monthly_child_budget": {
+            "type": "number",
+            "description": "Monthly budget for children",
+            "example": 2000
+          },
+          "marriage_gift": {
+            "type": "number",
+            "description": "Gift amount for marriage milestone",
+            "example": 50000
+          },
+          "termination_comp": {
+            "type": "number",
+            "description": "Termination compensation amount",
+            "example": 10000
+          },
+          "termination_clause": {
+            "type": "integer",
+            "description": "Termination notice period in months",
+            "example": 6
+          },
+          "milestone_gifts": {
+            "type": "array",
+            "description": "Array of milestone gift configurations",
+            "items": {
+              "$ref": "#/components/schemas/MilestoneGift"
+            }
+          },
+          "currency_detail": {
+            "$ref": "#/components/schemas/CurrencyDetail"
+          }
+        }
+      },
+      "UpdateFinancialProfileRequest": {
+        "type": "object",
+        "description": "Request body for updating financial profile",
+        "properties": {
+          "lifestyle_support_budget": {
+            "type": "number",
+            "description": "Monthly lifestyle support budget (required)",
+            "minimum": 0,
+            "example": 5000
+          },
+          "capital_level_precise": {
+            "type": "string",
+            "description": "Precise capital level value (mutually exclusive with capital_level_less_precise)",
+            "example": "1000000"
+          },
+          "capital_level_less_precise": {
+            "type": "string",
+            "description": "Less precise capital level value (mutually exclusive with capital_level_precise)",
+            "example": "1M+"
+          },
+          "monthly_income_precise": {
+            "type": "string",
+            "description": "Precise monthly income value",
+            "example": "50000"
+          },
+          "monthly_income_less_precise": {
+            "type": "string",
+            "description": "Less precise monthly income value",
+            "example": "50K+"
+          },
+          "first_child_payment": {
+            "type": "number",
+            "description": "Payment for first child",
+            "minimum": 0,
+            "example": 10000
+          },
+          "second_child_payment": {
+            "type": "number",
+            "description": "Payment for second child",
+            "minimum": 0,
+            "example": 8000
+          },
+          "subsequent_child_payment": {
+            "type": "number",
+            "description": "Payment for subsequent children",
+            "minimum": 0,
+            "example": 5000
+          },
+          "monthly_child_budget": {
+            "type": "number",
+            "description": "Monthly budget for children",
+            "minimum": 0,
+            "example": 2000
+          },
+          "marriage_gift": {
+            "type": "number",
+            "description": "Gift amount for marriage",
+            "minimum": 0,
+            "example": 50000
+          },
+          "growth_bonus": {
+            "type": "number",
+            "description": "Growth bonus percentage",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 10
+          },
+          "growth_clause": {
+            "type": "number",
+            "description": "Growth clause duration in months",
+            "minimum": 1,
+            "example": 12
+          },
+          "termination_comp": {
+            "type": "number",
+            "description": "Termination compensation",
+            "minimum": 0,
+            "example": 10000
+          },
+          "termination_clause": {
+            "type": "number",
+            "description": "Termination notice period in months",
+            "minimum": 6,
+            "example": 6
+          },
+          "milestone_amounts": {
+            "type": "array",
+            "description": "Array of milestone gift amounts",
+            "items": {
+              "type": "number",
+              "minimum": 0
+            },
+            "example": [5000, 10000]
+          },
+          "milestone_periods": {
+            "type": "array",
+            "description": "Array of milestone gift periods",
+            "items": {
+              "type": "string"
+            },
+            "example": ["6 months", "1 year"]
+          }
+        },
+        "required": ["lifestyle_support_budget"]
+      },
+      "UpdateFinancialProfileResponse": {
+        "type": "object",
+        "description": "Response for financial profile update",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Financial profile updated successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UpdatedFinancialProfileData"
+          }
+        }
+      },
+      "UpdatedFinancialProfileData": {
+        "type": "object",
+        "description": "Updated financial profile data",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Financial profile ID",
+            "example": 1
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "User ID",
+            "example": 1
+          },
+          "currency": {
+            "type": "string",
+            "description": "User's preferred currency code",
+            "example": "USD"
+          },
+          "lifestyle_support_budget": {
+            "type": "number",
+            "description": "Monthly lifestyle support budget amount",
+            "example": 5000
+          },
+          "lifestyle_support_budget_in_sc": {
+            "type": "number",
+            "description": "Lifestyle support budget in system currency",
+            "example": 5000
+          },
+          "capital_level_precise": {
+            "type": "string",
+            "description": "Precise capital level value",
+            "example": "1000000"
+          },
+          "capital_level_less_precise": {
+            "type": "string",
+            "description": "Less precise capital level value",
+            "example": null
+          },
+          "monthly_income_precise": {
+            "type": "string",
+            "description": "Precise monthly income value",
+            "example": "50000"
+          },
+          "monthly_income_less_precise": {
+            "type": "string",
+            "description": "Less precise monthly income value",
+            "example": null
+          },
+          "first_child_payment": {
+            "type": "number",
+            "description": "Payment amount for first child",
+            "example": 10000
+          },
+          "second_child_payment": {
+            "type": "number",
+            "description": "Payment amount for second child",
+            "example": 8000
+          },
+          "subsequent_child_payment": {
+            "type": "number",
+            "description": "Payment amount for subsequent children",
+            "example": 5000
+          },
+          "monthly_child_budget": {
+            "type": "number",
+            "description": "Monthly budget for children",
+            "example": 2000
+          },
+          "marriage_gift": {
+            "type": "number",
+            "description": "Gift amount for marriage milestone",
+            "example": 50000
+          },
+          "growth_bonus": {
+            "type": "number",
+            "description": "Growth bonus percentage",
+            "example": 10
+          },
+          "growth_clause": {
+            "type": "number",
+            "description": "Growth clause duration in months",
+            "example": 12
+          },
+          "termination_comp": {
+            "type": "number",
+            "description": "Termination compensation amount",
+            "example": 10000
+          },
+          "termination_clause": {
+            "type": "number",
+            "description": "Termination notice period in months",
+            "example": 6
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when profile was created",
+            "example": "2024-03-20T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when profile was last updated",
+            "example": "2024-03-20T10:00:00Z"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "description": "Response for validation errors",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Please check your inputs and try again."
+          },
+          "errors": {
+            "type": "object",
+            "description": "Field-specific validation errors",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": {
+              "capital_level_precise": [
+                "You can select only one: either Capital Level (Precise) or Capital Level (Less Precise)."
+              ]
+            }
           }
         }
       }
