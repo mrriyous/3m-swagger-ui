@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "This contains all API for 3M Platform\n\n## Chat API Overview\n\nThe Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging.\n\n### Key Features\n\n- **AI Moderation**: All messages are analyzed for inappropriate content with a strike system\n- **File Attachments**: Support for images, documents, videos, and audio files\n- **Real-time Events**: WebSocket events for message updates and chat room changes\n- **Rate Limiting**: 60 requests/minute for most endpoints, 30/minute for sending messages\n- **Message Management**: Edit (within 6 minutes), delete, and search capabilities\n- **Chat Organization**: Archive, delete, and mute notification options\n\n### Authentication\n\nAll chat endpoints require authentication using Laravel Sanctum. Include the Bearer token in the Authorization header:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Rate Limiting\n\n- 60 requests per minute per user for most endpoints\n- 30 requests per minute for message sending\n- 100 requests per hour for search operations\n\n### File Attachments\n\n- **Supported Formats**: Images, documents, videos, audio files\n- **File Size Limit**: Varies by file type\n- **Storage**: Files are stored securely and linked to messages\n- **Metadata**: File information is tracked including original filename and size\n\n### Real-time Events\n\nThe chat system uses WebSocket events for real-time updates:\n\n- **Message Sent**: `MessageSent` event when a new message is sent\n- **Chat Room Updated**: `ChatRoomUpdated` event when chat room status changes\n- **Read Status**: Real-time updates when messages are read\n\n## Interactions API Overview\n\nThe Interactions API provides comprehensive user interaction functionality including profile management, user blocking, zoom call requests, and user reporting. All endpoints require Bearer token authentication.\n\n### Key Features\n\n- **Profile Management**: Archive, save, and mark profiles as interested\n- **User Blocking**: Block and unblock users with comprehensive blocking management\n- **Zoom Call Requests**: Request video calls with partner users\n- **User Reporting**: Report inappropriate behavior with optional blocking\n- **Pagination**: List endpoints support pagination with meta information\n- **Real-time Updates**: User notifications for interest and zoom call requests\n\n### Authentication\n\nAll interactions endpoints require authentication using Laravel Sanctum:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Profile Management\n\n- **Archived Profiles**: Store profiles for later review without permanent deletion\n- **Saved Profiles**: Bookmark interesting profiles for quick access\n- **Interested Profiles**: Express interest in potential partners with notifications\n\n### User Blocking\n\n- **Block Management**: Block users to prevent further interactions\n- **Block Status**: Check if specific users are blocked\n- **Blocked Users List**: View all blocked users with timestamps\n\n### Zoom Call Requests\n\n- **Request Management**: Send and manage video call requests\n- **Partner Notifications**: Users are notified of pending requests\n- **Request Status**: Track pending and completed requests\n\n### User Reporting\n\n- **Content Reporting**: Report inappropriate messages or behavior\n- **User Blocking**: Optionally block users after reporting\n- **Admin Review**: Reports are reviewed by the platform team\n\n## Transaction API Overview\n\nThe Transaction API provides comprehensive transaction management functionality including transaction history, details, status tracking, and cancellation. All endpoints require Bearer token authentication.\n\n### Key Features\n\n- **Transaction History**: Paginated list with filtering by status and type\n- **Transaction Details**: Complete transaction information with relationships\n- **Status Management**: Real-time status tracking and updates\n- **Transaction Control**: Cancel pending transactions\n- **Payment Integration**: Comprehensive payment method support\n- **Subscription Management**: Subscription plan and feature details\n- **Status Styling**: Built-in CSS classes and color codes for UI\n\n### Authentication\n\nAll transaction endpoints require authentication using Laravel Sanctum:\n\n```\nAuthorization: Bearer {your_token}\n```\n\n### Transaction Types\n\n- **Deposit**: Money added to user account balance\n- **Subscription**: Subscription plan purchase\n- **Budget Upgrade**: Payment for lifestyle support budget increase\n- **Withdrawal**: Money withdrawn from user account\n\n### Transaction Statuses\n\n- **Pending**: Transaction is being processed\n- **Completed**: Transaction has been successfully processed\n- **Failed**: Transaction processing failed\n- **Cancelled**: Transaction was cancelled by user or system\n\n### Status Styling\n\nEach transaction status includes styling information for UI display:\n- **status_label**: Human-readable status name\n- **status_classes_str**: Tailwind CSS classes for styling\n- **status_bg_color**: Hex color code for background\n- **status_text_color**: Hex color code for text\n\n### Payment Methods\n\n- **BALANCE**: Uses available user balance\n- **COINGATE**: Cryptocurrency payment gateway\n- **SWIFT**: International bank transfer\n- **SEPA**: European bank transfer\n- **CARD**: Credit/debit card payment\n- **USDT**: Tether cryptocurrency\n\n### Currency Handling\n\n- **Currency**: Transaction currency (may differ from user's preferred currency)\n- **User Currency**: User's preferred currency\n- **Exchange Rate**: Rate used to convert between currencies\n- **Amount in LC**: Amount in local currency (system default)\n\n### Amount Fields\n\n- **Amount**: Base transaction amount\n- **Grand Total**: Total amount including fees\n- **Balance Used**: Amount deducted from user balance\n- **Deposited Amount**: Actual amount deposited/withdrawn\n- **All amounts have both raw and trimmed versions for display**\n\n### Transaction Relationships\n\n- **Subscription Plan**: Related subscription plan for subscription transactions\n- **Payments**: Collection of payment attempts for the transaction\n- **Deposit Transaction**: Original deposit transaction for subscription transactions\n- **Subscription Transaction**: Resulting subscription transaction from deposit\n\n### Security Features\n\n- Users can only access their own transactions\n- Transaction ownership is verified before any operation\n- Soft deletes are used to maintain transaction history\n- All transactions are logged for audit purposes\n\n### Pagination\n\n- Default page size is 10 transactions\n- Pagination metadata includes total count, current page, and last page\n- Results are ordered by creation date (newest first)\n\n### Filtering Options\n\n- **Status**: Filter by transaction status\n- **Type**: Filter by transaction type\n- **Per Page**: Customize number of results per page\n\n### Timezone Handling\n\n- All timestamps are stored in UTC\n- Local time conversion is provided for user convenience\n- Formatted local time is available for display purposes\n\n## Support Tickets API Overview\n\nThe Support Tickets API provides comprehensive ticket management functionality, supporting both authenticated users and guest access. The system includes spam protection, file validation, and comprehensive ticket lifecycle management.\n\n### Key Features\n\n- **Dual Authentication**: Works with Bearer tokens or X-Guest-Email headers\n- **File Attachments**: Support for PDF, JPG, JPEG, PNG files (max 15MB each)\n- **Spam Protection**: Built-in spam detection and rate limiting\n- **Ticket Lifecycle**: Complete management from creation to resolution\n- **Message Threading**: Support for threaded conversations with file attachments\n- **Status Management**: Comprehensive status tracking and filtering\n- **Visual Styling**: Built-in CSS classes and color schemes for categories and importance levels\n- **User Information**: Complete user profile data when available\n\n### Authentication\n\nAll support ticket endpoints use optional authentication middleware, working with:\n\n- **Bearer Token**: `Authorization: Bearer {your_token}`\n- **Guest Access**: `X-Guest-Email: guest@example.com`\n\n### Rate Limiting\n\n- **Individual IP**: 10 requests per day\n- **IP Network**: 20 requests per day\n\n### File Attachments\n\n- **Supported Formats**: PDF, JPG, JPEG, PNG\n- **File Size Limit**: 15MB per file\n- **Validation**: File extension and content signature validation\n- **Storage**: Secure file storage with download URLs\n\n### Response Features\n\n- **Ticket Numbers**: Auto-generated in format `{PREFIX}-{6-digit-number}` (e.g., GEN-123456, FINT-789012)\n- **Styling Information**: CSS classes and color codes for categories and importance levels\n- **User Details**: Profile information including names, username, and profile picture\n- **Message Counts**: Total message count and latest message preview\n- **Formatted Dates**: Human-readable local timezone dates",
+    "description": "3M Platform API - A comprehensive platform for user interactions, messaging, financial management, and profile management.\n\n## Overview\n\nThis API provides a complete solution for the 3M Platform, featuring user authentication, profile management, real-time messaging, financial transactions, and support systems. All endpoints use Laravel Sanctum for authentication with Bearer tokens.\n\n## Key Features\n\n- **User Management**: Complete profile and financial profile management\n- **Real-time Communication**: Chat system with AI moderation and file attachments\n- **Financial Services**: Wallet management, transactions, and subscription plans\n- **Social Features**: User interactions, blocking, and reporting systems\n- **Support System**: Ticket management with file attachments and spam protection\n- **Search & Discovery**: Advanced user search with filtering and pagination\n\n## Authentication\n\nMost endpoints require Bearer token authentication:\n```\nAuthorization: Bearer {your_token}\n```\n\n## Rate Limiting\n\n- Chat: 60 requests/minute (30 for sending messages)\n- Support: 10 requests/day per IP\n- General: Varies by endpoint\n\nFor detailed information about specific API sections, please refer to the individual tag descriptions below.",
     "version": "1.0.0",
     "title": "3M Api",
     "contact": {
@@ -27,7 +27,7 @@
     },
     {
       "name": "Profile",
-      "description": "Endpoints for viewing, updating, and managing the authenticated user's profile information, such as personal details, preferences, photos, and account settings."
+      "description": "Endpoints for viewing, updating, and managing the authenticated user's profile information, such as personal details, preferences, photos, and account settings. Includes comprehensive Profile Images and Albums API for organizing user photos into different categories like personal photos, places visited, interests, and fashion choices."
     },
     {
       "name": "Financial Profile",
@@ -2426,15 +2426,112 @@
         }
       }
     },
-    "/profile/images": {
+    "/profile/albums": {
       "get": {
-        "summary": "Get Album Images",
+        "summary": "Get Available Albums",
+        "description": "Retrieves the list of available album types for organizing profile images.",
         "tags": [
           "Profile"
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Available albums retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "data": [
+                        {
+                          "name": "my_photos",
+                          "label": "My Photos",
+                          "description": "Photos of yourself."
+                        },
+                        {
+                          "name": "places",
+                          "label": "Places I Visit",
+                          "description": "Photos showing locations you like or travel to."
+                        },
+                        {
+                          "name": "interests",
+                          "label": "Things I Like",
+                          "description": "Showcase personal interests or hobbies."
+                        },
+                        {
+                          "name": "fashion",
+                          "label": "I usually wear this",
+                          "description": "Visuals representing fashion or lifestyle choices."
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-profile-albums",
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
+      }
+    },
+    "/profile/images": {
+      "get": {
+        "summary": "Get User Images",
+        "description": "Retrieves images from a specific album or all images.",
+        "tags": [
+          "Profile"
+        ],
+        "responses": {
+          "200": {
+            "description": "Images retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -2454,11 +2551,32 @@
                           "url": {
                             "type": "string"
                           },
+                          "album_type": {
+                            "type": "string"
+                          },
+                          "album_detail": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            }
+                          },
                           "thumbnail_url": {
                             "type": "string"
                           },
                           "caption": {
-                            "type": "null"
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "order": {
+                            "type": "integer"
                           },
                           "created_at": {
                             "type": "string"
@@ -2472,59 +2590,80 @@
                       "error": false,
                       "images": [
                         {
-                          "id": 49,
-                          "url": "http://localhost:8000/storage/profile-images/pi_14_17485027723884.jpg",
-                          "thumbnail_url": "http://localhost:8000/storage/profile-images/pi_thumb_14_17485027723884.jpg",
-                          "caption": null,
-                          "created_at": "2025-05-02T08:34:16.000000Z"
-                        },
-                        {
-                          "id": 56,
-                          "url": "http://localhost:8000/storage/profile-images/pi_14_17485031192573.jpg",
-                          "thumbnail_url": "http://localhost:8000/storage/profile-images/pi_thumb_14_17485031192573.jpg",
-                          "caption": null,
-                          "created_at": "2025-05-05T04:16:54.000000Z"
-                        },
-                        {
-                          "id": 58,
-                          "url": "http://localhost:8000/storage/profile-images/pi_14_17485032486496.jpg",
-                          "thumbnail_url": "http://localhost:8000/storage/profile-images/pi_thumb_14_17485032486496.jpg",
-                          "caption": null,
-                          "created_at": "2025-05-05T04:57:27.000000Z"
+                          "id": 1,
+                          "url": "https://example.com/storage/images/user123/image1.jpg",
+                          "album_type": "my_photos",
+                          "album_detail": {
+                            "name": "my_photos",
+                            "label": "My Photos",
+                            "description": "Photos of yourself."
+                          },
+                          "thumbnail_url": "https://example.com/storage/images/user123/thumbnails/image1.jpg",
+                          "caption": "Profile photo",
+                          "order": 1,
+                          "created_at": "2024-01-15T10:30:00.000000Z"
                         }
                       ]
                     }
                   }
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "error": false,
-                      "images": [
-                        {
-                          "id": 49,
-                          "url": "http://localhost:8000/storage/profile-images/pi_14_17485027723884.jpg",
-                          "thumbnail_url": "http://localhost:8000/storage/profile-images/pi_thumb_14_17485027723884.jpg",
-                          "caption": null,
-                          "created_at": "2025-05-02T08:34:16.000000Z"
-                        },
-                        {
-                          "id": 56,
-                          "url": "http://localhost:8000/storage/profile-images/pi_14_17485031192573.jpg",
-                          "thumbnail_url": "http://localhost:8000/storage/profile-images/pi_thumb_14_17485031192573.jpg",
-                          "caption": null,
-                          "created_at": "2025-05-05T04:16:54.000000Z"
-                        },
-                        {
-                          "id": 58,
-                          "url": "http://localhost:8000/storage/profile-images/pi_14_17485032486496.jpg",
-                          "thumbnail_url": "http://localhost:8000/storage/profile-images/pi_thumb_14_17485032486496.jpg",
-                          "caption": null,
-                          "created_at": "2025-05-05T04:57:27.000000Z"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "album_type": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
                         }
-                      ]
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": true,
+                      "message": "Album type is required.",
+                      "errors": {
+                        "album_type": ["Album type is required."]
+                      }
                     }
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -2538,25 +2677,142 @@
         ],
         "parameters": [
           {
+            "name": "album_type",
+            "in": "query",
+            "required": true,
+            "description": "The album type to filter by. Use 'all' to get images from all albums.",
             "schema": {
               "type": "string",
               "enum": [
+                "my_photos",
                 "places",
                 "interests",
-                "fashion"
+                "fashion",
+                "all"
               ]
-            },
-            "in": "query",
-            "name": "album_type"
+            }
           }
         ]
       },
       "post": {
-        "summary": "Upload Album Images",
+        "summary": "Upload Image",
+        "description": "Uploads a new image or updates an existing one.",
         "tags": [
           "Profile"
         ],
-        "responses": {},
+        "responses": {
+          "200": {
+            "description": "Image uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "image": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "thumbnail_url": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Image uploaded successfully",
+                      "image": {
+                        "id": 1,
+                        "url": "https://example.com/storage/images/user123/image1.jpg",
+                        "thumbnail_url": "https://example.com/storage/images/user123/thumbnails/image1.jpg"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "image": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "album_type": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": true,
+                      "message": "The image may not be greater than 25MB.",
+                      "errors": {
+                        "image": ["The image may not be greater than 25MB."]
+                      }
+                    },
+                    "Example 2": {
+                      "error": true,
+                      "message": "Invalid file type. Please upload a valid image (JPEG, PNG, WebP, HEIC)."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
         "operationId": "post-profile-images",
         "security": [
           {
@@ -2573,17 +2829,23 @@
                 ],
                 "properties": {
                   "image": {
-                    "type": "object",
-                    "x-stoplight": {
-                      "id": "xymylz1x7oso7"
-                    }
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file (JPEG, PNG, WebP, HEIC, HEIF, JPG). Maximum size: 25MB."
+                  },
+                  "album_type": {
+                    "type": "string",
+                    "description": "The album type to assign the image to (required for new images)",
+                    "enum": [
+                      "my_photos",
+                      "places",
+                      "interests",
+                      "fashion"
+                    ]
                   },
                   "profile_image_id": {
                     "type": "integer",
-                    "x-stoplight": {
-                      "id": "1lvtxvpeyo2ti"
-                    },
-                    "description": "Send profile image id to update existing image, set null to upload new image"
+                    "description": "ID of existing image to update (optional)"
                   }
                 }
               }
@@ -2612,11 +2874,57 @@
         }
       ],
       "delete": {
-        "summary": "Delete Album Images",
+        "summary": "Delete Image",
+        "description": "Deletes a specific image from the user's profile.",
         "tags": [
           "Profile"
         ],
-        "responses": {},
+        "responses": {
+          "200": {
+            "description": "Image deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Image deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
         "operationId": "delete-profile-images-id",
         "security": [
           {
