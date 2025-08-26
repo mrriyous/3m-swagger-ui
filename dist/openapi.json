@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "3M Platform API - A comprehensive platform for user interactions, messaging, financial management, and profile management.\n\n## Overview\n\nThis API provides a complete solution for the 3M Platform, featuring user authentication, profile management, real-time messaging, financial transactions, and support systems. All endpoints use Laravel Sanctum for authentication with Bearer tokens.\n\n## Key Features\n\n- **User Management**: Complete profile and financial profile management\n- **Real-time Communication**: Chat system with AI moderation and file attachments\n- **Financial Services**: Wallet management, transactions, and subscription plans\n- **Social Features**: User interactions, blocking, and reporting systems\n- **Support System**: Ticket management with file attachments and spam protection\n- **Search & Discovery**: Advanced user search with filtering and pagination\n\n## Authentication\n\nMost endpoints require Bearer token authentication:\n```\nAuthorization: Bearer {your_token}\n```\n\n## Rate Limiting\n\n- Chat: 60 requests/minute (30 for sending messages)\n- Support: 10 requests/day per IP\n- General: Varies by endpoint\n\nFor detailed information about specific API sections, please refer to the individual tag descriptions below.",
+    "description": "3M Platform API - A comprehensive platform for user interactions, messaging, financial management, and profile management.\n\n## Overview\n\nThis API provides a complete solution for the 3M Platform, featuring user authentication, profile management, real-time messaging, financial transactions, and support systems. All endpoints use Laravel Sanctum for authentication with Bearer tokens.\n\n## Key Features\n\n- **User Management**: Complete profile and financial profile management\n- **Real-time Communication**: Chat system with AI moderation and file attachments\n- **Financial Services**: Wallet management, transactions, and subscription plans\n- **Social Features**: User interactions, blocking, and reporting systems\n- **Support System**: Ticket management with file attachments and spam protection\n- **Search & Discovery**: Advanced user search with filtering and pagination\n- **Options API**: Static configuration options and predefined values for UI components\n\n## Authentication\n\nMost endpoints require Bearer token authentication:\n```\nAuthorization: Bearer {your_token}\n```\n\n## Rate Limiting\n\n- Chat: 60 requests/minute (30 for sending messages)\n- Support: 10 requests/day per IP\n- General: Varies by endpoint\n\nFor detailed information about specific API sections, please refer to the individual tag descriptions below.",
     "version": "1.0.0",
     "title": "3M Api",
     "contact": {
@@ -80,6 +80,10 @@
     {
       "name": "Transactions",
       "description": "Endpoints for managing user transactions, including viewing transaction history, details, status, and cancellation. All endpoints require Bearer token authentication using Laravel Sanctum. Supports filtering by status and type, with comprehensive transaction data including payments, subscription plans, and counterparty information. Features include status styling with CSS classes and color codes, pagination, and detailed transaction relationships."
+    },
+    {
+      "name": "Options",
+      "description": "Endpoints for retrieving static configuration options and predefined values used throughout the 3M Matching Platform. These endpoints return static data that clients can use to populate dropdown menus, form fields, and other UI components. All options endpoints are public and do not require authentication."
     }
   ],
   "paths": {
@@ -15107,16 +15111,199 @@
         }
       }
     },
+    "/options/about-me": {
+      "get": {
+        "summary": "Get About Me Options",
+        "description": "Returns all options related to the 'About Me' section of user profiles including education levels, professions, religions, age displays, ethnicities, orientations, personality types, languages, hobbies, and relocation readiness.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "About me options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AboutMeOptionsResponse"
+                },
+                "examples": {
+                  "Sample Response": {
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "education_levels": [
+                          {
+                            "label": "High School / Secondary School",
+                            "value": "high_school"
+                          },
+                          {
+                            "label": "Bachelor's in Arts / Humanities",
+                            "value": "bachelor_arts"
+                          }
+                        ],
+                        "professions": [
+                          {
+                            "label": "Accountant",
+                            "value": "Accountant"
+                          },
+                          {
+                            "label": "Engineer (Civil, Mechanical, Electrical, etc.)",
+                            "value": "Engineer (Civil, Mechanical, Electrical, etc.)"
+                          }
+                        ],
+                        "religions": [
+                          {
+                            "label": "Christianity",
+                            "value": "christianity"
+                          },
+                          {
+                            "label": "Islam",
+                            "value": "islam"
+                          }
+                        ],
+                        "age_displays": [
+                          {
+                            "label": "Show Exact Age",
+                            "value": "Show Exact Age"
+                          },
+                          {
+                            "label": "Show Age Range",
+                            "value": "Show Age Range"
+                          },
+                          {
+                            "label": "Hide Age",
+                            "value": "Hide Age"
+                          }
+                        ],
+                        "ethnicities": [
+                          {
+                            "label": "Asian",
+                            "value": "Asian"
+                          },
+                          {
+                            "label": "White/Caucasian",
+                            "value": "White/Caucasian"
+                          }
+                        ],
+                        "orientations": [
+                          {
+                            "label": "Heterosexual",
+                            "value": "heterosexual"
+                          },
+                          {
+                            "label": "Homosexual",
+                            "value": "homosexual"
+                          },
+                          {
+                            "label": "Bisexual",
+                            "value": "bisexual"
+                          }
+                        ],
+                        "personality_types": [
+                          {
+                            "label": "Extrovert",
+                            "value": "extrovert"
+                          },
+                          {
+                            "label": "Introvert",
+                            "value": "introvert"
+                          },
+                          {
+                            "label": "Ambivert",
+                            "value": "ambivert"
+                          },
+                          {
+                            "label": "Not sure",
+                            "value": "unsure"
+                          }
+                        ],
+                        "languages": [
+                          {
+                            "id": 1,
+                            "name": "English",
+                            "created_at": "2024-01-01T00:00:00.000000Z",
+                            "updated_at": "2024-01-01T00:00:00.000000Z"
+                          }
+                        ],
+                        "hobbies": [
+                          {
+                            "id": 1,
+                            "name": "Reading",
+                            "created_at": "2024-01-01T00:00:00.000000Z",
+                            "updated_at": "2024-01-01T00:00:00.000000Z"
+                          }
+                        ],
+                        "relocation_readiness": [
+                          {
+                            "label": "Yes",
+                            "value": "yes"
+                          },
+                          {
+                            "label": "No",
+                            "value": "no"
+                          },
+                          {
+                            "label": "Maybe/Depends",
+                            "value": "maybe"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/options/relationship-preference": {
+      "get": {
+        "summary": "Get Relationship Preference Options",
+        "description": "Returns options for relationship preferences and availability settings including relationship goals, partner preferences, duration preferences, and available time slots.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Relationship preference options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipPreferenceOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/options/financial-profile": {
       "get": {
         "summary": "Get Financial Profile Options",
-        "description": "Retrieve available options for financial profile fields including capital level ranges, income ranges, and milestone durations.",
-        "tags": ["Financial Profile"],
+        "description": "Returns financial profile options including capital levels and relationship milestone durations. Supports currency conversion via query parameter. When a currency parameter is provided, the capital_level labels will be converted to the specified currency using current exchange rates.",
+        "tags": ["Options"],
         "parameters": [
           {
             "name": "currency",
             "in": "query",
-            "description": "Currency code for amount ranges (default: USD)",
+            "description": "Currency code for amount conversion (defaults to USD)",
             "required": false,
             "schema": {
               "type": "string",
@@ -15131,6 +15318,373 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FinancialProfileOptionsResponse"
+                },
+                "examples": {
+                  "Sample Response": {
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "capital_level": [
+                          {
+                            "label": "Below $1,000",
+                            "value": "below_1000"
+                          },
+                          {
+                            "label": "$1,000-1,999",
+                            "value": "1000_1999"
+                          },
+                          {
+                            "label": "$2,000-9,999",
+                            "value": "2000_9999"
+                          },
+                          {
+                            "label": "Above $10,000",
+                            "value": "above_10000"
+                          }
+                        ],
+                        "relationship_milestone_durations": [
+                          {
+                            "label": "3 months",
+                            "value": "3m"
+                          },
+                          {
+                            "label": "6 months",
+                            "value": "6m"
+                          },
+                          {
+                            "label": "1 year",
+                            "value": "1y"
+                          },
+                          {
+                            "label": "2 years",
+                            "value": "2y"
+                          },
+                          {
+                            "label": "3 years",
+                            "value": "3y"
+                          },
+                          {
+                            "label": "5 years",
+                            "value": "5y"
+                          },
+                          {
+                            "label": "7 years",
+                            "value": "7y"
+                          },
+                          {
+                            "label": "10 years",
+                            "value": "10y"
+                          },
+                          {
+                            "label": "15 years",
+                            "value": "15y"
+                          },
+                          {
+                            "label": "20 years",
+                            "value": "20y"
+                          },
+                          {
+                            "label": "25 years",
+                            "value": "25y"
+                          },
+                          {
+                            "label": "30 years",
+                            "value": "30y"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/options/living-preferences": {
+      "get": {
+        "summary": "Get Living Preferences Options",
+        "description": "Returns options for living arrangement preferences and availability settings including driving license, car availability, driver availability, and living format preferences.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Living preferences options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LivingPreferencesOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/age-displays": {
+      "get": {
+        "summary": "Get Age Display Options",
+        "description": "Returns available age display preferences for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Age display options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgeDisplayOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orientations": {
+      "get": {
+        "summary": "Get Sexual Orientation Options",
+        "description": "Returns available sexual orientation options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Sexual orientation options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrientationOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/religions": {
+      "get": {
+        "summary": "Get Religion Options",
+        "description": "Returns available religion options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Religion options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReligionOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ethnicities": {
+      "get": {
+        "summary": "Get Ethnicity Options",
+        "description": "Returns available ethnicity options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Ethnicity options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EthnicityOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/personality-types": {
+      "get": {
+        "summary": "Get Personality Type Options",
+        "description": "Returns available personality type options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Personality type options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalityTypeOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relocation-readiness": {
+      "get": {
+        "summary": "Get Relocation Readiness Options",
+        "description": "Returns available relocation readiness options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Relocation readiness options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationReadinessOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/education-levels": {
+      "get": {
+        "summary": "Get Education Level Options",
+        "description": "Returns available education level options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Education level options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EducationLevelOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hobbies": {
+      "get": {
+        "summary": "Get Hobby Options",
+        "description": "Returns available hobby options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Hobby options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HobbyOptionsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/languages": {
+      "get": {
+        "summary": "Get Language Options",
+        "description": "Returns available language options for user profiles.",
+        "tags": ["Options"],
+        "responses": {
+          "200": {
+            "description": "Language options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LanguageOptionsResponse"
                 }
               }
             }
@@ -20084,39 +20638,18 @@
         "type": "object",
         "description": "Financial profile options data structure",
         "properties": {
-          "capital_level_precise": {
+          "capital_level": {
             "type": "array",
-            "description": "Available capital level precise options",
+            "description": "Available capital level options",
             "items": {
-              "$ref": "#/components/schemas/FinancialOption"
-            }
-          },
-          "capital_level_less_precise": {
-            "type": "array",
-            "description": "Available capital level less precise options",
-            "items": {
-              "$ref": "#/components/schemas/FinancialOption"
-            }
-          },
-          "monthly_income_precise": {
-            "type": "array",
-            "description": "Available monthly income precise options",
-            "items": {
-              "$ref": "#/components/schemas/FinancialOption"
-            }
-          },
-          "monthly_income_less_precise": {
-            "type": "array",
-            "description": "Available monthly income less precise options",
-            "items": {
-              "$ref": "#/components/schemas/FinancialOption"
+              "$ref": "#/components/schemas/OptionItem"
             }
           },
           "relationship_milestone_durations": {
             "type": "array",
             "description": "Available milestone duration options",
             "items": {
-              "$ref": "#/components/schemas/FinancialOption"
+              "$ref": "#/components/schemas/OptionItem"
             }
           }
         }
@@ -20488,6 +21021,454 @@
                 "You can select only one: either Capital Level (Precise) or Capital Level (Less Precise)."
               ]
             }
+          }
+        }
+      },
+      "AboutMeOptionsResponse": {
+        "type": "object",
+        "description": "Response for about me options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "$ref": "#/components/schemas/AboutMeOptionsData"
+          }
+        }
+      },
+      "AboutMeOptionsData": {
+        "type": "object",
+        "description": "About me options data structure",
+        "properties": {
+          "education_levels": {
+            "type": "array",
+            "description": "Available education level options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "professions": {
+            "type": "array",
+            "description": "Available profession options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "religions": {
+            "type": "array",
+            "description": "Available religion options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "age_displays": {
+            "type": "array",
+            "description": "Available age display options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "ethnicities": {
+            "type": "array",
+            "description": "Available ethnicity options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "orientations": {
+            "type": "array",
+            "description": "Available sexual orientation options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "personality_types": {
+            "type": "array",
+            "description": "Available personality type options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "languages": {
+            "type": "array",
+            "description": "Available language options from database",
+            "items": {
+              "$ref": "#/components/schemas/LanguageItem"
+            }
+          },
+          "hobbies": {
+            "type": "array",
+            "description": "Available hobby options from database",
+            "items": {
+              "$ref": "#/components/schemas/HobbyItem"
+            }
+          },
+          "relocation_readiness": {
+            "type": "array",
+            "description": "Available relocation readiness options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "RelationshipPreferenceOptionsResponse": {
+        "type": "object",
+        "description": "Response for relationship preference options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "$ref": "#/components/schemas/RelationshipPreferenceOptionsData"
+          }
+        }
+      },
+      "RelationshipPreferenceOptionsData": {
+        "type": "object",
+        "description": "Relationship preference options data structure",
+        "properties": {
+          "relationship_goals": {
+            "type": "array",
+            "description": "Available relationship goal options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "partner_preferences": {
+            "type": "array",
+            "description": "Available partner preference options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "duration_of_relationship": {
+            "type": "array",
+            "description": "Available relationship duration options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "available_time_morning": {
+            "type": "array",
+            "description": "Available morning time slot options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "available_time_afternoon": {
+            "type": "array",
+            "description": "Available afternoon time slot options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "available_time_evening": {
+            "type": "array",
+            "description": "Available evening time slot options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "LivingPreferencesOptionsResponse": {
+        "type": "object",
+        "description": "Response for living preferences options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "$ref": "#/components/schemas/LivingPreferencesOptionsData"
+          }
+        }
+      },
+      "LivingPreferencesOptionsData": {
+        "type": "object",
+        "description": "Living preferences options data structure",
+        "properties": {
+          "driving_license_availability": {
+            "type": "array",
+            "description": "Available driving license availability options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "car_availability": {
+            "type": "array",
+            "description": "Available car availability options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "driver_availability": {
+            "type": "array",
+            "description": "Available driver availability options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "living_format_test_moon": {
+            "type": "array",
+            "description": "Available test moon living format options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "living_format_preliminary_contract": {
+            "type": "array",
+            "description": "Available preliminary contract living format options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          },
+          "living_format_final_contract": {
+            "type": "array",
+            "description": "Available final contract living format options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "AgeDisplayOptionsResponse": {
+        "type": "object",
+        "description": "Response for age display options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available age display options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "OrientationOptionsResponse": {
+        "type": "object",
+        "description": "Response for sexual orientation options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available sexual orientation options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "ReligionOptionsResponse": {
+        "type": "object",
+        "description": "Response for religion options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available religion options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "EthnicityOptionsResponse": {
+        "type": "object",
+        "description": "Response for ethnicity options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available ethnicity options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "PersonalityTypeOptionsResponse": {
+        "type": "object",
+        "description": "Response for personality type options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available personality type options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "RelocationReadinessOptionsResponse": {
+        "type": "object",
+        "description": "Response for relocation readiness options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available relocation readiness options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "EducationLevelOptionsResponse": {
+        "type": "object",
+        "description": "Response for education level options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available education level options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "HobbyOptionsResponse": {
+        "type": "object",
+        "description": "Response for hobby options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available hobby options",
+            "items": {
+              "$ref": "#/components/schemas/OptionItem"
+            }
+          }
+        }
+      },
+      "LanguageOptionsResponse": {
+        "type": "object",
+        "description": "Response for language options",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates if an error occurred",
+            "example": false
+          },
+          "data": {
+            "type": "array",
+            "description": "Available language options",
+            "items": {
+              "$ref": "#/components/schemas/LanguageItem"
+            }
+          }
+        }
+      },
+      "OptionItem": {
+        "type": "object",
+        "description": "Generic option item with label and value",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Human-readable display text",
+            "example": "High School / Secondary School"
+          },
+          "value": {
+            "type": "string",
+            "description": "Machine-readable value for form submission",
+            "example": "high_school"
+          }
+        }
+      },
+      "LanguageItem": {
+        "type": "object",
+        "description": "Language item with database fields",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the language",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the language",
+            "example": "English"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when language was created",
+            "example": "2024-01-01T00:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when language was last updated",
+            "example": "2024-01-01T00:00:00.000000Z"
+          }
+        }
+      },
+      "HobbyItem": {
+        "type": "object",
+        "description": "Hobby item with database fields",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the hobby",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the hobby",
+            "example": "Reading"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when hobby was created",
+            "example": "2024-01-01T00:00:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when hobby was last updated",
+            "example": "2024-01-01T00:00:00.000000Z"
           }
         }
       }
