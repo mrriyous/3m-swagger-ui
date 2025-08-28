@@ -6155,8 +6155,18 @@
                               "type": "integer"
                             },
                             "features": {
-                              "type": "string",
-                              "description": "JSON string containing array of feature objects"
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "support": {
+                                    "type": "integer"
+                                  }
+                                }
+                              }
                             }
                           }
                         }
@@ -6183,7 +6193,7 @@
                           "id": 15,
                           "level": 2,
                           "name": "Premium Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
+                          "description": "Premium subscription plan with advanced features",
                           "duration": 365,
                           "features": "[{\"title\": \"All Standard Plan Features\", \"support\": 1}, {\"title\": \"Unlocking all functionality\", \"support\": 1}, {\"title\": \"Personalized support\", \"support\": 1}, {\"title\": \"Unlimited chats\", \"support\": 1}, {\"title\": \"Up to 10 Test Moons\", \"support\": 1}, {\"title\": \"Assisted video calls with up to 10 potential partners\", \"support\": 1}, {\"note\": \"To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).\", \"title\": \"Option of anonymity\", \"support\": 1}, {\"title\": \"Makes potential partner’s profile unable to perform search\", \"support\": 1}, {\"title\": \"Training and continuous assistance by MMM’s staff for efficient search\", \"support\": 1}, {\"title\": \"Action plan building and follow up coordination with MMM’s expert for efficient search\", \"support\": 0}, {\"title\": \"Lifestyle / style changes advice by MMM’s experts\", \"support\": 0}, {\"title\": \"Travel and booking assistance for mutual travels\", \"support\": 0}, {\"title\": \"Special requests\", \"support\": 0}]",
                           "created_at": "2025-05-23T14:43:53.000000Z",
@@ -6212,7 +6222,7 @@
         "parameters": [],
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ]
       }
@@ -6220,9 +6230,38 @@
     "/subscription/plans": {
       "get": {
         "summary": "Get Subscription Plans",
-        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget.",
+        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget. The system automatically uses the higher budget between the user and their partner (if budget_user_id is provided).",
         "tags": [
           "Subscription"
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Currency code for pricing (defaults to user's preferred currency)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "upgrade",
+            "in": "query",
+            "description": "Set to \"yes\" to show only plans higher than current plan level",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "budget_user_id",
+            "in": "query",
+            "description": "Partner's user ID to use their budget if higher than user's budget",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -6234,6 +6273,14 @@
                   "properties": {
                     "error": {
                       "type": "boolean"
+                    },
+                    "budget_user_id": {
+                      "type": "integer",
+                      "description": "The user ID whose budget was used for calculations"
+                    },
+                    "budget_used": {
+                      "type": "number",
+                      "description": "The actual budget amount used for calculations"
                     },
                     "plans": {
                       "type": "array",
@@ -6332,6 +6379,8 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
+                      "budget_user_id": 123,
+                      "budget_used": 10000,
                       "plans": [
                         {
                           "id": 14,
@@ -6855,27 +6904,7 @@
         "operationId": "get-subscription-plans",
         "security": [
           {
-            "Authorization": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "currency",
-            "in": "query",
-            "description": "Currency code for pricing (defaults to user's preferred currency)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "upgrade",
-            "in": "query",
-            "description": "Set to \"yes\" to show only plans higher than current plan level",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
+            "bearerAuth": []
           }
         ]
       }
@@ -6887,6 +6916,50 @@
         "tags": [
           "Subscription"
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["subscription_id", "method"],
+                "properties": {
+                  "subscription_id": {
+                    "type": "integer",
+                    "description": "ID of the subscription plan to purchase"
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "Payment method (e.g., \"BALANCE\", \"COINGATE\")"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Additional comment for the transaction"
+                  },
+                  "balance_amount": {
+                    "type": "number",
+                    "description": "Amount to use from user balance",
+                    "minimum": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency for the transaction",
+                    "default": "USD"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Total transaction amount",
+                    "minimum": 0
+                  },
+                  "budget_user_id": {
+                    "type": "integer",
+                    "description": "Partner's user ID if using their budget"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -6911,7 +6984,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Subscription submitted successfully",
+                      "message": "Subscription deposit submitted successfully",
                       "redirect_url": "https://checkout.stripe.com/c/pay/cs_test_a1IUuBzNvbM6q59XHRaGeyEk2Mc6S8myphNuCo5Eo9cRrEl0ObSnuafMZd#fidkdWxOYHwnPyd1blpxYHZxWjA0V1NydFdMR2l8V0ZxNk9JTlVOREJUUG1BbjZ3cnFRT2NoVmlQTWI8XVN9UnJpYmRqX0N9SzNSTm03Qks8VFdXaEpTaENEN0t8PGhANEJpUmdhTzNGbHVLNTVwPElWUWxzYScpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
                       "transaction_id": 175
                     }
@@ -6921,7 +6994,7 @@
                   "Example 1": {
                     "value": {
                       "error": false,
-                      "message": "Subscription submitted successfully",
+                      "message": "Subscription deposit submitted successfully",
                       "redirect_url": "https://checkout.stripe.com/c/pay/cs_test_a1IUuBzNvbM6q59XHRaGeyEk....",
                       "transaction_id": 175
                     }
@@ -6984,72 +7057,9 @@
         "operationId": "post-subscription-submit",
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "x-examples": {
-                  "Example 1": {
-                    "subscription_id": 14,
-                    "method": "BALANCE",
-                    "comment": "Testing subscription purchase",
-                    "balance_amount": 20,
-                    "currency": "USD",
-                    "amount": 328
-                  }
-                },
-                "properties": {
-                  "subscription_id": {
-                    "type": "integer",
-                    "description": "ID of the subscription plan to purchase",
-                    "minimum": 1
-                  },
-                  "method": {
-                    "type": "string",
-                    "description": "Payment method (e.g., \"BALANCE\", \"COINGATE\")",
-                    "enum": ["BALANCE", "COINGATE"]
-                  },
-                  "comment": {
-                    "type": "string",
-                    "description": "Additional comment for the transaction"
-                  },
-                  "balance_amount": {
-                    "type": "number",
-                    "description": "Amount to use from user balance",
-                    "minimum": 0
-                  },
-                  "currency": {
-                    "type": "string",
-                    "description": "Currency for the transaction",
-                    "default": "USD"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "description": "Total transaction amount",
-                    "minimum": 0
-                  }
-                },
-                "required": ["subscription_id", "method"]
-              },
-              "examples": {
-                "Example 1": {
-                  "value": {
-                    "subscription_id": 14,
-                    "method": "BALANCE",
-                    "comment": "Testing subscription purchase",
-                    "balance_amount": 20,
-                    "currency": "USD",
-                    "amount": 328
-                  }
-                }
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/subscription/budget-upgrade": {
@@ -7221,7 +7231,7 @@
         "operationId": "get-subscription-budget-upgrade",
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ]
       },
@@ -7347,7 +7357,7 @@
         },
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ]
       }
