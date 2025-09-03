@@ -9549,8 +9549,21 @@
     },
     "/payment-methods": {
       "get": {
-        "summary": "Get Payment Method List",
-        "tags": [],
+        "summary": "Get Payment Methods List",
+        "description": "Retrieves all available payment methods with their configuration details. Can be filtered by type to show only methods available for specific operations.",
+        "tags": ["Payment Methods"],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter payment methods by type. Accepts: subscription, deposit, withdrawal",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["subscription", "deposit", "withdrawal"]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -9560,57 +9573,71 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "description": "Always false for successful responses"
                     },
                     "type": {
-                      "type": "null"
+                      "type": ["string", "null"],
+                      "description": "The filter type applied, or null if no filter was used"
                     },
                     "data": {
                       "type": "array",
+                      "description": "Array of payment method objects",
                       "items": {
                         "type": "object",
                         "properties": {
                           "withdrawal": {
-                            "type": "boolean"
+                            "type": "boolean",
+                            "description": "Whether this payment method supports withdrawals"
                           },
                           "type": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Payment method type (bank_transfer, card, crypto)",
+                            "enum": ["bank_transfer", "card", "crypto"]
                           },
                           "icon": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Relative path to the payment method icon"
+                          },
+                          "icon_url": {
+                            "type": "string",
+                            "description": "Full URL to the payment method icon"
                           },
                           "name": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Display name of the payment method"
                           },
                           "fields": {
-                            "type": "object",
-                            "properties": {
-                              "account_number": {
-                                "type": "string"
-                              },
-                              "account_holder_name": {
-                                "type": "string"
-                              },
-                              "bank_name": {
-                                "type": "string"
-                              },
-                              "swift_code": {
-                                "type": "string"
+                            "type": "array",
+                            "description": "Array of field objects (for bank transfers)",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "label": {
+                                  "type": "string",
+                                  "description": "Display label for the field"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "The actual value for the field"
+                                }
                               }
                             }
                           },
                           "message": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "User message for payment method (optional)"
                           },
                           "currency": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Currency code for crypto payments (optional)"
                           }
                         }
                       }
                     }
                   },
                   "x-examples": {
-                    "Example 1": {
+                    "All Payment Methods": {
                       "error": false,
                       "type": null,
                       "data": [
@@ -9618,30 +9645,65 @@
                           "withdrawal": true,
                           "type": "bank_transfer",
                           "icon": "static/icons/payment_swift_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_swift_icon.svg",
                           "name": "SWIFT",
-                          "fields": {
-                            "account_number": "1238343213721923",
-                            "account_holder_name": "MMM Financial Services",
-                            "bank_name": "Crédit Agricole Group",
-                            "swift_code": "BDE324IO023"
-                          }
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "005340104169"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "Regusto Inc."
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Banco de Oro"
+                            },
+                            {
+                              "label": "Bank Address",
+                              "value": "GC Corporate Plaza, Makati"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "BNORPHMM"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": true,
                           "type": "bank_transfer",
                           "icon": "static/icons/payment_sepa_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_sepa_icon.svg",
                           "name": "SEPA",
-                          "fields": {
-                            "account_number": "SEPA-123456789",
-                            "account_holder_name": "MMM Financial Services",
-                            "bank_name": "Crédit Agricole Group",
-                            "iban": "FR76300060000"
-                          }
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "SEPA-123456789"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "MMM Financial Services"
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Crédit Agricole Group"
+                            },
+                            {
+                              "label": "IBAN",
+                              "value": "FR76300060000"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "FR76300060000"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": false,
                           "type": "card",
                           "icon": "static/icons/payment_card_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_card_icon.svg",
                           "name": "CARD",
                           "message": "You will be redirected to our secure payment gateway to complete your transaction."
                         },
@@ -9649,6 +9711,7 @@
                           "withdrawal": true,
                           "type": "crypto",
                           "icon": "static/icons/payment_usdt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
                           "name": "USDT",
                           "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
                           "currency": "USDT"
@@ -9657,6 +9720,7 @@
                           "withdrawal": true,
                           "type": "crypto",
                           "icon": "static/icons/payment_bitcoin_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
                           "name": "BTC",
                           "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
                           "currency": "BTC"
@@ -9665,6 +9729,98 @@
                           "withdrawal": true,
                           "type": "crypto",
                           "icon": "static/icons/payment_eurt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
+                          "name": "EURT",
+                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
+                          "currency": "EURT"
+                        }
+                      ]
+                    },
+                    "Withdrawal Methods Only": {
+                      "error": false,
+                      "type": "withdrawal",
+                      "data": [
+                        {
+                          "withdrawal": true,
+                          "type": "bank_transfer",
+                          "icon": "static/icons/payment_swift_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_swift_icon.svg",
+                          "name": "SWIFT",
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "005340104169"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "Regusto Inc."
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Banco de Oro"
+                            },
+                            {
+                              "label": "Bank Address",
+                              "value": "GC Corporate Plaza, Makati"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "BNORPHMM"
+                            }
+                          ]
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "bank_transfer",
+                          "icon": "static/icons/payment_sepa_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_sepa_icon.svg",
+                          "name": "SEPA",
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "SEPA-123456789"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "MMM Financial Services"
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Crédit Agricole Group"
+                            },
+                            {
+                              "label": "IBAN",
+                              "value": "FR76300060000"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "FR76300060000"
+                            }
+                          ]
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "crypto",
+                          "icon": "static/icons/payment_usdt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
+                          "name": "USDT",
+                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
+                          "currency": "USDT"
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "crypto",
+                          "icon": "static/icons/payment_bitcoin_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
+                          "name": "BTC",
+                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
+                          "currency": "BTC"
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "crypto",
+                          "icon": "static/icons/payment_eurt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
                           "name": "EURT",
                           "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
                           "currency": "EURT"
@@ -9674,7 +9830,7 @@
                   }
                 },
                 "examples": {
-                  "Example 1": {
+                  "All Payment Methods": {
                     "value": {
                       "error": false,
                       "type": null,
@@ -9683,30 +9839,65 @@
                           "withdrawal": true,
                           "type": "bank_transfer",
                           "icon": "static/icons/payment_swift_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_swift_icon.svg",
                           "name": "SWIFT",
-                          "fields": {
-                            "account_number": "1238343213721923",
-                            "account_holder_name": "MMM Financial Services",
-                            "bank_name": "Crédit Agricole Group",
-                            "swift_code": "BDE324IO023"
-                          }
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "005340104169"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "Regusto Inc."
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Banco de Oro"
+                            },
+                            {
+                              "label": "Bank Address",
+                              "value": "GC Corporate Plaza, Makati"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "BNORPHMM"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": true,
                           "type": "bank_transfer",
                           "icon": "static/icons/payment_sepa_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_sepa_icon.svg",
                           "name": "SEPA",
-                          "fields": {
-                            "account_number": "SEPA-123456789",
-                            "account_holder_name": "MMM Financial Services",
-                            "bank_name": "Crédit Agricole Group",
-                            "iban": "FR76300060000"
-                          }
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "SEPA-123456789"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "MMM Financial Services"
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Crédit Agricole Group"
+                            },
+                            {
+                              "label": "IBAN",
+                              "value": "FR76300060000"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "FR76300060000"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": false,
                           "type": "card",
                           "icon": "static/icons/payment_card_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_card_icon.svg",
                           "name": "CARD",
                           "message": "You will be redirected to our secure payment gateway to complete your transaction."
                         },
@@ -9714,6 +9905,7 @@
                           "withdrawal": true,
                           "type": "crypto",
                           "icon": "static/icons/payment_usdt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
                           "name": "USDT",
                           "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
                           "currency": "USDT"
@@ -9722,6 +9914,7 @@
                           "withdrawal": true,
                           "type": "crypto",
                           "icon": "static/icons/payment_bitcoin_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
                           "name": "BTC",
                           "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
                           "currency": "BTC"
@@ -9730,6 +9923,100 @@
                           "withdrawal": true,
                           "type": "crypto",
                           "icon": "static/icons/payment_eurt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
+                          "name": "EURT",
+                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
+                          "currency": "EURT"
+                        }
+                      ]
+                    }
+                  },
+                  "Withdrawal Methods Only": {
+                    "value": {
+                      "error": false,
+                      "type": "withdrawal",
+                      "data": [
+                        {
+                          "withdrawal": true,
+                          "type": "bank_transfer",
+                          "icon": "static/icons/payment_swift_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_swift_icon.svg",
+                          "name": "SWIFT",
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "005340104169"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "Regusto Inc."
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Banco de Oro"
+                            },
+                            {
+                              "label": "Bank Address",
+                              "value": "GC Corporate Plaza, Makati"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "BNORPHMM"
+                            }
+                          ]
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "bank_transfer",
+                          "icon": "static/icons/payment_sepa_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_sepa_icon.svg",
+                          "name": "SEPA",
+                          "fields": [
+                            {
+                              "label": "Account Number",
+                              "value": "SEPA-123456789"
+                            },
+                            {
+                              "label": "Account Holder Name",
+                              "value": "MMM Financial Services"
+                            },
+                            {
+                              "label": "Bank Name",
+                              "value": "Crédit Agricole Group"
+                            },
+                            {
+                              "label": "IBAN",
+                              "value": "FR76300060000"
+                            },
+                            {
+                              "label": "SWIFT Code",
+                              "value": "FR76300060000"
+                            }
+                          ]
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "crypto",
+                          "icon": "static/icons/payment_usdt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
+                          "name": "USDT",
+                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
+                          "currency": "USDT"
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "crypto",
+                          "icon": "static/icons/payment_bitcoin_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
+                          "name": "BTC",
+                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
+                          "currency": "BTC"
+                        },
+                        {
+                          "withdrawal": true,
+                          "type": "crypto",
+                          "icon": "static/icons/payment_eurt_icon.svg",
+                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
                           "name": "EURT",
                           "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
                           "currency": "EURT"
@@ -9742,27 +10029,7 @@
             }
           }
         },
-        "operationId": "get-payment-methods",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {}
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "type",
-            "description": "Accept: subscription, deposit, withdrawal"
-          }
-        ]
+        "operationId": "get-payment-methods"
       }
     },
     "/currencies": {
