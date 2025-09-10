@@ -23,7 +23,7 @@
   "tags": [
     {
       "name": "Authentication",
-      "description": "Endpoints related to user authentication, including login, logout, token management, and API key validation. These routes are used to verify user credentials and establish secure access to the API."
+      "description": "Endpoints related to user authentication, including login, logout, token management, and API key validation. These routes are used to verify user credentials, establish secure access to the API, and handle user session termination with optional OneSignal subscription cleanup."
     },
     {
       "name": "Profile",
@@ -60,12 +60,12 @@
     {
       "name": "Notifications",
       "description": "Endpoints for managing user notifications, including listing, filtering, marking as read, updating importance, and managing user preferences. All endpoints require Bearer token authentication."
-          },
-      {
-        "name": "Affiliate",
-        "description": "Endpoints for managing affiliate links, statistics, and earnings. All endpoints require Bearer token authentication using Laravel Sanctum."
-      },
-                {
+    },
+    {
+      "name": "Affiliate",
+      "description": "Endpoints for managing affiliate links, statistics, and earnings. All endpoints require Bearer token authentication using Laravel Sanctum."
+    },
+    {
       "name": "Wallet",
       "description": "Endpoints for managing user wallet and balance information, including retrieving current balance, deposits, withdrawals, and purchase power. All endpoints require Bearer token authentication."
     },
@@ -88,6 +88,10 @@
     {
       "name": "Account Management",
       "description": "Endpoints for managing user account settings including username, password, and email updates. All endpoints require authentication using Laravel Sanctum Bearer tokens. Features include validation, activity logging, and security measures for account modifications."
+    },
+    {
+      "name": "OneSignal",
+      "description": "Endpoints for managing OneSignal push notification subscriptions and player IDs. Handles device registration, subscription management, and logout cleanup for push notifications. All endpoints require Bearer token authentication using Laravel Sanctum."
     }
   ],
   "paths": {
@@ -18929,6 +18933,308 @@
                     "message": {
                       "type": "string",
                       "example": "Failed to update email: Database connection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/onesignal/save-player-id": {
+      "post": {
+        "summary": "Save OneSignal Player ID",
+        "description": "Saves the OneSignal player ID and subscription details for the authenticated user. This endpoint handles multiple device subscriptions per user by creating separate records for each device.",
+        "tags": [
+          "OneSignal"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subscription_id"
+                ],
+                "properties": {
+                  "subscription_id": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "OneSignal subscription ID",
+                    "example": "subscription_123456789"
+                  },
+                  "player_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "OneSignal player ID (optional)",
+                    "example": "player_987654321"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OneSignal player ID and subscription saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "OneSignal player ID and subscription saved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "subscription_details": {
+                          "type": "object",
+                          "properties": {
+                            "device_os": {
+                              "type": "string",
+                              "example": "iOS"
+                            },
+                            "device_type": {
+                              "type": "string",
+                              "example": "mobile"
+                            },
+                            "device_model": {
+                              "type": "string",
+                              "example": "iPhone 14"
+                            },
+                            "ip": {
+                              "type": "string",
+                              "example": "192.168.1.1"
+                            }
+                          }
+                        },
+                        "user_id": {
+                          "type": "integer",
+                          "example": 123
+                        },
+                        "player_id": {
+                          "type": "string",
+                          "example": "player_987654321"
+                        },
+                        "subscription_id": {
+                          "type": "string",
+                          "example": "subscription_123456789"
+                        },
+                        "onesignal_user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "example": 456
+                            },
+                            "user_id": {
+                              "type": "integer",
+                              "example": 123
+                            },
+                            "player_id": {
+                              "type": "string",
+                              "example": "player_987654321"
+                            },
+                            "subscription_id": {
+                              "type": "string",
+                              "example": "subscription_123456789"
+                            },
+                            "device_os": {
+                              "type": "string",
+                              "example": "iOS"
+                            },
+                            "device_type": {
+                              "type": "string",
+                              "example": "mobile"
+                            },
+                            "device_model": {
+                              "type": "string",
+                              "example": "iPhone 14"
+                            },
+                            "ip": {
+                              "type": "string",
+                              "example": "192.168.1.1"
+                            },
+                            "inactive": {
+                              "type": "integer",
+                              "example": 0
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "example": "2024-01-01T00:00:00.000000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "example": "2024-01-01T00:00:00.000000Z"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User not authenticated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "subscription_id": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The subscription id field is required."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to save OneSignal player ID and subscription: Database connection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Logout User",
+        "description": "Logs out the authenticated user by invalidating their current access token and optionally deactivating OneSignal subscriptions.",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "onesignal_player_id": {
+                    "type": "string",
+                    "description": "OneSignal player ID to deactivate",
+                    "example": "player_987654321"
+                  },
+                  "onesignal_subscription_id": {
+                    "type": "string",
+                    "description": "OneSignal subscription ID to deactivate",
+                    "example": "subscription_123456789"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User logged out successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User not authenticated"
                     }
                   }
                 }
