@@ -51,7 +51,7 @@
     },
     {
       "name": "People",
-      "description": "Endpoints for viewing public user profiles and their information. These endpoints allow authenticated users to view other users' profiles using their public username."
+      "description": "The People API provides endpoints for viewing public user profiles and their information. These endpoints allow authenticated users to view other users' profiles using their public username. All endpoints require Bearer token authentication and return comprehensive profile data including personal information, relationship preferences, financial details, living arrangements, and profile images. The API also includes a public endpoint for retrieving age ranges used in profile display and search functionality."
     },
     {
       "name": "Support Tickets",
@@ -15303,7 +15303,7 @@
     "/people/{public_username}": {
       "get": {
         "summary": "Get User Profile",
-        "description": "Retrieve a user's basic profile information.",
+        "description": "Retrieve a user's basic profile information including personal details, relationship preferences, financial information, living arrangements, and profile images. This endpoint returns comprehensive profile data that allows authenticated users to view other users' profiles using their public username. The response includes age display preferences - when a user has set their age display to 'Show Age Range', the exact birth date is hidden and an age range is shown instead.",
         "tags": ["People"],
         "parameters": [
           {
@@ -15331,6 +15331,202 @@
                       "$ref": "#/components/schemas/UserProfile"
                     }
                   }
+                },
+                "examples": {
+                  "exact_age_example": {
+                    "summary": "Profile with exact age display",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "id": 123,
+                        "public_username": "john_doe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john@example.com",
+                        "gender": "male",
+                        "partner_preference": "female",
+                        "relationship_goals": "marriage",
+                        "role": "user",
+                        "profile_picture_url": "https://example.com/profile.jpg",
+                        "hide_images": 0,
+                        "initials": "JD",
+                        "profile": {
+                          "id": 123,
+                          "birth_date": "1990-05-15",
+                          "birth_date_formatted": "May 15, 1990",
+                          "age": 34,
+                          "age_display": "Show Exact Age",
+                          "orientation": "Straight",
+                          "short_intro": "Looking for meaningful connections",
+                          "weight_mesurement": "kg",
+                          "weight": 70,
+                          "height_mesurement": "cm",
+                          "height": 175,
+                          "extended_descriptions": [
+                            {
+                              "id": 1,
+                              "description": "I love traveling and exploring new cultures",
+                              "order": 1
+                            }
+                          ],
+                          "family_views": "Open to having children",
+                          "financial_views": "Financial stability is important",
+                          "long_term_views": "Looking for a life partner",
+                          "secret_text": "I'm secretly a great cook",
+                          "education_level": "Bachelor's Degree",
+                          "profession": "Software Engineer",
+                          "religion": "Christian",
+                          "ethnicity": "Caucasian",
+                          "astrology_belief": "Moderately interested",
+                          "personality_type": "INTJ",
+                          "location_residence": "New York, NY, USA",
+                          "location_residence_place_id": "ChIJOwg_06VPwokRYv534QaPC8g",
+                          "location_residence_latitude": 40.7128,
+                          "location_residence_longitude": -74.0060,
+                          "location_residence_secondary_text": "Manhattan",
+                          "relocation_readiness": "Open to relocation",
+                          "location_search": "San Francisco, CA, USA",
+                          "location_search_place_id": "ChIJIQBpAG2ahYAR_6128GcTUEo",
+                          "location_search_latitude": 37.7749,
+                          "location_search_longitude": -122.4194,
+                          "location_search_secondary_text": "Bay Area",
+                          "location_difference_reason": "Career opportunities",
+                          "languages": [
+                            {
+                              "id": 1,
+                              "code": "en",
+                              "name": "English",
+                              "fluency": 5
+                            },
+                            {
+                              "id": 2,
+                              "code": "es",
+                              "name": "Spanish",
+                              "fluency": 3
+                            }
+                          ],
+                          "hobbies": [
+                            {
+                              "id": 1,
+                              "name": "Photography",
+                              "emoji": "📸",
+                              "icon_url": "https://example.com/icons/photography.png",
+                              "icon_url_active": "https://example.com/icons/photography-active.png"
+                            }
+                          ],
+                          "created_at": "2024-01-15T10:30:00.000000Z",
+                          "updated_at": "2024-01-20T14:45:00.000000Z"
+                        },
+                        "financialProfile": null,
+                        "lifestyle_support_budget": "5000.00",
+                        "lifestyle_support_budget_trimmed": "5,000",
+                        "profileImages": [
+                          {
+                            "id": 123,
+                            "url": "https://example.com/profile.jpg",
+                            "thumbnail_url": "https://example.com/profile_thumb.jpg"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "age_range_example": {
+                    "summary": "Profile with age range display",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "id": 123,
+                        "public_username": "john_doe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john@example.com",
+                        "gender": "male",
+                        "partner_preference": "female",
+                        "relationship_goals": "marriage",
+                        "role": "user",
+                        "profile_picture_url": "https://example.com/profile.jpg",
+                        "hide_images": 0,
+                        "initials": "JD",
+                        "profile": {
+                          "id": 123,
+                          "birth_date": null,
+                          "birth_date_formatted": null,
+                          "age": "31-35",
+                          "age_display": "Show Age Range",
+                          "orientation": "Straight",
+                          "short_intro": "Looking for meaningful connections",
+                          "weight_mesurement": "kg",
+                          "weight": 70,
+                          "height_mesurement": "cm",
+                          "height": 175,
+                          "extended_descriptions": [
+                            {
+                              "id": 1,
+                              "description": "I love traveling and exploring new cultures",
+                              "order": 1
+                            }
+                          ],
+                          "family_views": "Open to having children",
+                          "financial_views": "Financial stability is important",
+                          "long_term_views": "Looking for a life partner",
+                          "secret_text": "I'm secretly a great cook",
+                          "education_level": "Bachelor's Degree",
+                          "profession": "Software Engineer",
+                          "religion": "Christian",
+                          "ethnicity": "Caucasian",
+                          "astrology_belief": "Moderately interested",
+                          "personality_type": "INTJ",
+                          "location_residence": "New York, NY, USA",
+                          "location_residence_place_id": "ChIJOwg_06VPwokRYv534QaPC8g",
+                          "location_residence_latitude": 40.7128,
+                          "location_residence_longitude": -74.0060,
+                          "location_residence_secondary_text": "Manhattan",
+                          "relocation_readiness": "Open to relocation",
+                          "location_search": "San Francisco, CA, USA",
+                          "location_search_place_id": "ChIJIQBpAG2ahYAR_6128GcTUEo",
+                          "location_search_latitude": 37.7749,
+                          "location_search_longitude": -122.4194,
+                          "location_search_secondary_text": "Bay Area",
+                          "location_difference_reason": "Career opportunities",
+                          "languages": [
+                            {
+                              "id": 1,
+                              "code": "en",
+                              "name": "English",
+                              "fluency": 5
+                            },
+                            {
+                              "id": 2,
+                              "code": "es",
+                              "name": "Spanish",
+                              "fluency": 3
+                            }
+                          ],
+                          "hobbies": [
+                            {
+                              "id": 1,
+                              "name": "Photography",
+                              "emoji": "📸",
+                              "icon_url": "https://example.com/icons/photography.png",
+                              "icon_url_active": "https://example.com/icons/photography-active.png"
+                            }
+                          ],
+                          "created_at": "2024-01-15T10:30:00.000000Z",
+                          "updated_at": "2024-01-20T14:45:00.000000Z"
+                        },
+                        "financialProfile": null,
+                        "lifestyle_support_budget": "5000.00",
+                        "lifestyle_support_budget_trimmed": "5,000",
+                        "profileImages": [
+                          {
+                            "id": 123,
+                            "url": "https://example.com/profile.jpg",
+                            "thumbnail_url": "https://example.com/profile_thumb.jpg"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -15351,7 +15547,7 @@
     "/people/{public_username}/relationship": {
       "get": {
         "summary": "Get User Relationship Information",
-        "description": "Retrieve a user's relationship preferences and goals.",
+        "description": "Retrieve a user's relationship preferences and goals including relationship goals, partner preferences, duration preferences, and availability times. This endpoint provides detailed information about what the user is looking for in a relationship and their availability for different types of interactions.",
         "tags": ["People"],
         "parameters": [
           {
@@ -15377,6 +15573,24 @@
                     },
                     "data": {
                       "$ref": "#/components/schemas/UserRelationshipInfo"
+                    }
+                  }
+                },
+                "examples": {
+                  "relationship_info_example": {
+                    "summary": "User relationship information",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "relationship_goals": "marriage",
+                        "relationship_goals_text": "Looking for marriage",
+                        "partner_preference": "female",
+                        "duration_preference": "long_term",
+                        "duration_preference_text": "Long-term relationship",
+                        "available_time_morning": true,
+                        "available_time_afternoon": true,
+                        "available_time_evening": false
+                      }
                     }
                   }
                 }
@@ -15961,7 +16175,7 @@
     "/people/{public_username}/financial": {
       "get": {
         "summary": "Get User Financial Information",
-        "description": "Retrieve a user's financial profile information.",
+        "description": "Retrieve a user's financial profile information including budget, capital level, income, milestone gifts, and financial preferences. This endpoint provides comprehensive financial data that helps users understand each other's financial capabilities and expectations in relationships.",
         "tags": ["People"],
         "parameters": [
           {
@@ -15989,6 +16203,47 @@
                       "$ref": "#/components/schemas/UserFinancialInfo"
                     }
                   }
+                },
+                "examples": {
+                  "financial_info_example": {
+                    "summary": "User financial information",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "currency": "USD",
+                        "lifestyle_support_budget": "5000.00",
+                        "lifestyle_support_budget_in_sc": "5000.00",
+                        "lifestyle_support_budget_trimmed": "5,000",
+                        "lifestyle_support_budget_trimmed_in_sc": "5,000",
+                        "capital_level_precise": "1000000",
+                        "capital_level_less_precise": "high",
+                        "monthly_income_precise": "10000",
+                        "monthly_income_less_precise": "high",
+                        "first_child_payment": "1000.00",
+                        "second_child_payment": "800.00",
+                        "subsequent_child_payment": "600.00",
+                        "monthly_child_budget": "500.00",
+                        "marriage_gift": "50000.00",
+                        "termination_comp": "10000.00",
+                        "termination_clause": "3 months notice",
+                        "milestone_gifts": [
+                          {
+                            "id": 1,
+                            "amount": "1000.00",
+                            "period": "monthly"
+                          }
+                        ],
+                        "currency_detail": {
+                          "id": 1,
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "symbol": "$",
+                          "created_at": "2025-01-01T00:00:00.000000Z",
+                          "updated_at": "2025-01-01T00:00:00.000000Z"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -16009,7 +16264,7 @@
     "/people/{public_username}/living": {
       "get": {
         "summary": "Get User Living Information",
-        "description": "Retrieve a user's living preferences and arrangements.",
+        "description": "Retrieve a user's living preferences and arrangements including transportation availability, living format preferences, and housing information. This endpoint provides details about the user's current living situation and preferences for different stages of relationships.",
         "tags": ["People"],
         "parameters": [
           {
@@ -16037,6 +16292,30 @@
                       "$ref": "#/components/schemas/UserLivingInfo"
                     }
                   }
+                },
+                "examples": {
+                  "living_info_example": {
+                    "summary": "User living information",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "driving_license_availability": true,
+                        "car_availability": true,
+                        "driver_availability": true,
+                        "living_format_test_moon": "apartment",
+                        "living_format_preliminary_contract": "rental",
+                        "living_format_final_contract": "purchase",
+                        "living_format_test_moon_image_url": "https://example.com/test_moon.jpg",
+                        "living_format_test_moon_image_thumbnail_url": "https://example.com/test_moon_thumb.jpg",
+                        "living_format_preliminary_contract_image_url": "https://example.com/preliminary.jpg",
+                        "living_format_preliminary_contract_image_thumbnail_url": "https://example.com/preliminary_thumb.jpg",
+                        "living_format_final_contract_image_url": "https://example.com/final.jpg",
+                        "living_format_final_contract_image_thumbnail_url": "https://example.com/final_thumb.jpg",
+                        "housing_image_url": "https://example.com/housing.jpg",
+                        "housing_image_thumbnail_url": "https://example.com/housing_thumb.jpg"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -16057,7 +16336,7 @@
     "/people/{public_username}/images": {
       "get": {
         "summary": "Get User Images",
-        "description": "Retrieve a user's profile images and album photos.",
+        "description": "Retrieve a user's profile images and album photos. This endpoint respects the user's privacy settings - if a user has hidden their images, only the profile picture will be returned. For managing your own profile images and albums, use the Profile Images and Albums API endpoints.",
         "tags": ["People"],
         "parameters": [
           {
@@ -16088,6 +16367,31 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "images_example": {
+                    "summary": "User images",
+                    "value": {
+                      "error": false,
+                      "data": [
+                        {
+                          "id": 123,
+                          "url": "https://example.com/profile.jpg",
+                          "thumbnail_url": "https://example.com/profile_thumb.jpg"
+                        },
+                        {
+                          "id": 456,
+                          "url": "https://example.com/album1.jpg",
+                          "thumbnail_url": "https://example.com/album1_thumb.jpg"
+                        },
+                        {
+                          "id": 789,
+                          "url": "https://example.com/album2.jpg",
+                          "thumbnail_url": "https://example.com/album2_thumb.jpg"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -16098,6 +16402,157 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/age-ranges": {
+      "get": {
+        "summary": "Get Age Ranges",
+        "description": "Retrieve all available age ranges that can be used for profile age display and search criteria. These ranges are used when users choose to display their age as a range instead of exact age. This is a public endpoint that does not require authentication.",
+        "tags": ["People"],
+        "responses": {
+          "200": {
+            "description": "Age ranges retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "description": "Display label for the age range (e.g., '21-25')"
+                          },
+                          "min": {
+                            "type": "integer",
+                            "description": "Minimum age in the range"
+                          },
+                          "max": {
+                            "type": "integer",
+                            "description": "Maximum age in the range"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "age_ranges_example": {
+                    "summary": "Available age ranges",
+                    "value": {
+                      "success": true,
+                      "data": [
+                        {
+                          "label": "18+",
+                          "min": 18,
+                          "max": 20
+                        },
+                        {
+                          "label": "21-25",
+                          "min": 21,
+                          "max": 25
+                        },
+                        {
+                          "label": "26-30",
+                          "min": 26,
+                          "max": 30
+                        },
+                        {
+                          "label": "31-35",
+                          "min": 31,
+                          "max": 35
+                        },
+                        {
+                          "label": "36-40",
+                          "min": 36,
+                          "max": 40
+                        },
+                        {
+                          "label": "41-45",
+                          "min": 41,
+                          "max": 45
+                        },
+                        {
+                          "label": "46-50",
+                          "min": 46,
+                          "max": 50
+                        },
+                        {
+                          "label": "51-55",
+                          "min": 51,
+                          "max": 55
+                        },
+                        {
+                          "label": "56-60",
+                          "min": 56,
+                          "max": 60
+                        },
+                        {
+                          "label": "61-65",
+                          "min": 61,
+                          "max": 65
+                        },
+                        {
+                          "label": "66-70",
+                          "min": 66,
+                          "max": 70
+                        },
+                        {
+                          "label": "71-75",
+                          "min": 71,
+                          "max": 75
+                        },
+                        {
+                          "label": "76-80",
+                          "min": 76,
+                          "max": 80
+                        },
+                        {
+                          "label": "80+",
+                          "min": 81,
+                          "max": 999
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "error_example": {
+                    "summary": "Error response",
+                    "value": {
+                      "success": false,
+                      "message": "Sorry, Something went wrong. Please try again later."
+                    }
+                  }
                 }
               }
             }
@@ -22420,6 +22875,511 @@
             "format": "date-time",
             "description": "Timestamp when hobby was last updated",
             "example": "2024-01-01T00:00:00.000000Z"
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "description": "Complete user profile information",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "User ID",
+            "example": 123
+          },
+          "public_username": {
+            "type": "string",
+            "description": "Public username",
+            "example": "john_doe"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "First name",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Last name",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "example": "john@example.com"
+          },
+          "gender": {
+            "type": "string",
+            "description": "Gender",
+            "example": "male"
+          },
+          "partner_preference": {
+            "type": "string",
+            "description": "Partner gender preference",
+            "example": "female"
+          },
+          "relationship_goals": {
+            "type": "string",
+            "description": "Relationship goals",
+            "example": "marriage"
+          },
+          "role": {
+            "type": "string",
+            "description": "User role",
+            "example": "user"
+          },
+          "profile_picture_url": {
+            "type": "string",
+            "description": "Profile picture URL",
+            "example": "https://example.com/profile.jpg"
+          },
+          "hide_images": {
+            "type": "integer",
+            "description": "Hide images flag (0 = show, 1 = hide)",
+            "example": 0
+          },
+          "initials": {
+            "type": "string",
+            "description": "User initials",
+            "example": "JD"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/UserProfileDetails"
+          },
+          "financialProfile": {
+            "type": "object",
+            "description": "Financial profile information",
+            "nullable": true
+          },
+          "lifestyle_support_budget": {
+            "type": "string",
+            "description": "Lifestyle support budget",
+            "example": "5000.00"
+          },
+          "lifestyle_support_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget",
+            "example": "5,000"
+          },
+          "profileImages": {
+            "type": "array",
+            "description": "Profile images",
+            "items": {
+              "$ref": "#/components/schemas/UserImage"
+            }
+          }
+        }
+      },
+      "UserProfileDetails": {
+        "type": "object",
+        "description": "Detailed user profile information",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Profile ID",
+            "example": 123
+          },
+          "birth_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Birth date (null if age range display is used)",
+            "nullable": true,
+            "example": "1990-05-15"
+          },
+          "birth_date_formatted": {
+            "type": "string",
+            "description": "Formatted birth date (null if age range display is used)",
+            "nullable": true,
+            "example": "May 15, 1990"
+          },
+          "age": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "description": "Exact age when age_display is 'Show Exact Age'",
+                "example": 34
+              },
+              {
+                "type": "string",
+                "description": "Age range when age_display is 'Show Age Range'",
+                "example": "31-35"
+              }
+            ]
+          },
+          "age_display": {
+            "type": "string",
+            "description": "Age display preference",
+            "enum": ["Show Exact Age", "Show Age Range", "Hide Age"],
+            "example": "Show Exact Age"
+          },
+          "orientation": {
+            "type": "string",
+            "description": "Sexual orientation",
+            "example": "Straight"
+          },
+          "short_intro": {
+            "type": "string",
+            "description": "Short introduction",
+            "example": "Looking for meaningful connections"
+          },
+          "weight_mesurement": {
+            "type": "string",
+            "description": "Weight measurement unit",
+            "example": "kg"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Weight",
+            "example": 70
+          },
+          "height_mesurement": {
+            "type": "string",
+            "description": "Height measurement unit",
+            "example": "cm"
+          },
+          "height": {
+            "type": "number",
+            "description": "Height",
+            "example": 175
+          },
+          "extended_descriptions": {
+            "type": "array",
+            "description": "Extended descriptions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "description": {
+                  "type": "string",
+                  "example": "I love traveling and exploring new cultures"
+                },
+                "order": {
+                  "type": "integer",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "family_views": {
+            "type": "string",
+            "description": "Family views",
+            "example": "Open to having children"
+          },
+          "financial_views": {
+            "type": "string",
+            "description": "Financial views",
+            "example": "Financial stability is important"
+          },
+          "long_term_views": {
+            "type": "string",
+            "description": "Long-term views",
+            "example": "Looking for a life partner"
+          },
+          "secret_text": {
+            "type": "string",
+            "description": "Secret text",
+            "example": "I'm secretly a great cook"
+          },
+          "education_level": {
+            "type": "string",
+            "description": "Education level",
+            "example": "Bachelor's Degree"
+          },
+          "profession": {
+            "type": "string",
+            "description": "Profession",
+            "example": "Software Engineer"
+          },
+          "religion": {
+            "type": "string",
+            "description": "Religion",
+            "example": "Christian"
+          },
+          "ethnicity": {
+            "type": "string",
+            "description": "Ethnicity",
+            "example": "Caucasian"
+          },
+          "astrology_belief": {
+            "type": "string",
+            "description": "Astrology belief level",
+            "example": "Moderately interested"
+          },
+          "personality_type": {
+            "type": "string",
+            "description": "Personality type",
+            "example": "INTJ"
+          },
+          "location_residence": {
+            "type": "string",
+            "description": "Current residence location",
+            "example": "New York, NY, USA"
+          },
+          "location_residence_place_id": {
+            "type": "string",
+            "description": "Google Place ID for residence",
+            "example": "ChIJOwg_06VPwokRYv534QaPC8g"
+          },
+          "location_residence_latitude": {
+            "type": "number",
+            "description": "Residence latitude",
+            "example": 40.7128
+          },
+          "location_residence_longitude": {
+            "type": "number",
+            "description": "Residence longitude",
+            "example": -74.0060
+          },
+          "location_residence_secondary_text": {
+            "type": "string",
+            "description": "Residence secondary text",
+            "example": "Manhattan"
+          },
+          "relocation_readiness": {
+            "type": "string",
+            "description": "Relocation readiness",
+            "example": "Open to relocation"
+          },
+          "location_search": {
+            "type": "string",
+            "description": "Desired search location",
+            "example": "San Francisco, CA, USA"
+          },
+          "location_search_place_id": {
+            "type": "string",
+            "description": "Google Place ID for search location",
+            "example": "ChIJIQBpAG2ahYAR_6128GcTUEo"
+          },
+          "location_search_latitude": {
+            "type": "number",
+            "description": "Search location latitude",
+            "example": 37.7749
+          },
+          "location_search_longitude": {
+            "type": "number",
+            "description": "Search location longitude",
+            "example": -122.4194
+          },
+          "location_search_secondary_text": {
+            "type": "string",
+            "description": "Search location secondary text",
+            "example": "Bay Area"
+          },
+          "location_difference_reason": {
+            "type": "string",
+            "description": "Reason for location difference",
+            "example": "Career opportunities"
+          },
+          "languages": {
+            "type": "array",
+            "description": "User languages",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "code": {
+                  "type": "string",
+                  "example": "en"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "English"
+                },
+                "fluency": {
+                  "type": "integer",
+                  "example": 5
+                }
+              }
+            }
+          },
+          "hobbies": {
+            "type": "array",
+            "description": "User hobbies",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Photography"
+                },
+                "emoji": {
+                  "type": "string",
+                  "example": "📸"
+                },
+                "icon_url": {
+                  "type": "string",
+                  "example": "https://example.com/icons/photography.png"
+                },
+                "icon_url_active": {
+                  "type": "string",
+                  "example": "https://example.com/icons/photography-active.png"
+                }
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-15T10:30:00.000000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-20T14:45:00.000000Z"
+          }
+        }
+      },
+      "UserRelationshipInfo": {
+        "type": "object",
+        "description": "User relationship information",
+        "properties": {
+          "relationship_goals": {
+            "type": "string",
+            "description": "Relationship goals",
+            "example": "marriage"
+          },
+          "relationship_goals_text": {
+            "type": "string",
+            "description": "Relationship goals text",
+            "example": "Looking for marriage"
+          },
+          "partner_preference": {
+            "type": "string",
+            "description": "Partner preference",
+            "example": "female"
+          },
+          "duration_preference": {
+            "type": "string",
+            "description": "Duration preference",
+            "example": "long_term"
+          },
+          "duration_preference_text": {
+            "type": "string",
+            "description": "Duration preference text",
+            "example": "Long-term relationship"
+          },
+          "available_time_morning": {
+            "type": "boolean",
+            "description": "Available in the morning",
+            "example": true
+          },
+          "available_time_afternoon": {
+            "type": "boolean",
+            "description": "Available in the afternoon",
+            "example": true
+          },
+          "available_time_evening": {
+            "type": "boolean",
+            "description": "Available in the evening",
+            "example": false
+          }
+        }
+      },
+      "UserLivingInfo": {
+        "type": "object",
+        "description": "User living information",
+        "properties": {
+          "driving_license_availability": {
+            "type": "boolean",
+            "description": "Has driving license",
+            "example": true
+          },
+          "car_availability": {
+            "type": "boolean",
+            "description": "Has car available",
+            "example": true
+          },
+          "driver_availability": {
+            "type": "boolean",
+            "description": "Has driver available",
+            "example": true
+          },
+          "living_format_test_moon": {
+            "type": "string",
+            "description": "Test moon living format",
+            "example": "apartment"
+          },
+          "living_format_preliminary_contract": {
+            "type": "string",
+            "description": "Preliminary contract living format",
+            "example": "rental"
+          },
+          "living_format_final_contract": {
+            "type": "string",
+            "description": "Final contract living format",
+            "example": "purchase"
+          },
+          "living_format_test_moon_image_url": {
+            "type": "string",
+            "description": "Test moon image URL",
+            "example": "https://example.com/test_moon.jpg"
+          },
+          "living_format_test_moon_image_thumbnail_url": {
+            "type": "string",
+            "description": "Test moon image thumbnail URL",
+            "example": "https://example.com/test_moon_thumb.jpg"
+          },
+          "living_format_preliminary_contract_image_url": {
+            "type": "string",
+            "description": "Preliminary contract image URL",
+            "example": "https://example.com/preliminary.jpg"
+          },
+          "living_format_preliminary_contract_image_thumbnail_url": {
+            "type": "string",
+            "description": "Preliminary contract image thumbnail URL",
+            "example": "https://example.com/preliminary_thumb.jpg"
+          },
+          "living_format_final_contract_image_url": {
+            "type": "string",
+            "description": "Final contract image URL",
+            "example": "https://example.com/final.jpg"
+          },
+          "living_format_final_contract_image_thumbnail_url": {
+            "type": "string",
+            "description": "Final contract image thumbnail URL",
+            "example": "https://example.com/final_thumb.jpg"
+          },
+          "housing_image_url": {
+            "type": "string",
+            "description": "Housing image URL",
+            "example": "https://example.com/housing.jpg"
+          },
+          "housing_image_thumbnail_url": {
+            "type": "string",
+            "description": "Housing image thumbnail URL",
+            "example": "https://example.com/housing_thumb.jpg"
+          }
+        }
+      },
+      "UserImage": {
+        "type": "object",
+        "description": "User image information",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Image ID",
+            "example": 123
+          },
+          "url": {
+            "type": "string",
+            "description": "Image URL",
+            "example": "https://example.com/profile.jpg"
+          },
+          "thumbnail_url": {
+            "type": "string",
+            "description": "Thumbnail URL",
+            "example": "https://example.com/profile_thumb.jpg"
           }
         }
       }
