@@ -15726,35 +15726,6 @@
         }
       }
     },
-    "/age-displays": {
-      "get": {
-        "summary": "Get Age Display Options",
-        "description": "Returns available age display preferences for user profiles.",
-        "tags": ["Options"],
-        "responses": {
-          "200": {
-            "description": "Age display options retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AgeDisplayOptionsResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/orientations": {
       "get": {
         "summary": "Get Sexual Orientation Options",
