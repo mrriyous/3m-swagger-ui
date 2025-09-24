@@ -788,9 +788,15 @@
     },
     "/profile/basic-info": {
       "get": {
-        "summary": "Profile Baisc Info",
+        "summary": "Get Basic Info",
+        "description": "Get your basic profile information including personal details, contact information, and profile settings.",
         "tags": [
           "Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "200": {
@@ -1302,18 +1308,19 @@
           }
         },
         "operationId": "get-profile-basic-info",
-        "security": [
-          {
-            "Authorization": []
-          }
-        ]
       }
     },
     "/profile/relationship-info": {
       "get": {
-        "summary": "Get Profile Relationship Info",
+        "summary": "Get Relationship Info",
+        "description": "Get your relationship preferences and goals including partner preferences, relationship goals, duration preferences, and availability times.",
         "tags": [
           "Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "200": {
@@ -1399,23 +1406,18 @@
           }
         },
         "operationId": "get-profile-relationship-info",
-        "security": [
-          {
-            "Authorization": []
-          }
-        ]
       }
     },
     "/profile/financial-info": {
       "get": {
-        "summary": "Get Financial Profile",
-        "description": "Retrieve the authenticated user's financial profile information including budget, capital level, income, and milestone settings.",
+        "summary": "Get Financial Info",
+        "description": "Get your financial profile information including lifestyle support budget, capital level, income details, child payments, marriage gifts, and milestone settings.",
         "tags": [
-          "Financial Profile"
+          "Profile"
         ],
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1455,9 +1457,15 @@
     },
     "/profile/living-info": {
       "get": {
-        "summary": "Your GET endpoint",
+        "summary": "Get Living Info",
+        "description": "Get your living profile information including transportation availability, living format preferences, and housing images.",
         "tags": [
           "Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "200": {
@@ -1588,27 +1596,129 @@
           }
         },
         "operationId": "get-profile-living-info",
+      }
+    },
+    "/profile/visibility-setting": {
+      "get": {
+        "summary": "Get Visibility Setting",
+        "description": "Get your current profile visibility settings including profile visibility, image visibility, and contact visibility.",
+        "tags": [
+          "Profile"
+        ],
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Visibility settings retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Visibility setting ID"
+                        },
+                        "user_id": {
+                          "type": "integer",
+                          "description": "User ID"
+                        },
+                        "profile_visibility": {
+                          "type": "boolean",
+                          "description": "Profile visibility setting"
+                        },
+                        "image_visibility": {
+                          "type": "boolean",
+                          "description": "Image visibility setting"
+                        },
+                        "contact_visibility": {
+                          "type": "boolean",
+                          "description": "Contact visibility setting"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Creation timestamp"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/profile/picture": {
       "post": {
-        "summary": "Upload User Profile Picture",
+        "summary": "Upload Profile Picture",
+        "description": "Upload or update your profile picture. The image will be automatically resized and optimized for web display.",
         "tags": [
           "Profile"
         ],
-        "responses": {},
-        "operationId": "post-profile-picture",
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
@@ -1616,10 +1726,115 @@
                 "properties": {
                   "profile_picture": {
                     "type": "string",
-                    "x-stoplight": {
-                      "id": "u3b18ioxwiokc"
+                    "format": "binary",
+                    "description": "Profile picture image file (max 5MB, formats: jpeg, png, jpg, gif, heic, heif, webp)"
+                  }
+                },
+                "required": ["profile_picture"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile picture updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
                     },
-                    "description": "file"
+                    "message": {
+                      "type": "string",
+                      "example": "Profile picture has been updated successfully"
+                    },
+                    "image_url": {
+                      "type": "string",
+                      "description": "URL of the uploaded profile picture",
+                      "example": "https://example.com/storage/profile-pictures/123_1640995200.jpg"
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Profile picture has been updated successfully",
+                      "image_url": "https://example.com/storage/profile-pictures/123_1640995200.jpg"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The profile picture must not be larger than 5MB."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "profile_picture": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The profile picture must not be larger than 5MB."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
                   }
                 }
               }
@@ -1630,386 +1845,622 @@
     },
     "/profile/about": {
       "post": {
-        "summary": "Update Profile About Section",
+        "summary": "Update About Section",
+        "description": "Update your profile's about section including basic information, personal details, location preferences, languages, hobbies, and extended descriptions.",
         "tags": [
           "Profile"
         ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "role": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "null"
-                        },
-                        "gender": {
-                          "type": "string"
-                        },
-                        "initials": {
-                          "type": "string"
-                        },
-                        "last_name": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "first_name": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "profileImages": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "integer"
-                              },
-                              "url": {
-                                "type": "string"
-                              },
-                              "thumbnail_url": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        },
-                        "email_verified": {
-                          "type": "boolean"
-                        },
-                        "public_username": {
-                          "type": "string"
-                        },
-                        "partner_preference": {
-                          "type": "string"
-                        },
-                        "relationship_goals": {
-                          "type": "string"
-                        },
-                        "profile_picture_url": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "data": {
-                        "id": 52,
-                        "role": "rs",
-                        "email": null,
-                        "gender": "female",
-                        "initials": "NH",
-                        "last_name": "Hajime",
-                        "created_at": "2025-06-03T14:31:06.000000Z",
-                        "first_name": "Noshi",
-                        "updated_at": "2025-06-05T06:27:44.000000Z",
-                        "profileImages": [
-                          {
-                            "id": 52,
-                            "url": "http://localhost:8000/storage/profile-pictures/52_1749104864.jpg",
-                            "thumbnail_url": "http://localhost:8000/storage/profile-pictures/52_1749104864.jpg"
-                          }
-                        ],
-                        "email_verified": true,
-                        "public_username": "noshi",
-                        "partner_preference": "female",
-                        "relationship_goals": "long_term",
-                        "profile_picture_url": "http://localhost:8000/storage/profile-pictures/52_1749104864.jpg"
-                      },
-                      "error": false,
-                      "message": "Profile updated successfully"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "post-profile-about",
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "height": {
-                    "type": "string"
+                  "public_username": {
+                    "type": "string",
+                    "description": "Public username (3-20 chars, alphanumeric + underscore/dot)",
+                    "minLength": 3,
+                    "maxLength": 20,
+                    "pattern": "^[a-zA-Z0-9._]+$"
+                  },
+                  "birth_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Birth date (before today, after 1900-01-01)"
+                  },
+                  "age_display": {
+                    "type": "string",
+                    "description": "Age display preference",
+                    "enum": ["Show Exact Age", "Show Age Range", "Hide Age"]
                   },
                   "weight": {
-                    "type": "string"
+                    "type": "number",
+                    "description": "Weight in kg (40-150)",
+                    "minimum": 40,
+                    "maximum": 150
                   },
-                  "hobbies": {
-                    "type": "string"
+                  "height": {
+                    "type": "number",
+                    "description": "Height in cm (50-230)",
+                    "minimum": 50,
+                    "maximum": 230
+                  },
+                  "orientation": {
+                    "type": "string",
+                    "description": "Sexual orientation",
+                    "maxLength": 50
+                  },
+                  "short_intro": {
+                    "type": "string",
+                    "description": "Short introduction",
+                    "maxLength": 1000
+                  },
+                  "extended_description": {
+                    "type": "array",
+                    "description": "Extended descriptions (max 9 items, 10000 chars each)",
+                    "maxItems": 9,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 10000
+                    }
+                  },
+                  "family_views": {
+                    "type": "string",
+                    "description": "Views on family",
+                    "maxLength": 10000
+                  },
+                  "financial_views": {
+                    "type": "string",
+                    "description": "Views on finances",
+                    "maxLength": 10000
+                  },
+                  "long_term_views": {
+                    "type": "string",
+                    "description": "Long-term goals",
+                    "maxLength": 10000
+                  },
+                  "secret_text": {
+                    "type": "string",
+                    "description": "Secret text",
+                    "maxLength": 10000
+                  },
+                  "education_level": {
+                    "type": "string",
+                    "description": "Education level",
+                    "maxLength": 100
+                  },
+                  "profession": {
+                    "type": "string",
+                    "description": "Profession",
+                    "maxLength": 100
                   },
                   "religion": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Religion",
+                    "maxLength": 50
                   },
                   "ethnicity": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Ethnicity",
+                    "maxLength": 50
+                  },
+                  "astrology_belief": {
+                    "type": "boolean",
+                    "description": "Interest in astrology"
+                  },
+                  "personality_type": {
+                    "type": "string",
+                    "description": "Personality type",
+                    "maxLength": 50
+                  },
+                  "location_residence": {
+                    "type": "string",
+                    "description": "Current residence",
+                    "maxLength": 50
+                  },
+                  "location_residence_place_id": {
+                    "type": "string",
+                    "description": "Google Place ID for residence"
+                  },
+                  "location_residence_latitude": {
+                    "type": "number",
+                    "description": "Residence latitude"
+                  },
+                  "location_residence_longitude": {
+                    "type": "number",
+                    "description": "Residence longitude"
+                  },
+                  "location_residence_secondary_text": {
+                    "type": "string",
+                    "description": "Additional residence info",
+                    "maxLength": 255
+                  },
+                  "relocation_readiness": {
+                    "type": "string",
+                    "description": "Relocation readiness",
+                    "enum": ["yes", "no", "maybe"]
+                  },
+                  "location_search": {
+                    "type": "string",
+                    "description": "Preferred search location",
+                    "maxLength": 50
+                  },
+                  "location_search_place_id": {
+                    "type": "string",
+                    "description": "Google Place ID for search"
+                  },
+                  "location_search_latitude": {
+                    "type": "number",
+                    "description": "Search location latitude"
+                  },
+                  "location_search_longitude": {
+                    "type": "number",
+                    "description": "Search location longitude"
+                  },
+                  "location_search_secondary_text": {
+                    "type": "string",
+                    "description": "Additional search location info",
+                    "maxLength": 255
+                  },
+                  "location_difference_reason": {
+                    "type": "string",
+                    "description": "Reason for location difference",
+                    "maxLength": 10000
                   },
                   "languages": {
                     "type": "array",
+                    "description": "Languages array with code and fluency (1-5)",
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
                         "code": {
-                          "type": "string"
-                        },
-                        "known": {
-                          "type": "boolean"
+                          "type": "string",
+                          "description": "Language code"
                         },
                         "fluency": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Fluency level (1-5)",
+                          "minimum": 1,
+                          "maximum": 5
+                        }
+                      },
+                      "required": ["code", "fluency"]
+                    }
+                  },
+                  "hobbies": {
+                    "type": "string",
+                    "description": "Comma-separated hobby IDs"
+                  }
+                },
+                "required": ["public_username", "birth_date", "age_display"]
+              },
+              "x-examples": {
+                "Example 1": {
+                  "public_username": "john_doe",
+                  "birth_date": "1990-05-15",
+                  "age_display": "Show Exact Age",
+                  "weight": 70,
+                  "height": 175,
+                  "orientation": "Straight",
+                  "short_intro": "Looking for meaningful connections",
+                  "extended_description": [
+                    "I love traveling and exploring new cultures",
+                    "I'm passionate about photography and nature"
+                  ],
+                  "family_views": "Open to having children",
+                  "financial_views": "Financial stability is important",
+                  "long_term_views": "Looking for a life partner",
+                  "secret_text": "I'm secretly a great cook",
+                  "education_level": "Bachelor's Degree",
+                  "profession": "Software Engineer",
+                  "religion": "Christian",
+                  "ethnicity": "Caucasian",
+                  "astrology_belief": true,
+                  "personality_type": "INTJ",
+                  "location_residence": "New York, NY, USA",
+                  "location_residence_place_id": "ChIJOwg_06VPwokRYv534QaPC8g",
+                  "location_residence_latitude": 40.7128,
+                  "location_residence_longitude": -74.0060,
+                  "location_residence_secondary_text": "Manhattan",
+                  "relocation_readiness": "yes",
+                  "location_search": "San Francisco, CA, USA",
+                  "location_search_place_id": "ChIJIQBpAG2ahYAR_6128GcTUEo",
+                  "location_search_latitude": 37.7749,
+                  "location_search_longitude": -122.4194,
+                  "location_search_secondary_text": "Bay Area",
+                  "location_difference_reason": "Career opportunities",
+                  "languages": [
+                    {
+                      "code": "en",
+                      "fluency": 5
+                    },
+                    {
+                      "code": "es",
+                      "fluency": 3
+                    }
+                  ],
+                  "hobbies": "1,5,12,23"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Profile has been saved"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID"
+                        },
+                        "public_username": {
+                          "type": "string",
+                          "description": "Public username"
+                        },
+                        "profile": {
+                          "type": "object",
+                          "description": "Updated profile information",
+                          "properties": {
+                            "birth_date": {
+                              "type": "string",
+                              "format": "date"
+                            },
+                            "age_display": {
+                              "type": "string"
+                            },
+                            "weight": {
+                              "type": "number"
+                            },
+                            "height": {
+                              "type": "number"
+                            },
+                            "orientation": {
+                              "type": "string"
+                            },
+                            "short_intro": {
+                              "type": "string"
+                            },
+                            "extended_descriptions": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "order": {
+                                    "type": "integer"
+                                  }
+                                }
+                              }
+                            },
+                            "family_views": {
+                              "type": "string"
+                            },
+                            "financial_views": {
+                              "type": "string"
+                            },
+                            "long_term_views": {
+                              "type": "string"
+                            },
+                            "secret_text": {
+                              "type": "string"
+                            },
+                            "education_level": {
+                              "type": "string"
+                            },
+                            "profession": {
+                              "type": "string"
+                            },
+                            "religion": {
+                              "type": "string"
+                            },
+                            "ethnicity": {
+                              "type": "string"
+                            },
+                            "astrology_belief": {
+                              "type": "string"
+                            },
+                            "personality_type": {
+                              "type": "string"
+                            },
+                            "location_residence": {
+                              "type": "string"
+                            },
+                            "location_residence_place_id": {
+                              "type": "string"
+                            },
+                            "location_residence_latitude": {
+                              "type": "number"
+                            },
+                            "location_residence_longitude": {
+                              "type": "number"
+                            },
+                            "location_residence_secondary_text": {
+                              "type": "string"
+                            },
+                            "relocation_readiness": {
+                              "type": "string"
+                            },
+                            "location_search": {
+                              "type": "string"
+                            },
+                            "location_search_place_id": {
+                              "type": "string"
+                            },
+                            "location_search_latitude": {
+                              "type": "number"
+                            },
+                            "location_search_longitude": {
+                              "type": "number"
+                            },
+                            "location_search_secondary_text": {
+                              "type": "string"
+                            },
+                            "location_difference_reason": {
+                              "type": "string"
+                            },
+                            "languages": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "code": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "fluency": {
+                                    "type": "integer"
+                                  }
+                                }
+                              }
+                            },
+                            "hobbies": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "emoji": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "changes": {
+                      "type": "object",
+                      "description": "Object containing all modified fields with old and new values",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "old": {
+                            "description": "Previous value"
+                          },
+                          "new": {
+                            "description": "New value"
+                          }
                         }
                       }
                     }
                   },
-                  "birth_date": {
-                    "type": "string"
-                  },
-                  "profession": {
-                    "type": "string"
-                  },
-                  "age_display": {
-                    "type": "string"
-                  },
-                  "orientation": {
-                    "type": "string"
-                  },
-                  "secret_text": {
-                    "type": "string"
-                  },
-                  "short_intro": {
-                    "type": "string"
-                  },
-                  "family_views": {
-                    "type": "string"
-                  },
-                  "education_level": {
-                    "type": "string"
-                  },
-                  "financial_views": {
-                    "type": "string"
-                  },
-                  "location_search": {
-                    "type": "string"
-                  },
-                  "long_term_views": {
-                    "type": "string"
-                  },
-                  "public_username": {
-                    "type": "string"
-                  },
-                  "astrology_belief": {
-                    "type": "integer"
-                  },
-                  "personality_type": {
-                    "type": "string"
-                  },
-                  "location_residence": {
-                    "type": "string"
-                  },
-                  "partner_preference": {
-                    "type": "null"
-                  },
-                  "relationship_goals": {
-                    "type": "null"
-                  },
-                  "duration_preference": {
-                    "type": "null"
-                  },
-                  "extended_description": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "relocation_readiness": {
-                    "type": "string"
-                  },
-                  "available_time_evening": {
-                    "type": "null"
-                  },
-                  "available_time_morning": {
-                    "type": "null"
-                  },
-                  "available_time_afternoon": {
-                    "type": "null"
-                  },
-                  "location_search_latitude": {
-                    "type": "string"
-                  },
-                  "location_search_place_id": {
-                    "type": "string"
-                  },
-                  "location_search_longitude": {
-                    "type": "string"
-                  },
-                  "location_difference_reason": {
-                    "type": "string"
-                  },
-                  "location_residence_latitude": {
-                    "type": "string"
-                  },
-                  "location_residence_place_id": {
-                    "type": "string"
-                  },
-                  "location_residence_longitude": {
-                    "type": "string"
-                  },
-                  "location_search_secondary_text": {
-                    "type": "string"
-                  },
-                  "location_residence_secondary_text": {
-                    "type": "string"
-                  }
-                },
-                "x-examples": {
-                  "Example 1": {
-                    "height": "180",
-                    "weight": "80",
-                    "hobbies": "6,2",
-                    "religion": "islam",
-                    "ethnicity": "hispanic",
-                    "languages": [
-                      {
-                        "id": 1,
-                        "code": "en",
-                        "known": true,
-                        "fluency": 5
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Profile has been saved",
+                      "data": {
+                        "id": 123,
+                        "public_username": "john_doe",
+                        "profile": {
+                          "birth_date": "1990-05-15",
+                          "age_display": "Show Exact Age",
+                          "weight": 70,
+                          "height": 175,
+                          "orientation": "Straight",
+                          "short_intro": "Looking for meaningful connections",
+                          "extended_descriptions": [
+                            {
+                              "id": 1,
+                              "description": "I love traveling and exploring new cultures",
+                              "order": 1
+                            }
+                          ],
+                          "family_views": "Open to having children",
+                          "financial_views": "Financial stability is important",
+                          "long_term_views": "Looking for a life partner",
+                          "secret_text": "I'm secretly a great cook",
+                          "education_level": "Bachelor's Degree",
+                          "profession": "Software Engineer",
+                          "religion": "Christian",
+                          "ethnicity": "Caucasian",
+                          "astrology_belief": "Moderately interested",
+                          "personality_type": "INTJ",
+                          "location_residence": "New York, NY, USA",
+                          "location_residence_place_id": "ChIJOwg_06VPwokRYv534QaPC8g",
+                          "location_residence_latitude": 40.7128,
+                          "location_residence_longitude": -74.0060,
+                          "location_residence_secondary_text": "Manhattan",
+                          "relocation_readiness": "Open to relocation",
+                          "location_search": "San Francisco, CA, USA",
+                          "location_search_place_id": "ChIJIQBpAG2ahYAR_6128GcTUEo",
+                          "location_search_latitude": 37.7749,
+                          "location_search_longitude": -122.4194,
+                          "location_search_secondary_text": "Bay Area",
+                          "location_difference_reason": "Career opportunities",
+                          "languages": [
+                            {
+                              "id": 1,
+                              "code": "en",
+                              "name": "English",
+                              "fluency": 5
+                            }
+                          ],
+                          "hobbies": [
+                            {
+                              "id": 1,
+                              "name": "Photography",
+                              "emoji": "📸"
+                            }
+                          ]
+                        }
                       },
-                      {
-                        "id": 2,
-                        "code": "ar",
-                        "known": true,
-                        "fluency": 4
+                      "changes": {
+                        "public_username": {
+                          "old": "john_doe_old",
+                          "new": "john_doe"
+                        },
+                        "short_intro": {
+                          "old": "Old introduction",
+                          "new": "Looking for meaningful connections"
+                        },
+                        "weight": {
+                          "old": 75,
+                          "new": 70
+                        },
+                        "extended_description": {
+                          "old": ["Old description"],
+                          "new": ["I love traveling and exploring new cultures"]
+                        },
+                        "languages": {
+                          "old": {"en": 4, "fr": 2},
+                          "new": {"en": 5, "es": 3}
+                        },
+                        "hobbies": {
+                          "old": ["Photography", "Reading"],
+                          "new": ["Photography", "Cooking"]
+                        }
                       }
-                    ],
-                    "birth_date": "1998-06-04",
-                    "profession": "profession",
-                    "age_display": "Show Age Range",
-                    "orientation": "Homosexual",
-                    "secret_text": "secret",
-                    "short_intro": "short text",
-                    "family_views": "family",
-                    "education_level": "education",
-                    "financial_views": "financial",
-                    "location_search": "Fukushima Road",
-                    "long_term_views": "long term",
-                    "public_username": "noshi",
-                    "astrology_belief": 1,
-                    "personality_type": "introvert",
-                    "location_residence": "Route 9W",
-                    "partner_preference": null,
-                    "relationship_goals": null,
-                    "duration_preference": null,
-                    "extended_description": [
-                      "long txext",
-                      "long text 2"
-                    ],
-                    "relocation_readiness": "yes",
-                    "available_time_evening": null,
-                    "available_time_morning": null,
-                    "available_time_afternoon": null,
-                    "location_search_latitude": "40.9309767",
-                    "location_search_place_id": "EjpGdWt1c2hpbWEgUm9hZCwg5LiL44K_55SwIEtvbWluYXRvLCBIaXJhbmFpLCBBb21vcmksIEphcGFuIi4qLAoUChIJL1956lGBm18RW1_AzbzAP00SFAoSCU-NdaRRgZtfEcEQ-3c2pG-a",
-                    "location_search_longitude": "140.9568002",
-                    "location_difference_reason": "reason",
-                    "location_residence_latitude": "40.9602943",
-                    "location_residence_place_id": "EhlSb3V0ZSA5VywgQWxwaW5lLCBOSiwgVVNBIi4qLAoUChIJL90qWbIV3YkR-1EsJ9q2-PISFAoSCTPcCM4Y8sKJEUE3jqhaxgKe",
-                    "location_residence_longitude": "-73.9204738",
-                    "location_search_secondary_text": "下タ田 Kominato, Hiranai, Aomori, Japan",
-                    "location_residence_secondary_text": "Alpine, NJ, USA"
+                    }
                   }
                 }
-              },
-              "examples": {
-                "Example 1": {
-                  "value": {
-                    "height": "180",
-                    "weight": "80",
-                    "hobbies": "6,2",
-                    "religion": "islam",
-                    "ethnicity": "hispanic",
-                    "languages": [
-                      {
-                        "id": 1,
-                        "code": "en",
-                        "known": true,
-                        "fluency": 5
-                      },
-                      {
-                        "id": 2,
-                        "code": "ar",
-                        "known": true,
-                        "fluency": 4
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please check your inputs and try again."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "public_username": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["This public username is already taken"]
+                        },
+                        "birth_date": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["Birth date is invalid."]
+                        },
+                        "weight": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["Weight must be at least 40 kg"]
+                        },
+                        "height": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["Height must not exceed 230 cm"]
+                        }
                       }
-                    ],
-                    "birth_date": "1998-06-04",
-                    "profession": "profession",
-                    "age_display": "Show Age Range",
-                    "orientation": "Homosexual",
-                    "secret_text": "secret",
-                    "short_intro": "short text",
-                    "family_views": "family",
-                    "education_level": "education",
-                    "financial_views": "financial",
-                    "location_search": "Fukushima Road",
-                    "long_term_views": "long term",
-                    "public_username": "noshi",
-                    "astrology_belief": 1,
-                    "personality_type": "introvert",
-                    "location_residence": "Route 9W",
-                    "partner_preference": null,
-                    "relationship_goals": null,
-                    "duration_preference": null,
-                    "extended_description": [
-                      "long txext",
-                      "long text 2"
-                    ],
-                    "relocation_readiness": "yes",
-                    "available_time_evening": null,
-                    "available_time_morning": null,
-                    "available_time_afternoon": null,
-                    "location_search_latitude": "40.9309767",
-                    "location_search_place_id": "EjpGdWt1c2hpbWEgUm9hZCwg5LiL44K_55SwIEtvbWluYXRvLCBIaXJhbmFpLCBBb21vcmksIEphcGFuIi4qLAoUChIJL1956lGBm18RW1_AzbzAP00SFAoSCU-NdaRRgZtfEcEQ-3c2pG-a",
-                    "location_search_longitude": "140.9568002",
-                    "location_difference_reason": "reason",
-                    "location_residence_latitude": "40.9602943",
-                    "location_residence_place_id": "EhlSb3V0ZSA5VywgQWxwaW5lLCBOSiwgVVNBIi4qLAoUChIJL90qWbIV3YkR-1EsJ9q2-PISFAoSCTPcCM4Y8sKJEUE3jqhaxgKe",
-                    "location_residence_longitude": "-73.9204738",
-                    "location_search_secondary_text": "下タ田 Kominato, Hiranai, Aomori, Japan",
-                    "location_residence_secondary_text": "Alpine, NJ, USA"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
                   }
                 }
               }
@@ -2020,147 +2471,223 @@
     },
     "/profile/relationship": {
       "post": {
-        "summary": "Update Profile Relationship Section",
+        "summary": "Update Relationship Preferences",
+        "description": "Update your relationship preferences and goals including partner preferences, relationship goals, duration preferences, and availability times.",
         "tags": [
           "Profile"
         ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "user_id": {
-                          "type": "integer"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "deleted_at": {
-                          "type": "null"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "partner_preference": {
-                          "type": "string"
-                        },
-                        "relationship_goals": {
-                          "type": "string"
-                        },
-                        "duration_preference": {
-                          "type": "string"
-                        },
-                        "available_time_evening": {
-                          "type": "string"
-                        },
-                        "available_time_morning": {
-                          "type": "string"
-                        },
-                        "available_time_afternoon": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "data": {
-                        "id": 25,
-                        "user_id": 52,
-                        "created_at": "2025-06-03T14:31:06.000000Z",
-                        "deleted_at": null,
-                        "updated_at": "2025-06-08T13:48:01.000000Z",
-                        "partner_preference": "female",
-                        "relationship_goals": "Relationship Itself and Possibly Kids",
-                        "duration_preference": "Medium term relationship (up to 6 months)",
-                        "available_time_evening": "0",
-                        "available_time_morning": "0.5",
-                        "available_time_afternoon": "0.5"
-                      },
-                      "error": false,
-                      "message": "Relationship preferences updated successfully"
-                    }
-                  }
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "data": {
-                        "id": 25,
-                        "user_id": 52,
-                        "created_at": "2025-06-03T14:31:06.000000Z",
-                        "deleted_at": null,
-                        "updated_at": "2025-06-08T13:48:01.000000Z",
-                        "partner_preference": "female",
-                        "relationship_goals": "Relationship Itself and Possibly Kids",
-                        "duration_preference": "Medium term relationship (up to 6 months)",
-                        "available_time_evening": "0",
-                        "available_time_morning": "0.5",
-                        "available_time_afternoon": "0.5"
-                      },
-                      "error": false,
-                      "message": "Relationship preferences updated successfully"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "post-profile-relationship",
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "partner_preference": {
-                    "type": "string"
-                  },
                   "relationship_goals": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Your relationship goals",
+                    "example": "marriage"
+                  },
+                  "partner_preference": {
+                    "type": "string",
+                    "description": "Preferred partner gender",
+                    "enum": ["male", "female", "any"],
+                    "example": "female"
                   },
                   "duration_preference": {
-                    "type": "string"
-                  },
-                  "available_time_evening": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Preferred relationship duration",
+                    "example": "long_term"
                   },
                   "available_time_morning": {
-                    "type": "string"
+                    "type": "boolean",
+                    "description": "Available in morning",
+                    "example": true
                   },
                   "available_time_afternoon": {
-                    "type": "string"
+                    "type": "boolean",
+                    "description": "Available in afternoon",
+                    "example": true
+                  },
+                  "available_time_evening": {
+                    "type": "boolean",
+                    "description": "Available in evening",
+                    "example": false
                   }
                 },
-                "x-examples": {
-                  "Example 1": {
-                    "partner_preference": "female",
-                    "relationship_goals": "Relationship Itself and Possibly Kids",
-                    "duration_preference": "Medium term relationship (up to 6 months)",
-                    "available_time_evening": "0",
-                    "available_time_morning": "0.5",
-                    "available_time_afternoon": "0.5"
+                "required": ["partner_preference"]
+              },
+              "x-examples": {
+                "Example 1": {
+                  "relationship_goals": "marriage",
+                  "partner_preference": "female",
+                  "duration_preference": "long_term",
+                  "available_time_morning": true,
+                  "available_time_afternoon": true,
+                  "available_time_evening": false
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Relationship preferences updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Relationship preferences has been updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Relationship preference ID"
+                        },
+                        "user_id": {
+                          "type": "integer",
+                          "description": "User ID"
+                        },
+                        "relationship_goals": {
+                          "type": "string",
+                          "description": "Relationship goals"
+                        },
+                        "partner_preference": {
+                          "type": "string",
+                          "description": "Partner preference"
+                        },
+                        "duration_preference": {
+                          "type": "string",
+                          "description": "Duration preference"
+                        },
+                        "available_time_morning": {
+                          "type": "boolean",
+                          "description": "Morning availability"
+                        },
+                        "available_time_afternoon": {
+                          "type": "boolean",
+                          "description": "Afternoon availability"
+                        },
+                        "available_time_evening": {
+                          "type": "boolean",
+                          "description": "Evening availability"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Creation timestamp"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Relationship preferences has been updated successfully",
+                      "data": {
+                        "id": 1,
+                        "user_id": 123,
+                        "relationship_goals": "marriage",
+                        "partner_preference": "female",
+                        "duration_preference": "long_term",
+                        "available_time_morning": true,
+                        "available_time_afternoon": true,
+                        "available_time_evening": false,
+                        "created_at": "2024-01-15T10:30:00.000000Z",
+                        "updated_at": "2024-01-20T14:45:00.000000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please check your inputs and try again."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "partner_preference": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The partner preference field is required."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
                   }
                 }
               }
@@ -2172,20 +2699,140 @@
     "/profile/financial": {
       "post": {
         "summary": "Update Financial Profile",
-        "description": "Update the authenticated user's financial profile information including budget, capital level, income, and milestone settings.",
+        "description": "Update your financial profile information including lifestyle support budget, capital level, income details, child payments, marriage gifts, and milestone settings. For detailed financial profile documentation, see Financial Profile API.",
         "tags": [
-          "Financial Profile"
+          "Profile"
         ],
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateFinancialProfileRequest"
+                "type": "object",
+                "properties": {
+                  "lifestyle_support_budget": {
+                    "type": "number",
+                    "description": "Monthly lifestyle support budget (required)",
+                    "minimum": 0,
+                    "example": 5000
+                  },
+                  "capital_level_precise": {
+                    "type": "string",
+                    "description": "Precise capital level value (mutually exclusive with capital_level_less_precise)",
+                    "example": "1000000"
+                  },
+                  "capital_level_less_precise": {
+                    "type": "string",
+                    "description": "Less precise capital level value (mutually exclusive with capital_level_precise)",
+                    "example": "1M+"
+                  },
+                  "monthly_income_precise": {
+                    "type": "string",
+                    "description": "Precise monthly income value",
+                    "example": "50000"
+                  },
+                  "monthly_income_less_precise": {
+                    "type": "string",
+                    "description": "Less precise monthly income value",
+                    "example": "50K+"
+                  },
+                  "first_child_payment": {
+                    "type": "number",
+                    "description": "Payment for first child",
+                    "minimum": 0,
+                    "example": 10000
+                  },
+                  "second_child_payment": {
+                    "type": "number",
+                    "description": "Payment for second child",
+                    "minimum": 0,
+                    "example": 8000
+                  },
+                  "subsequent_child_payment": {
+                    "type": "number",
+                    "description": "Payment for subsequent children",
+                    "minimum": 0,
+                    "example": 5000
+                  },
+                  "monthly_child_budget": {
+                    "type": "number",
+                    "description": "Monthly budget for children",
+                    "minimum": 0,
+                    "example": 2000
+                  },
+                  "marriage_gift": {
+                    "type": "number",
+                    "description": "Gift amount for marriage",
+                    "minimum": 0,
+                    "example": 50000
+                  },
+                  "growth_bonus": {
+                    "type": "number",
+                    "description": "Growth bonus percentage",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "example": 10
+                  },
+                  "growth_clause": {
+                    "type": "number",
+                    "description": "Growth clause duration in months",
+                    "minimum": 1,
+                    "example": 12
+                  },
+                  "termination_comp": {
+                    "type": "number",
+                    "description": "Termination compensation",
+                    "minimum": 0,
+                    "example": 10000
+                  },
+                  "termination_clause": {
+                    "type": "number",
+                    "description": "Termination notice period in months",
+                    "minimum": 6,
+                    "example": 6
+                  },
+                  "milestone_amounts": {
+                    "type": "array",
+                    "description": "Array of milestone gift amounts",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "example": [5000, 10000]
+                  },
+                  "milestone_periods": {
+                    "type": "array",
+                    "description": "Array of milestone gift periods",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["6 months", "12 months"]
+                  }
+                },
+                "required": ["lifestyle_support_budget"]
+              },
+              "x-examples": {
+                "Example 1": {
+                  "lifestyle_support_budget": 5000,
+                  "capital_level_precise": "1000000",
+                  "monthly_income_precise": "50000",
+                  "first_child_payment": 10000,
+                  "second_child_payment": 8000,
+                  "subsequent_child_payment": 5000,
+                  "monthly_child_budget": 2000,
+                  "marriage_gift": 50000,
+                  "growth_bonus": 10,
+                  "growth_clause": 12,
+                  "termination_comp": 10000,
+                  "termination_clause": 6,
+                  "milestone_amounts": [5000, 10000],
+                  "milestone_periods": ["6 months", "12 months"]
+                }
               }
             }
           }
@@ -2196,240 +2843,357 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateFinancialProfileResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - Validation errors",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Financial profile has been updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Updated financial profile data"
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized - Authentication required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "post-profile-financial"
-      }
-    },
-    "/profile/living": {
-      "post": {
-        "summary": "Update Profile Living Section",
-        "tags": [
-          "Profile"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {},
+            "description": "Unauthenticated",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "user_id": {
-                          "type": "integer"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "housing_image": {
-                          "type": "string"
-                        },
-                        "car_availability": {
-                          "type": "null"
-                        },
-                        "driver_availability": {
-                          "type": "null"
-                        },
-                        "housing_image_thumbnail": {
-                          "type": "string"
-                        },
-                        "living_format_test_moon": {
-                          "type": "null"
-                        },
-                        "driving_license_availability": {
-                          "type": "null"
-                        },
-                        "living_format_final_contract": {
-                          "type": "null"
-                        },
-                        "living_format_test_moon_image": {
-                          "type": "string"
-                        },
-                        "living_format_test_moon_image_url": {
-                          "type": "string"
-                        },
-                        "living_format_final_contract_image": {
-                          "type": "string"
-                        },
-                        "living_format_preliminary_contract": {
-                          "type": "null"
-                        },
-                        "living_format_final_contract_image_url": {
-                          "type": "string"
-                        },
-                        "living_format_test_moon_image_thumbnail": {
-                          "type": "string"
-                        },
-                        "living_format_preliminary_contract_image": {
-                          "type": "string"
-                        },
-                        "living_format_test_moon_image_thumbnail_url": {
-                          "type": "string"
-                        },
-                        "living_format_final_contract_image_thumbnail": {
-                          "type": "string"
-                        },
-                        "living_format_preliminary_contract_image_url": {
-                          "type": "string"
-                        },
-                        "living_format_final_contract_image_thumbnail_url": {
-                          "type": "string"
-                        },
-                        "living_format_preliminary_contract_image_thumbnail": {
-                          "type": "string"
-                        },
-                        "living_format_preliminary_contract_image_thumbnail_url": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Unauthenticated."
                     }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "data": {
-                        "id": 18,
-                        "user_id": 52,
-                        "created_at": "2025-06-08T13:54:14.000000Z",
-                        "updated_at": "2025-06-08T13:54:14.000000Z",
-                        "housing_image": "living-form-pictures/pi_52_17493908544440.jpg",
-                        "car_availability": null,
-                        "driver_availability": null,
-                        "housing_image_thumbnail": "living-form-pictures/pi_thumb_52_17493908544440.jpg",
-                        "living_format_test_moon": null,
-                        "driving_license_availability": null,
-                        "living_format_final_contract": null,
-                        "living_format_test_moon_image": "living-form-pictures/pi_52_17493908544223.jpg",
-                        "living_format_test_moon_image_url": "http://localhost:8000/storage/living-form-pictures/pi_52_17493908544223.jpg",
-                        "living_format_final_contract_image": "living-form-pictures/pi_52_17493908545768.jpg",
-                        "living_format_preliminary_contract": null,
-                        "living_format_final_contract_image_url": "http://localhost:8000/storage/living-form-pictures/pi_52_17493908545768.jpg",
-                        "living_format_test_moon_image_thumbnail": "living-form-pictures/pi_thumb_52_17493908544223.jpg",
-                        "living_format_preliminary_contract_image": "living-form-pictures/pi_52_17493908549162.jpg",
-                        "living_format_test_moon_image_thumbnail_url": "http://localhost:8000/storage/living-form-pictures/pi_thumb_52_17493908544223.jpg",
-                        "living_format_final_contract_image_thumbnail": "living-form-pictures/pi_thumb_52_17493908545768.jpg",
-                        "living_format_preliminary_contract_image_url": "http://localhost:8000/storage/living-form-pictures/pi_52_17493908549162.jpg",
-                        "living_format_final_contract_image_thumbnail_url": "http://localhost:8000/storage/living-form-pictures/pi_thumb_52_17493908545768.jpg",
-                        "living_format_preliminary_contract_image_thumbnail": "living-form-pictures/pi_thumb_52_17493908549162.jpg",
-                        "living_format_preliminary_contract_image_thumbnail_url": "http://localhost:8000/storage/living-form-pictures/pi_thumb_52_17493908549162.jpg"
-                      },
-                      "error": false,
-                      "message": "Living profile updated successfully"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please check your inputs and try again."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "lifestyle_support_budget": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The lifestyle support budget field is required."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
                     }
                   }
                 }
               }
             }
           }
-        },
-        "operationId": "post-profile-living",
+        }
+      }
+    },
+    "/profile/living": {
+      "post": {
+        "summary": "Update Living Profile",
+        "description": "Update your living arrangements and preferences including transportation availability, living format preferences, and housing images.",
+        "tags": [
+          "Profile"
+        ],
         "security": [
           {
-            "Authorization": []
+            "bearerAuth": []
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "housing_image": {
-                    "type": "object",
-                    "properties": {}
+                  "driving_license_availability": {
+                    "type": "boolean",
+                    "description": "Has driving license",
+                    "example": true
                   },
                   "car_availability": {
-                    "type": "null"
+                    "type": "boolean",
+                    "description": "Has car",
+                    "example": true
                   },
                   "driver_availability": {
-                    "type": "null"
+                    "type": "boolean",
+                    "description": "Has driver",
+                    "example": false
                   },
                   "living_format_test_moon": {
-                    "type": "null"
-                  },
-                  "driving_license_availability": {
-                    "type": "null"
-                  },
-                  "living_format_final_contract": {
-                    "type": "null"
-                  },
-                  "living_format_test_moon_image": {
-                    "type": "object",
-                    "properties": {}
-                  },
-                  "living_format_final_contract_image": {
-                    "type": "object",
-                    "properties": {}
+                    "type": "string",
+                    "description": "Test moon living format",
+                    "example": "apartment"
                   },
                   "living_format_preliminary_contract": {
-                    "type": "null"
+                    "type": "string",
+                    "description": "Preliminary contract format",
+                    "example": "rental"
+                  },
+                  "living_format_final_contract": {
+                    "type": "string",
+                    "description": "Final contract format",
+                    "example": "purchase"
+                  },
+                  "living_format_test_moon_image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Test moon image (max 15MB)"
                   },
                   "living_format_preliminary_contract_image": {
-                    "type": "object",
-                    "properties": {}
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Preliminary contract image (max 15MB)"
+                  },
+                  "living_format_final_contract_image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Final contract image (max 15MB)"
+                  },
+                  "housing_image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Housing image (max 15MB)"
                   }
-                },
-                "x-examples": {
-                  "Example 1": {
-                    "housing_image": {},
-                    "car_availability": null,
-                    "driver_availability": null,
-                    "living_format_test_moon": null,
-                    "driving_license_availability": null,
-                    "living_format_final_contract": null,
-                    "living_format_test_moon_image": {},
-                    "living_format_final_contract_image": {},
-                    "living_format_preliminary_contract": null,
-                    "living_format_preliminary_contract_image": {}
+                }
+              },
+              "x-examples": {
+                "Example 1": {
+                  "driving_license_availability": true,
+                  "car_availability": true,
+                  "driver_availability": false,
+                  "living_format_test_moon": "apartment",
+                  "living_format_preliminary_contract": "rental",
+                  "living_format_final_contract": "purchase"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Living profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Living profile has been updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Living profile ID"
+                        },
+                        "user_id": {
+                          "type": "integer",
+                          "description": "User ID"
+                        },
+                        "driving_license_availability": {
+                          "type": "boolean",
+                          "description": "Driving license availability"
+                        },
+                        "car_availability": {
+                          "type": "boolean",
+                          "description": "Car availability"
+                        },
+                        "driver_availability": {
+                          "type": "boolean",
+                          "description": "Driver availability"
+                        },
+                        "living_format_test_moon": {
+                          "type": "string",
+                          "description": "Test moon living format"
+                        },
+                        "living_format_preliminary_contract": {
+                          "type": "string",
+                          "description": "Preliminary contract format"
+                        },
+                        "living_format_final_contract": {
+                          "type": "string",
+                          "description": "Final contract format"
+                        },
+                        "living_format_test_moon_image": {
+                          "type": "string",
+                          "description": "Test moon image path"
+                        },
+                        "living_format_test_moon_image_thumbnail": {
+                          "type": "string",
+                          "description": "Test moon image thumbnail path"
+                        },
+                        "housing_image": {
+                          "type": "string",
+                          "description": "Housing image path"
+                        },
+                        "housing_image_thumbnail": {
+                          "type": "string",
+                          "description": "Housing image thumbnail path"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Creation timestamp"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Living profile has been updated successfully",
+                      "data": {
+                        "id": 1,
+                        "user_id": 123,
+                        "driving_license_availability": true,
+                        "car_availability": true,
+                        "driver_availability": false,
+                        "living_format_test_moon": "apartment",
+                        "living_format_preliminary_contract": "rental",
+                        "living_format_final_contract": "purchase",
+                        "living_format_test_moon_image": "living-form-pictures/123_test_moon_1640995200.jpg",
+                        "living_format_test_moon_image_thumbnail": "living-form-pictures/123_test_moon_thumb_1640995200.jpg",
+                        "housing_image": "living-form-pictures/123_housing_1640995200.jpg",
+                        "housing_image_thumbnail": "living-form-pictures/123_housing_thumb_1640995200.jpg",
+                        "created_at": "2024-01-15T10:30:00.000000Z",
+                        "updated_at": "2024-01-20T14:45:00.000000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please check your inputs and try again."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "housing_image": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The housing image must not be larger than 15MB."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
                   }
                 }
               }
@@ -2943,6 +3707,661 @@
             "Authorization": []
           }
         ]
+      }
+    },
+    "/profile/": {
+      "get": {
+        "summary": "Get Profile",
+        "description": "Retrieve your own profile information including basic details, about section, relationship preferences, financial profile, living arrangements, and visibility settings.",
+        "tags": [
+          "Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID"
+                        },
+                        "public_username": {
+                          "type": "string",
+                          "description": "Public username"
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "description": "First name"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "description": "Last name"
+                        },
+                        "email": {
+                          "type": "string",
+                          "description": "Email address"
+                        },
+                        "gender": {
+                          "type": "string",
+                          "description": "Gender"
+                        },
+                        "partner_preference": {
+                          "type": "string",
+                          "description": "Preferred partner gender"
+                        },
+                        "relationship_goals": {
+                          "type": "string",
+                          "description": "Relationship goals"
+                        },
+                        "role": {
+                          "type": "string",
+                          "description": "User role"
+                        },
+                        "profile_picture_url": {
+                          "type": "string",
+                          "description": "Profile picture URL"
+                        },
+                        "hide_images": {
+                          "type": "integer",
+                          "description": "Hide images setting"
+                        },
+                        "initials": {
+                          "type": "string",
+                          "description": "User initials"
+                        },
+                        "profile": {
+                          "type": "object",
+                          "description": "Detailed profile information",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "birth_date": {
+                              "type": "string",
+                              "format": "date",
+                              "description": "Birth date"
+                            },
+                            "birth_date_formatted": {
+                              "type": "string",
+                              "description": "Formatted birth date"
+                            },
+                            "age": {
+                              "type": "integer",
+                              "description": "Current age"
+                            },
+                            "age_display": {
+                              "type": "string",
+                              "description": "Age display preference"
+                            },
+                            "orientation": {
+                              "type": "string",
+                              "description": "Sexual orientation"
+                            },
+                            "short_intro": {
+                              "type": "string",
+                              "description": "Short introduction"
+                            },
+                            "weight_mesurement": {
+                              "type": "string",
+                              "description": "Weight measurement unit"
+                            },
+                            "weight": {
+                              "type": "number",
+                              "description": "Weight"
+                            },
+                            "height_mesurement": {
+                              "type": "string",
+                              "description": "Height measurement unit"
+                            },
+                            "height": {
+                              "type": "number",
+                              "description": "Height"
+                            },
+                            "extended_descriptions": {
+                              "type": "array",
+                              "description": "Extended descriptions",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "order": {
+                                    "type": "integer"
+                                  }
+                                }
+                              }
+                            },
+                            "family_views": {
+                              "type": "string",
+                              "description": "Views on family"
+                            },
+                            "financial_views": {
+                              "type": "string",
+                              "description": "Views on finances"
+                            },
+                            "long_term_views": {
+                              "type": "string",
+                              "description": "Long-term goals"
+                            },
+                            "secret_text": {
+                              "type": "string",
+                              "description": "Secret text"
+                            },
+                            "education_level": {
+                              "type": "string",
+                              "description": "Education level"
+                            },
+                            "profession": {
+                              "type": "string",
+                              "description": "Profession"
+                            },
+                            "religion": {
+                              "type": "string",
+                              "description": "Religion"
+                            },
+                            "ethnicity": {
+                              "type": "string",
+                              "description": "Ethnicity"
+                            },
+                            "astrology_belief": {
+                              "type": "string",
+                              "description": "Astrology belief level"
+                            },
+                            "personality_type": {
+                              "type": "string",
+                              "description": "Personality type"
+                            },
+                            "location_residence": {
+                              "type": "string",
+                              "description": "Current residence location"
+                            },
+                            "location_residence_place_id": {
+                              "type": "string",
+                              "description": "Google Place ID for residence"
+                            },
+                            "location_residence_latitude": {
+                              "type": "number",
+                              "description": "Residence latitude"
+                            },
+                            "location_residence_longitude": {
+                              "type": "number",
+                              "description": "Residence longitude"
+                            },
+                            "location_residence_secondary_text": {
+                              "type": "string",
+                              "description": "Additional residence information"
+                            },
+                            "relocation_readiness": {
+                              "type": "string",
+                              "description": "Relocation readiness"
+                            },
+                            "location_search": {
+                              "type": "string",
+                              "description": "Preferred search location"
+                            },
+                            "location_search_place_id": {
+                              "type": "string",
+                              "description": "Google Place ID for search location"
+                            },
+                            "location_search_latitude": {
+                              "type": "number",
+                              "description": "Search location latitude"
+                            },
+                            "location_search_longitude": {
+                              "type": "number",
+                              "description": "Search location longitude"
+                            },
+                            "location_search_secondary_text": {
+                              "type": "string",
+                              "description": "Additional search location information"
+                            },
+                            "location_difference_reason": {
+                              "type": "string",
+                              "description": "Reason for location difference"
+                            },
+                            "languages": {
+                              "type": "array",
+                              "description": "Languages spoken",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "code": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "fluency": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 5
+                                  }
+                                }
+                              }
+                            },
+                            "hobbies": {
+                              "type": "array",
+                              "description": "User hobbies",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "emoji": {
+                                    "type": "string"
+                                  },
+                                  "icon_url": {
+                                    "type": "string"
+                                  },
+                                  "icon_url_active": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
+                          }
+                        },
+                        "financialProfile": {
+                          "type": "object",
+                          "nullable": true,
+                          "description": "Financial profile information"
+                        },
+                        "lifestyle_support_budget": {
+                          "type": "string",
+                          "description": "Lifestyle support budget"
+                        },
+                        "lifestyle_support_budget_trimmed": {
+                          "type": "string",
+                          "description": "Formatted lifestyle support budget"
+                        },
+                        "profileImages": {
+                          "type": "array",
+                          "description": "Profile images",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "url": {
+                                "type": "string"
+                              },
+                              "thumbnail_url": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "data": {
+                        "id": 123,
+                        "public_username": "john_doe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john@example.com",
+                        "gender": "male",
+                        "partner_preference": "female",
+                        "relationship_goals": "marriage",
+                        "role": "user",
+                        "profile_picture_url": "https://example.com/profile.jpg",
+                        "hide_images": 0,
+                        "initials": "JD",
+                        "profile": {
+                          "id": 123,
+                          "birth_date": "1990-05-15",
+                          "birth_date_formatted": "May 15, 1990",
+                          "age": 34,
+                          "age_display": "Show Exact Age",
+                          "orientation": "Straight",
+                          "short_intro": "Looking for meaningful connections",
+                          "weight_mesurement": "kg",
+                          "weight": 70,
+                          "height_mesurement": "cm",
+                          "height": 175,
+                          "extended_descriptions": [
+                            {
+                              "id": 1,
+                              "description": "I love traveling and exploring new cultures",
+                              "order": 1
+                            }
+                          ],
+                          "family_views": "Open to having children",
+                          "financial_views": "Financial stability is important",
+                          "long_term_views": "Looking for a life partner",
+                          "secret_text": "I'm secretly a great cook",
+                          "education_level": "Bachelor's Degree",
+                          "profession": "Software Engineer",
+                          "religion": "Christian",
+                          "ethnicity": "Caucasian",
+                          "astrology_belief": "Moderately interested",
+                          "personality_type": "INTJ",
+                          "location_residence": "New York, NY, USA",
+                          "location_residence_place_id": "ChIJOwg_06VPwokRYv534QaPC8g",
+                          "location_residence_latitude": 40.7128,
+                          "location_residence_longitude": -74.0060,
+                          "location_residence_secondary_text": "Manhattan",
+                          "relocation_readiness": "Open to relocation",
+                          "location_search": "San Francisco, CA, USA",
+                          "location_search_place_id": "ChIJIQBpAG2ahYAR_6128GcTUEo",
+                          "location_search_latitude": 37.7749,
+                          "location_search_longitude": -122.4194,
+                          "location_search_secondary_text": "Bay Area",
+                          "location_difference_reason": "Career opportunities",
+                          "languages": [
+                            {
+                              "id": 1,
+                              "code": "en",
+                              "name": "English",
+                              "fluency": 5
+                            },
+                            {
+                              "id": 2,
+                              "code": "es",
+                              "name": "Spanish",
+                              "fluency": 3
+                            }
+                          ],
+                          "hobbies": [
+                            {
+                              "id": 1,
+                              "name": "Photography",
+                              "emoji": "📸",
+                              "icon_url": "https://example.com/icons/photography.png",
+                              "icon_url_active": "https://example.com/icons/photography-active.png"
+                            }
+                          ],
+                          "created_at": "2024-01-15T10:30:00.000000Z",
+                          "updated_at": "2024-01-20T14:45:00.000000Z"
+                        },
+                        "financialProfile": null,
+                        "lifestyle_support_budget": "5000.00",
+                        "lifestyle_support_budget_trimmed": "5,000",
+                        "profileImages": [
+                          {
+                            "id": 123,
+                            "url": "https://example.com/profile.jpg",
+                            "thumbnail_url": "https://example.com/profile_thumb.jpg"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile/visibility": {
+      "post": {
+        "summary": "Update Visibility Settings",
+        "description": "Update your profile visibility settings including profile visibility, image visibility, and contact visibility.",
+        "tags": [
+          "Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profile_visibility": {
+                    "type": "boolean",
+                    "description": "Make profile visible to others",
+                    "example": true
+                  },
+                  "image_visibility": {
+                    "type": "boolean",
+                    "description": "Show images to others",
+                    "example": true
+                  },
+                  "contact_visibility": {
+                    "type": "boolean",
+                    "description": "Show contact information",
+                    "example": false
+                  }
+                }
+              },
+              "x-examples": {
+                "Example 1": {
+                  "profile_visibility": true,
+                  "image_visibility": true,
+                  "contact_visibility": false
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Visibility settings updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Visibility setting has been updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Visibility setting ID"
+                        },
+                        "user_id": {
+                          "type": "integer",
+                          "description": "User ID"
+                        },
+                        "profile_visibility": {
+                          "type": "boolean",
+                          "description": "Profile visibility setting"
+                        },
+                        "image_visibility": {
+                          "type": "boolean",
+                          "description": "Image visibility setting"
+                        },
+                        "contact_visibility": {
+                          "type": "boolean",
+                          "description": "Contact visibility setting"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Creation timestamp"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Visibility setting has been updated successfully",
+                      "data": {
+                        "id": 1,
+                        "user_id": 123,
+                        "profile_visibility": true,
+                        "image_visibility": true,
+                        "contact_visibility": false,
+                        "created_at": "2024-01-15T10:30:00.000000Z",
+                        "updated_at": "2024-01-20T14:45:00.000000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please check your inputs and try again."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "profile_visibility": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The profile visibility field is required."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/places/autocomplete": {
