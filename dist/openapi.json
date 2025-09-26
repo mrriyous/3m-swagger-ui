@@ -8357,7 +8357,7 @@
                   },
                   "method": {
                     "type": "string",
-                    "description": "Payment method (e.g., \"BALANCE\", \"COINGATE\")"
+                    "description": "Payment method (e.g., \"BALANCE\", \"BTC\", \"USDT\", \"SWIFT\", \"SEPA\", \"CARD\")"
                   },
                   "comment": {
                     "type": "string",
@@ -8791,11 +8791,11 @@
     },
     "/deposit/submit": {
       "post": {
-        "summary": "Submit a Deposit Transaction",
+        "summary": "Submit Deposit",
+        "description": "Creates a new deposit transaction for the authenticated user. The system will process the deposit using the specified payment method and return transaction details including any external payment URLs for completion.",
         "tags": [
           "Wallet"
         ],
-        "responses": {},
         "operationId": "post-deposit-submit",
         "security": [
           {
@@ -8803,40 +8803,201 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "x-examples": {
-                  "Example 1": {
-                    "amount": 2400,
-                    "method": "CARD",
-                    "comment": "testt",
-                    "currency": "USD"
-                  }
-                },
+                "required": ["amount", "method"],
                 "properties": {
                   "amount": {
-                    "type": "number"
+                    "type": "number",
+                    "format": "float",
+                    "description": "The amount to deposit",
+                    "example": 100.00
                   },
                   "method": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Payment method to use for the deposit",
+                    "example": "STRIPE"
                   },
                   "comment": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Optional comment for the deposit",
+                    "example": "Account top-up"
                   },
                   "currency": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Currency code (default: 'USD')",
+                    "default": "USD",
+                    "example": "USD"
                   }
                 }
               },
               "examples": {
-                "Example 1": {
+                "Stripe Payment": {
+                  "summary": "Credit card payment via Stripe",
                   "value": {
-                    "amount": 2400,
-                    "method": "CARD",
-                    "comment": "testt",
+                    "amount": 100.00,
+                    "method": "STRIPE",
+                    "comment": "Account top-up",
                     "currency": "USD"
+                  }
+                },
+                "Cryptocurrency Payment": {
+                  "summary": "Cryptocurrency payment via CoinGate",
+                  "value": {
+                    "amount": 50.00,
+                    "method": "COINGATE",
+                    "comment": "Crypto deposit",
+                    "currency": "USD"
+                  }
+                },
+                "Bank Transfer": {
+                  "summary": "Bank transfer via SWIFT",
+                  "value": {
+                    "amount": 500.00,
+                    "method": "SWIFT",
+                    "comment": "Bank transfer deposit",
+                    "currency": "USD"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deposit submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Deposit submitted successfully"
+                    },
+                    "transaction_id": {
+                      "type": "integer",
+                      "description": "Internal transaction ID",
+                      "example": 123
+                    },
+                    "transaction_number": {
+                      "type": "string",
+                      "description": "Human-readable transaction number",
+                      "example": "TXN-2024-001234"
+                    },
+                    "redirect_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "External payment URL for completion (if applicable)",
+                      "example": "https://checkout.stripe.com/pay/cs_test_..."
+                    }
+                  }
+                },
+                "examples": {
+                  "Success with Redirect": {
+                    "summary": "Successful deposit with external payment URL",
+                    "value": {
+                      "error": false,
+                      "message": "Deposit submitted successfully",
+                      "transaction_id": 123,
+                      "transaction_number": "TXN-2024-001234",
+                      "redirect_url": "https://checkout.stripe.com/pay/cs_test_..."
+                    }
+                  },
+                  "Success without Redirect": {
+                    "summary": "Successful deposit without external payment URL (e.g., BALANCE method)",
+                    "value": {
+                      "error": false,
+                      "message": "Deposit submitted successfully",
+                      "transaction_id": 124,
+                      "transaction_number": "TXN-2024-001235",
+                      "redirect_url": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please enter the amount to deposit"
+                    }
+                  }
+                },
+                "examples": {
+                  "Missing Amount": {
+                    "summary": "Amount parameter is missing",
+                    "value": {
+                      "error": true,
+                      "message": "Please enter the amount to deposit"
+                    }
+                  },
+                  "Invalid Method": {
+                    "summary": "Invalid payment method",
+                    "value": {
+                      "error": true,
+                      "message": "Invalid payment method selected"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, something went wrong. Please try again."
+                    }
                   }
                 }
               }
@@ -8847,11 +9008,11 @@
     },
     "/withdrawal/submit": {
       "post": {
-        "summary": "Submit a Withdrawal Request",
+        "summary": "Submit Withdrawal",
+        "description": "Creates a new withdrawal transaction for the authenticated user. The system validates the user's available balance and processes the withdrawal request using the specified payment method and banking details.\n\n## Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n## Withdrawal Methods\n\n| Method | Type | Description | Required Fields |\n|--------|------|-------------|-----------------|\n| `SWIFT` | Bank Transfer | International bank transfer via SWIFT | bank_name, bank_swift_code, bank_account_number, bank_receiver_name |\n| `SEPA` | Bank Transfer | European bank transfer via SEPA | bank_name, bank_swift_code, bank_account_number, bank_receiver_name |\n| `USDT` | Cryptocurrency | USDT withdrawal to wallet | wallet_address |\n| `BTC` | Cryptocurrency | Bitcoin withdrawal to wallet | wallet_address |\n\n## Validation Rules\n- **Amount**: Must be numeric and greater than or equal to 0\n- **Method**: Must be one of the valid withdrawal methods\n- **Currency**: Required field\n- **Bank Details**: Required only for SWIFT and SEPA methods\n- **Wallet Address**: Required only for USDT and BTC methods\n\n## Balance Requirements\n- Withdrawals can only use **available balance** (active_balance + affiliate_earning_balance)\n- The system checks available balance before processing the withdrawal\n- Pending or locked balances cannot be withdrawn\n\n## Transaction Processing\n1. **Validation**: All required fields are validated based on the selected method\n2. **Balance Check**: System verifies sufficient available balance\n3. **Transaction Creation**: A new withdrawal transaction is created with status 'pending'\n4. **Banking Details**: Withdrawal-specific banking information is stored\n5. **Response**: Transaction details are returned for tracking",
         "tags": [
           "Wallet"
         ],
-        "responses": {},
         "operationId": "post-withdrawal-submit",
         "security": [
           {
@@ -8859,60 +9020,264 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "x-examples": {
-                  "Example 1": {
-                    "amount": 2900,
-                    "method": "SWIFT",
-                    "currency": "USD",
-                    "bank_name": "BANK CENTRAL ASIA",
-                    "wallet_address": null,
-                    "bank_swift_code": "299239",
-                    "bank_receiver_name": "John",
-                    "bank_account_number": "0198082839"
-                  }
-                },
+                "required": ["amount", "method", "currency"],
                 "properties": {
                   "amount": {
-                    "type": "number"
+                    "type": "number",
+                    "format": "float",
+                    "minimum": 0,
+                    "description": "The amount to withdraw (must be ≥ 0)"
                   },
                   "method": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": ["SWIFT", "SEPA", "USDT", "BTC"],
+                    "description": "Withdrawal method"
                   },
                   "currency": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Currency code for the withdrawal"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Optional comment for the withdrawal"
                   },
                   "bank_name": {
-                    "type": "string"
-                  },
-                  "wallet_address": {
-                    "nullable": true
+                    "type": "string",
+                    "description": "Bank name (required for SWIFT/SEPA)"
                   },
                   "bank_swift_code": {
-                    "type": "string"
-                  },
-                  "bank_receiver_name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Bank SWIFT code (required for SWIFT/SEPA)"
                   },
                   "bank_account_number": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Bank account number (required for SWIFT/SEPA)"
+                  },
+                  "bank_receiver_name": {
+                    "type": "string",
+                    "description": "Account holder name (required for SWIFT/SEPA)"
+                  },
+                  "wallet_address": {
+                    "type": "string",
+                    "description": "Cryptocurrency wallet address (required for USDT/BTC)"
                   }
                 }
               },
               "examples": {
-                "Example 1": {
+                "SWIFT Bank Transfer": {
+                  "summary": "International bank transfer via SWIFT",
                   "value": {
-                    "amount": 2900,
+                    "amount": 500.00,
                     "method": "SWIFT",
                     "currency": "USD",
-                    "bank_name": "BANK CENTRAL ASIA",
-                    "wallet_address": null,
-                    "bank_swift_code": "299239",
-                    "bank_receiver_name": "John",
-                    "bank_account_number": "0198082839"
+                    "comment": "Monthly withdrawal",
+                    "bank_name": "Chase Bank",
+                    "bank_swift_code": "CHASUS33",
+                    "bank_account_number": "1234567890",
+                    "bank_receiver_name": "John Doe"
+                  }
+                },
+                "SEPA Bank Transfer": {
+                  "summary": "European bank transfer via SEPA",
+                  "value": {
+                    "amount": 1000.00,
+                    "method": "SEPA",
+                    "currency": "EUR",
+                    "comment": "Quarterly withdrawal",
+                    "bank_name": "Deutsche Bank",
+                    "bank_swift_code": "DEUTDEFF",
+                    "bank_account_number": "DE89370400440532013000",
+                    "bank_receiver_name": "Jane Smith"
+                  }
+                },
+                "USDT Cryptocurrency": {
+                  "summary": "USDT withdrawal to wallet",
+                  "value": {
+                    "amount": 100.00,
+                    "method": "USDT",
+                    "currency": "USD",
+                    "comment": "Crypto withdrawal",
+                    "wallet_address": "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
+                  }
+                },
+                "BTC Cryptocurrency": {
+                  "summary": "Bitcoin withdrawal to wallet",
+                  "value": {
+                    "amount": 0.05,
+                    "method": "BTC",
+                    "currency": "USD",
+                    "comment": "Bitcoin withdrawal",
+                    "wallet_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Withdrawal submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false,
+                      "description": "Indicates if the request was successful"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Withdrawal submitted successfully",
+                      "description": "Human-readable message about the result"
+                    },
+                    "transaction_id": {
+                      "type": "integer",
+                      "example": 456,
+                      "description": "Internal transaction ID"
+                    },
+                    "transaction_number": {
+                      "type": "string",
+                      "example": "TXN-2024-005678",
+                      "description": "Human-readable transaction number"
+                    }
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "value": {
+                      "error": false,
+                      "message": "Withdrawal submitted successfully",
+                      "transaction_id": 456,
+                      "transaction_number": "TXN-2024-005678"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation errors or insufficient balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the request was successful"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the error"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "description": "Validation errors (only present on validation failure)",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "Validation Errors": {
+                    "summary": "Validation errors for missing or invalid fields",
+                    "value": {
+                      "error": true,
+                      "message": "Please fill in all the fields correctly",
+                      "errors": {
+                        "amount": ["The amount field is required."],
+                        "method": ["The method must be a valid method."],
+                        "bank_name": ["The bank name field is required."]
+                      }
+                    }
+                  },
+                  "Insufficient Balance": {
+                    "summary": "Insufficient balance error",
+                    "value": {
+                      "error": true,
+                      "message": "Insufficient balance"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The given data was invalid."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error message details"
+                    }
                   }
                 }
               }
@@ -9148,6 +9513,20 @@
                                   "type": "string",
                                   "description": "Payment method used"
                                 },
+                                "payment_session_id": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "description": "Payment session ID for tracking"
+                                },
+                                "payment_url": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "description": "Payment URL for redirect-based payments"
+                                },
+                                "amount_in_lc": {
+                                  "type": "number",
+                                  "description": "Payment amount in local currency"
+                                },
                                 "created_at": {
                                   "type": "string",
                                   "format": "date-time",
@@ -9274,9 +9653,12 @@
                               "transaction_id": 1,
                               "amount": 464.00,
                               "amount_trimmed": "464",
+                              "amount_in_lc": 464.00,
                               "currency": "USD",
                               "status": "completed",
-                              "payment_method": "COINGATE",
+                              "payment_method": "BTC",
+                              "payment_session_id": "cg_123456",
+                              "payment_url": "https://payment-gateway.com/pay/abc123",
                               "created_at": "2024-01-01T10:00:00.000000Z",
                               "updated_at": "2024-01-01T10:00:00.000000Z"
                             }
@@ -10528,7 +10910,7 @@
                         "currency": "USD",
                         "user_currency": "USD",
                         "status": "completed",
-                        "payment_method": "COINGATE",
+                        "payment_method": "BTC",
                         "amount": 464.00,
                         "amount_in_lc": 464.00,
                         "grand_total": 464.00,
@@ -10561,7 +10943,7 @@
                           {
                             "id": 1,
                             "transaction_id": 1,
-                            "payment_method": "COINGATE",
+                            "payment_method": "BTC",
                             "amount": 464.00,
                             "amount_in_lc": 464.00,
                             "currency": "USD",
@@ -10600,7 +10982,7 @@
                         "currency": "USD",
                         "user_currency": "USD",
                         "status": "completed",
-                        "payment_method": "COINGATE",
+                        "payment_method": "BTC",
                         "amount": 464.00,
                         "amount_in_lc": 464.00,
                         "grand_total": 464.00,
@@ -10633,7 +11015,7 @@
                           {
                             "id": 1,
                             "transaction_id": 1,
-                            "payment_method": "COINGATE",
+                            "payment_method": "BTC",
                             "amount": 464.00,
                             "amount_in_lc": 464.00,
                             "currency": "USD",
@@ -10977,7 +11359,7 @@
     "/payment-methods": {
       "get": {
         "summary": "Get Payment Methods List",
-        "description": "Retrieves all available payment methods with their configuration details. Can be filtered by type to show only methods available for specific operations.",
+        "description": "Retrieves all available payment methods with their configuration details. Can be filtered by type to show only methods available for specific operations. Cryptocurrency payments now use direct wallet addresses for manual transfers instead of redirecting to payment gateways.",
         "tags": ["Payment Methods"],
         "parameters": [
           {
@@ -11019,8 +11401,8 @@
                           },
                           "type": {
                             "type": "string",
-                            "description": "Payment method type (bank_transfer, card, crypto)",
-                            "enum": ["bank_transfer", "card", "crypto"]
+                            "description": "Payment method type (bank_transfer, card, crypto_wallet)",
+                            "enum": ["bank_transfer", "card", "crypto_wallet"]
                           },
                           "icon": {
                             "type": "string",
@@ -11036,7 +11418,7 @@
                           },
                           "fields": {
                             "type": "array",
-                            "description": "Array of field objects (for bank transfers)",
+                            "description": "Array of field objects (for bank transfers and crypto wallets)",
                             "items": {
                               "type": "object",
                               "properties": {
@@ -11136,30 +11518,39 @@
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_usdt_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
                           "name": "USDT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "USDT"
+                          "currency": "USDT",
+                          "fields": [
+                            {
+                              "label": "USDT TRC20",
+                              "value": "TNffNZoWwCv9Ep4e82cVexBVTfLdZna5tC"
+                            },
+                            {
+                              "label": "USDT BEP20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            },
+                            {
+                              "label": "USDT ERC20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_bitcoin_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
                           "name": "BTC",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "BTC"
-                        },
-                        {
-                          "withdrawal": true,
-                          "type": "crypto",
-                          "icon": "static/icons/payment_eurt_icon.svg",
-                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
-                          "name": "EURT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "EURT"
+                          "currency": "BTC",
+                          "fields": [
+                            {
+                              "label": "BTC",
+                              "value": "bc1qn3tlm2hxs5vsuu6xvpjt0f6uq738jnt53ae9qx"
+                            }
+                          ]
                         }
                       ]
                     },
@@ -11227,30 +11618,39 @@
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_usdt_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
                           "name": "USDT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "USDT"
+                          "currency": "USDT",
+                          "fields": [
+                            {
+                              "label": "USDT TRC20",
+                              "value": "TNffNZoWwCv9Ep4e82cVexBVTfLdZna5tC"
+                            },
+                            {
+                              "label": "USDT BEP20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            },
+                            {
+                              "label": "USDT ERC20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_bitcoin_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
                           "name": "BTC",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "BTC"
-                        },
-                        {
-                          "withdrawal": true,
-                          "type": "crypto",
-                          "icon": "static/icons/payment_eurt_icon.svg",
-                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
-                          "name": "EURT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "EURT"
+                          "currency": "BTC",
+                          "fields": [
+                            {
+                              "label": "BTC",
+                              "value": "bc1qn3tlm2hxs5vsuu6xvpjt0f6uq738jnt53ae9qx"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -11330,30 +11730,39 @@
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_usdt_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
                           "name": "USDT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "USDT"
+                          "currency": "USDT",
+                          "fields": [
+                            {
+                              "label": "USDT TRC20",
+                              "value": "TNffNZoWwCv9Ep4e82cVexBVTfLdZna5tC"
+                            },
+                            {
+                              "label": "USDT BEP20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            },
+                            {
+                              "label": "USDT ERC20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_bitcoin_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
                           "name": "BTC",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "BTC"
-                        },
-                        {
-                          "withdrawal": true,
-                          "type": "crypto",
-                          "icon": "static/icons/payment_eurt_icon.svg",
-                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
-                          "name": "EURT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "EURT"
+                          "currency": "BTC",
+                          "fields": [
+                            {
+                              "label": "BTC",
+                              "value": "bc1qn3tlm2hxs5vsuu6xvpjt0f6uq738jnt53ae9qx"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -11423,30 +11832,39 @@
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_usdt_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_usdt_icon.svg",
                           "name": "USDT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "USDT"
+                          "currency": "USDT",
+                          "fields": [
+                            {
+                              "label": "USDT TRC20",
+                              "value": "TNffNZoWwCv9Ep4e82cVexBVTfLdZna5tC"
+                            },
+                            {
+                              "label": "USDT BEP20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            },
+                            {
+                              "label": "USDT ERC20",
+                              "value": "0xd220368fB7C910A552C26e725a18b1BfB3A6684E"
+                            }
+                          ]
                         },
                         {
                           "withdrawal": true,
-                          "type": "crypto",
+                          "type": "crypto_wallet",
                           "icon": "static/icons/payment_bitcoin_icon.svg",
                           "icon_url": "https://startup2050.com/static/icons/payment_bitcoin_icon.svg",
                           "name": "BTC",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "BTC"
-                        },
-                        {
-                          "withdrawal": true,
-                          "type": "crypto",
-                          "icon": "static/icons/payment_eurt_icon.svg",
-                          "icon_url": "https://startup2050.com/static/icons/payment_eurt_icon.svg",
-                          "name": "EURT",
-                          "message": "You will be redirected to CoinGate to complete your cryptocurrency payment.",
-                          "currency": "EURT"
+                          "currency": "BTC",
+                          "fields": [
+                            {
+                              "label": "BTC",
+                              "value": "bc1qn3tlm2hxs5vsuu6xvpjt0f6uq738jnt53ae9qx"
+                            }
+                          ]
                         }
                       ]
                     }
