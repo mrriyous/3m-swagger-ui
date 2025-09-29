@@ -7486,1309 +7486,7 @@
         }
       }
     },
-    "/subscription/current": {
-      "get": {
-        "summary": "Get Current Subscription",
-        "description": "Retrieves the authenticated user's current active subscription details.",
-        "tags": [
-          "Subscription"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "active_subscription": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "user_id": {
-                          "type": "integer"
-                        },
-                        "subscription_plan_id": {
-                          "type": "integer"
-                        },
-                        "transaction_id": {
-                          "type": "integer"
-                        },
-                        "start_date": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "end_date": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["active", "expired", "cancelled"]
-                        },
-                        "price": {
-                          "type": "number"
-                        },
-                        "currency": {
-                          "type": "string"
-                        },
-                        "days_left": {
-                          "type": "string"
-                        },
-                        "used_months": {
-                          "type": "integer"
-                        },
-                        "price_trimmed": {
-                          "type": "string"
-                        },
-                        "currency_details": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "symbol": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "plan": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer"
-                            },
-                            "level": {
-                              "type": "integer"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "description": {
-                              "type": "string"
-                            },
-                            "duration": {
-                              "type": "integer"
-                            },
-                            "features": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "title": {
-                                    "type": "string"
-                                  },
-                                  "support": {
-                                    "type": "integer"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "active_subscription": {
-                        "id": 1,
-                        "user_id": 1,
-                        "subscription_plan_id": 2,
-                        "transaction_id": 123,
-                        "start_date": "2024-01-01T00:00:00.000000Z",
-                        "end_date": "2024-12-31T23:59:59.000000Z",
-                        "status": "active",
-                        "price": 464.00,
-                        "currency": "USD",
-                        "days_left": "8 months 15 days 12 hours",
-                        "used_months": 3,
-                        "price_trimmed": "464",
-                        "plan": {
-                          "id": 15,
-                          "level": 2,
-                          "name": "Premium Annual Plan",
-                          "description": "Premium subscription plan with advanced features",
-                          "duration": 365,
-                          "features": "[{\"title\": \"All Standard Plan Features\", \"support\": 1}, {\"title\": \"Unlocking all functionality\", \"support\": 1}, {\"title\": \"Personalized support\", \"support\": 1}, {\"title\": \"Unlimited chats\", \"support\": 1}, {\"title\": \"Up to 10 Test Moons\", \"support\": 1}, {\"title\": \"Assisted video calls with up to 10 potential partners\", \"support\": 1}, {\"note\": \"To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).\", \"title\": \"Option of anonymity\", \"support\": 1}, {\"title\": \"Makes potential partner’s profile unable to perform search\", \"support\": 1}, {\"title\": \"Training and continuous assistance by MMM’s staff for efficient search\", \"support\": 1}, {\"title\": \"Action plan building and follow up coordination with MMM’s expert for efficient search\", \"support\": 0}, {\"title\": \"Lifestyle / style changes advice by MMM’s experts\", \"support\": 0}, {\"title\": \"Travel and booking assistance for mutual travels\", \"support\": 0}, {\"title\": \"Special requests\", \"support\": 0}]",
-                          "created_at": "2025-05-23T14:43:53.000000Z",
-                          "updated_at": "2025-05-23T14:43:53.000000Z",
-                          "deleted_at": null
-                        },
-                        "currency_details": {
-                          "id": 1,
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "symbol": "$"
-                        }
-                      },
-                      "Example 2": {
-                        "error": false,
-                        "active_subscription": null
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-subscription-current",
-        "parameters": [],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/subscription/plans": {
-      "get": {
-        "summary": "Get Subscription Plans",
-        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget. The system automatically uses the higher budget between the user and their partner (if budget_user_id is provided).",
-        "tags": [
-          "Subscription"
-        ],
-        "parameters": [
-          {
-            "name": "currency",
-            "in": "query",
-            "description": "Currency code for pricing (defaults to user's preferred currency)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "upgrade",
-            "in": "query",
-            "description": "Set to \"yes\" to show only plans higher than current plan level",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "budget_user_id",
-            "in": "query",
-            "description": "Partner's user ID to use their budget if higher than user's budget",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "budget_user_id": {
-                      "type": "integer",
-                      "description": "The user ID whose budget was used for calculations"
-                    },
-                    "budget_used": {
-                      "type": "number",
-                      "description": "The actual budget amount used for calculations"
-                    },
-                    "plans": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer"
-                          },
-                          "level": {
-                            "type": "integer"
-                          },
-                          "price": {
-                            "type": "string"
-                          },
-                          "price_trimmed": {
-                            "type": "string"
-                          },
-                          "currency": {
-                            "type": "string"
-                          },
-                          "currency_symbol": {
-                            "type": "string"
-                          },
-                          "currency_detail": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "integer"
-                              },
-                              "code": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "symbol": {
-                                "type": "string"
-                              },
-                              "prefix": {
-                                "type": "string"
-                              },
-                              "suffix": {
-                                "type": "string"
-                              },
-                              "icon": {
-                                "type": "string"
-                              },
-                              "created_at": {
-                                "type": "string"
-                              },
-                              "updated_at": {
-                                "type": "string"
-                              },
-                              "deleted_at": {
-                                "type": "null"
-                              },
-                              "icon_url": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "description": {
-                            "type": "string"
-                          },
-                          "duration": {
-                            "type": "integer"
-                          },
-                          "features": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "title": {
-                                  "type": "string"
-                                },
-                                "support": {
-                                  "type": "integer"
-                                },
-                                "note": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "currency": {
-                      "type": "string"
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "budget_user_id": 123,
-                      "budget_used": 10000,
-                      "plans": [
-                        {
-                          "id": 14,
-                          "level": 1,
-                          "price": "348.00",
-                          "price_trimmed": "348",
-                          "currency": "USD",
-                          "currency_symbol": "$",
-                          "currency_detail": {
-                            "id": 10,
-                            "code": "USD",
-                            "name": "US Dollar",
-                            "symbol": "$",
-                            "prefix": "$",
-                            "suffix": "",
-                            "icon": "/static/icons/currency/usd.png",
-                            "created_at": "2025-06-03T12:31:20.000000Z",
-                            "updated_at": "2025-06-03T12:31:20.000000Z",
-                            "deleted_at": null,
-                            "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                          },
-                          "name": "Standard Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
-                          "duration": 365,
-                          "features": [
-                            {
-                              "title": "All Standard Plan Features",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlocking all functionality",
-                              "support": 1
-                            },
-                            {
-                              "title": "Personalized support",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlimited chats",
-                              "support": 1
-                            },
-                            {
-                              "title": "Up to 10 Test Moons",
-                              "support": 1
-                            },
-                            {
-                              "title": "Assisted video calls with up to 10 potential partners",
-                              "support": 1
-                            },
-                            {
-                              "note": "To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).",
-                              "title": "Option of anonymity",
-                              "support": 1
-                            },
-                            {
-                              "title": "Makes potential partner’s profile unable to perform search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Training and continuous assistance by MMM’s staff for efficient search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Action plan building and follow up coordination with MMM’s expert for efficient search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Lifestyle / style changes advice by MMM’s experts",
-                              "support": 0
-                            },
-                            {
-                              "title": "Travel and booking assistance for mutual travels",
-                              "support": 0
-                            },
-                            {
-                              "title": "Special requests",
-                              "support": 0
-                            }
-                          ]
-                        },
-                        {
-                          "id": 15,
-                          "level": 2,
-                          "price": "464.00",
-                          "price_trimmed": "464",
-                          "currency": "USD",
-                          "currency_symbol": "$",
-                          "currency_detail": {
-                            "id": 10,
-                            "code": "USD",
-                            "name": "US Dollar",
-                            "symbol": "$",
-                            "prefix": "$",
-                            "suffix": "",
-                            "icon": "/static/icons/currency/usd.png",
-                            "created_at": "2025-06-03T12:31:20.000000Z",
-                            "updated_at": "2025-06-03T12:31:20.000000Z",
-                            "deleted_at": null,
-                            "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                          },
-                          "name": "Premium Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
-                          "duration": 365,
-                          "features": [
-                            {
-                              "title": "All Standard Plan Features",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlocking all functionality",
-                              "support": 1
-                            },
-                            {
-                              "title": "Personalized support",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlimited chats",
-                              "support": 1
-                            },
-                            {
-                              "title": "Up to 10 Test Moons",
-                              "support": 1
-                            },
-                            {
-                              "title": "Assisted video calls with up to 10 potential partners",
-                              "support": 1
-                            },
-                            {
-                              "note": "To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).",
-                              "title": "Option of anonymity",
-                              "support": 1
-                            },
-                            {
-                              "title": "Makes potential partner’s profile unable to perform search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Training and continuous assistance by MMM’s staff for efficient search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Action plan building and follow up coordination with MMM’s expert for efficient search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Lifestyle / style changes advice by MMM’s experts",
-                              "support": 0
-                            },
-                            {
-                              "title": "Travel and booking assistance for mutual travels",
-                              "support": 0
-                            },
-                            {
-                              "title": "Special requests",
-                              "support": 0
-                            }
-                          ]
-                        },
-                        {
-                          "id": 16,
-                          "level": 3,
-                          "price": "580.00",
-                          "price_trimmed": "580",
-                          "currency": "USD",
-                          "currency_symbol": "$",
-                          "currency_detail": {
-                            "id": 10,
-                            "code": "USD",
-                            "name": "US Dollar",
-                            "symbol": "$",
-                            "prefix": "$",
-                            "suffix": "",
-                            "icon": "/static/icons/currency/usd.png",
-                            "created_at": "2025-06-03T12:31:20.000000Z",
-                            "updated_at": "2025-06-03T12:31:20.000000Z",
-                            "deleted_at": null,
-                            "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                          },
-                          "name": "VIP Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
-                          "duration": 365,
-                          "features": [
-                            {
-                              "title": "All Standard Plan Features",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlocking all functionality",
-                              "support": 1
-                            },
-                            {
-                              "title": "Personalized support",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlimited chats",
-                              "support": 1
-                            },
-                            {
-                              "title": "Up to 10 Test Moons",
-                              "support": 1
-                            },
-                            {
-                              "title": "Assisted video calls with up to 10 potential partners",
-                              "support": 1
-                            },
-                            {
-                              "note": "To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).",
-                              "title": "Option of anonymity",
-                              "support": 1
-                            },
-                            {
-                              "title": "Makes potential partner’s profile unable to perform search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Training and continuous assistance by MMM’s staff for efficient search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Action plan building and follow up coordination with MMM’s expert for efficient search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Lifestyle / style changes advice by MMM’s experts",
-                              "support": 1
-                            },
-                            {
-                              "title": "Travel and booking assistance for mutual travels",
-                              "support": 1
-                            },
-                            {
-                              "title": "Special requests",
-                              "support": 1
-                            }
-                          ]
-                        }
-                      ],
-                      "currency": "USD"
-                    }
-                  }
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "error": false,
-                      "plans": [
-                        {
-                          "id": 14,
-                          "level": 1,
-                          "price": "348.00",
-                          "price_trimmed": "348",
-                          "currency": "USD",
-                          "currency_symbol": "$",
-                          "currency_detail": {
-                            "id": 10,
-                            "code": "USD",
-                            "name": "US Dollar",
-                            "symbol": "$",
-                            "prefix": "$",
-                            "suffix": "",
-                            "icon": "/static/icons/currency/usd.png",
-                            "created_at": "2025-06-03T12:31:20.000000Z",
-                            "updated_at": "2025-06-03T12:31:20.000000Z",
-                            "deleted_at": null,
-                            "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                          },
-                          "name": "Standard Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
-                          "duration": 365,
-                          "features": [
-                            {
-                              "title": "All Standard Plan Features",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlocking all functionality",
-                              "support": 1
-                            },
-                            {
-                              "title": "Personalized support",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlimited chats",
-                              "support": 1
-                            },
-                            {
-                              "title": "Up to 10 Test Moons",
-                              "support": 1
-                            },
-                            {
-                              "title": "Assisted video calls with up to 10 potential partners",
-                              "support": 1
-                            },
-                            {
-                              "note": "To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).",
-                              "title": "Option of anonymity",
-                              "support": 1
-                            },
-                            {
-                              "title": "Makes potential partner’s profile unable to perform search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Training and continuous assistance by MMM’s staff for efficient search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Action plan building and follow up coordination with MMM’s expert for efficient search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Lifestyle / style changes advice by MMM’s experts",
-                              "support": 0
-                            },
-                            {
-                              "title": "Travel and booking assistance for mutual travels",
-                              "support": 0
-                            },
-                            {
-                              "title": "Special requests",
-                              "support": 0
-                            }
-                          ]
-                        },
-                        {
-                          "id": 15,
-                          "level": 2,
-                          "price": "464.00",
-                          "price_trimmed": "464",
-                          "currency": "USD",
-                          "currency_symbol": "$",
-                          "currency_detail": {
-                            "id": 10,
-                            "code": "USD",
-                            "name": "US Dollar",
-                            "symbol": "$",
-                            "prefix": "$",
-                            "suffix": "",
-                            "icon": "/static/icons/currency/usd.png",
-                            "created_at": "2025-06-03T12:31:20.000000Z",
-                            "updated_at": "2025-06-03T12:31:20.000000Z",
-                            "deleted_at": null,
-                            "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                          },
-                          "name": "Premium Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
-                          "duration": 365,
-                          "features": [
-                            {
-                              "title": "All Standard Plan Features",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlocking all functionality",
-                              "support": 1
-                            },
-                            {
-                              "title": "Personalized support",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlimited chats",
-                              "support": 1
-                            },
-                            {
-                              "title": "Up to 10 Test Moons",
-                              "support": 1
-                            },
-                            {
-                              "title": "Assisted video calls with up to 10 potential partners",
-                              "support": 1
-                            },
-                            {
-                              "note": "To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).",
-                              "title": "Option of anonymity",
-                              "support": 1
-                            },
-                            {
-                              "title": "Makes potential partner’s profile unable to perform search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Training and continuous assistance by MMM’s staff for efficient search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Action plan building and follow up coordination with MMM’s expert for efficient search",
-                              "support": 0
-                            },
-                            {
-                              "title": "Lifestyle / style changes advice by MMM’s experts",
-                              "support": 0
-                            },
-                            {
-                              "title": "Travel and booking assistance for mutual travels",
-                              "support": 0
-                            },
-                            {
-                              "title": "Special requests",
-                              "support": 0
-                            }
-                          ]
-                        },
-                        {
-                          "id": 16,
-                          "level": 3,
-                          "price": "580.00",
-                          "price_trimmed": "580",
-                          "currency": "USD",
-                          "currency_symbol": "$",
-                          "currency_detail": {
-                            "id": 10,
-                            "code": "USD",
-                            "name": "US Dollar",
-                            "symbol": "$",
-                            "prefix": "$",
-                            "suffix": "",
-                            "icon": "/static/icons/currency/usd.png",
-                            "created_at": "2025-06-03T12:31:20.000000Z",
-                            "updated_at": "2025-06-03T12:31:20.000000Z",
-                            "deleted_at": null,
-                            "icon_url": "http://localhost:8001/static/icons/currency/usd.png"
-                          },
-                          "name": "VIP Annual Plan",
-                          "description": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit.",
-                          "duration": 365,
-                          "features": [
-                            {
-                              "title": "All Standard Plan Features",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlocking all functionality",
-                              "support": 1
-                            },
-                            {
-                              "title": "Personalized support",
-                              "support": 1
-                            },
-                            {
-                              "title": "Unlimited chats",
-                              "support": 1
-                            },
-                            {
-                              "title": "Up to 10 Test Moons",
-                              "support": 1
-                            },
-                            {
-                              "title": "Assisted video calls with up to 10 potential partners",
-                              "support": 1
-                            },
-                            {
-                              "note": "To MMM and your partner until you go for a Preliminary Contract (after a successful Test Moon with your potential partner).",
-                              "title": "Option of anonymity",
-                              "support": 1
-                            },
-                            {
-                              "title": "Makes potential partner’s profile unable to perform search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Training and continuous assistance by MMM’s staff for efficient search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Action plan building and follow up coordination with MMM’s expert for efficient search",
-                              "support": 1
-                            },
-                            {
-                              "title": "Lifestyle / style changes advice by MMM’s experts",
-                              "support": 1
-                            },
-                            {
-                              "title": "Travel and booking assistance for mutual travels",
-                              "support": 1
-                            },
-                            {
-                              "title": "Special requests",
-                              "support": 1
-                            }
-                          ]
-                        }
-                      ],
-                      "currency": "USD"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "examples": {
-                  "No Available Plans": {
-                    "value": {
-                      "error": true,
-                      "message": "There is no available plan for subscription at the moment. Please contact support."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-subscription-plans",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/subscription/submit": {
-      "post": {
-        "summary": "Submit Subscription",
-        "description": "Submits a subscription purchase request. The system will create a transaction and process the payment.",
-        "tags": [
-          "Subscription"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["subscription_id", "method"],
-                "properties": {
-                  "subscription_id": {
-                    "type": "integer",
-                    "description": "ID of the subscription plan to purchase"
-                  },
-                  "method": {
-                    "type": "string",
-                    "description": "Payment method (e.g., \"BALANCE\", \"BTC\", \"USDT\", \"SWIFT\", \"SEPA\", \"CARD\")"
-                  },
-                  "comment": {
-                    "type": "string",
-                    "description": "Additional comment for the transaction"
-                  },
-                  "balance_amount": {
-                    "type": "number",
-                    "description": "Amount to use from user balance",
-                    "minimum": 0
-                  },
-                  "currency": {
-                    "type": "string",
-                    "description": "Currency for the transaction",
-                    "default": "USD"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "description": "Total transaction amount",
-                    "minimum": 0
-                  },
-                  "budget_user_id": {
-                    "type": "integer",
-                    "description": "Partner's user ID if using their budget"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "redirect_url": {
-                      "type": "string"
-                    },
-                    "transaction_id": {
-                      "type": "integer"
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "message": "Subscription deposit submitted successfully",
-                      "redirect_url": "https://checkout.stripe.com/c/pay/cs_test_a1IUuBzNvbM6q59XHRaGeyEk2Mc6S8myphNuCo5Eo9cRrEl0ObSnuafMZd#fidkdWxOYHwnPyd1blpxYHZxWjA0V1NydFdMR2l8V0ZxNk9JTlVOREJUUG1BbjZ3cnFRT2NoVmlQTWI8XVN9UnJpYmRqX0N9SzNSTm03Qks8VFdXaEpTaENEN0t8PGhANEJpUmdhTzNGbHVLNTVwPElWUWxzYScpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
-                      "transaction_id": 175
-                    }
-                  }
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "error": false,
-                      "message": "Subscription deposit submitted successfully",
-                      "redirect_url": "https://checkout.stripe.com/c/pay/cs_test_a1IUuBzNvbM6q59XHRaGeyEk....",
-                      "transaction_id": 175
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "x-stoplight": {
-                        "id": "wf71ldmj689fh"
-                      }
-                    },
-                    "message": {
-                      "type": "string",
-                      "x-stoplight": {
-                        "id": "bpw3y3x3qwwrv"
-                      }
-                    }
-                  }
-                },
-                "examples": {
-                  "Subscription below the current's subscription error": {
-                    "value": {
-                      "error": true,
-                      "message": "You cannot downgrade your subscription."
-                    }
-                  },
-                  "Subscription is the same with the current subscription": {
-                    "value": {
-                      "error": true,
-                      "message": "You are already on this subscription plan."
-                    }
-                  },
-                  "Invalid Plan": {
-                    "value": {
-                      "error": true,
-                      "message": "Subscription plan is not valid"
-                    }
-                  },
-                  "Insufficient Balance": {
-                    "value": {
-                      "error": true,
-                      "message": "Insufficient balance for the requested amount"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "post-subscription-submit",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/subscription/budget-upgrade": {
-      "get": {
-        "summary": "Get Budget Upgrade Information",
-        "description": "Retrieves information about budget upgrade options for users with pending budget changes.",
-        "tags": [
-          "Subscription"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "active_subscription": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "user_id": {
-                          "type": "integer"
-                        },
-                        "subscription_plan_id": {
-                          "type": "integer"
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": ["active", "expired", "cancelled"]
-                        },
-                        "plan": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer"
-                            },
-                            "level": {
-                              "type": "integer"
-                            },
-                            "name": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "new_pricing": {
-                          "type": "number"
-                        },
-                        "new_pricing_trimmed": {
-                          "type": "string"
-                        },
-                        "upgrade_price": {
-                          "type": "number"
-                        },
-                        "upgrade_price_trimmed": {
-                          "type": "string"
-                        },
-                        "currency_details": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer"
-                            },
-                            "code": {
-                              "type": "string"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "symbol": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "financial_profile": {
-                      "type": "object",
-                      "properties": {
-                        "currency": {
-                          "type": "string"
-                        },
-                        "lifestyle_support_budget": {
-                          "type": "number"
-                        },
-                        "pending_lifestyle_support_budget": {
-                          "type": "number"
-                        },
-                        "budget_upgrade_payment": {
-                          "type": "number"
-                        }
-                      }
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "active_subscription": {
-                        "id": 1,
-                        "user_id": 1,
-                        "subscription_plan_id": 2,
-                        "status": "active",
-                        "plan": {
-                          "id": 2,
-                          "level": 2,
-                          "name": "Premium Annual Plan"
-                        },
-                        "new_pricing": 580.00,
-                        "new_pricing_trimmed": "580",
-                        "upgrade_price": 116.00,
-                        "upgrade_price_trimmed": "116",
-                        "currency_details": {
-                          "id": 1,
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "symbol": "$"
-                        }
-                      },
-                      "financial_profile": {
-                        "currency": "USD",
-                        "lifestyle_support_budget": 5000,
-                        "pending_lifestyle_support_budget": 1000,
-                        "budget_upgrade_payment": 1000
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "examples": {
-                  "No Pending Budget": {
-                    "value": {
-                      "error": true,
-                      "message": "You don't have any pending budget upgrade."
-                    }
-                  },
-                  "No Active Subscription": {
-                    "value": {
-                      "error": true,
-                      "message": "You are not subscribed to any plan."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-subscription-budget-upgrade",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "summary": "Submit Budget Upgrade",
-        "description": "Submits a budget upgrade request for users with pending budget changes.",
-        "tags": [
-          "Subscription"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "transaction_id": {
-                      "type": "integer"
-                    },
-                    "redirect_url": {
-                      "type": "string"
-                    }
-                  },
-                  "x-examples": {
-                    "Example 1": {
-                      "error": false,
-                      "message": "Budget upgrade submitted successfully",
-                      "transaction_id": 124,
-                      "redirect_url": "https://payment-gateway.com/pay/def456"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "examples": {
-                  "Invalid Subscription": {
-                    "value": {
-                      "error": true,
-                      "message": "Subscription plan is not valid"
-                    }
-                  },
-                  "Insufficient Balance": {
-                    "value": {
-                      "error": true,
-                      "message": "Insufficient balance for the requested amount"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "operationId": "post-subscription-budget-upgrade",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "method": {
-                    "type": "string",
-                    "description": "Payment method (e.g., \"BALANCE\", \"COINGATE\")",
-                    "enum": ["BALANCE", "COINGATE"]
-                  },
-                  "comment": {
-                    "type": "string",
-                    "description": "Additional comment for the transaction"
-                  },
-                  "balance_amount": {
-                    "type": "number",
-                    "description": "Amount to use from user balance",
-                    "minimum": 0
-                  },
-                  "currency": {
-                    "type": "string",
-                    "description": "Currency for the transaction",
-                    "default": "USD"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "description": "Total transaction amount",
-                    "minimum": 0
-                  }
-                },
-                "required": ["method"]
-              },
-              "examples": {
-                "Example 1": {
-                  "value": {
-                    "method": "BALANCE",
-                    "comment": "Budget upgrade payment",
-                    "balance_amount": 50,
-                    "currency": "USD",
-                    "amount": 116
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
+
     "/deposit/submit": {
       "post": {
         "summary": "Submit Deposit",
@@ -9009,7 +7707,7 @@
     "/withdrawal/submit": {
       "post": {
         "summary": "Submit Withdrawal",
-        "description": "Creates a new withdrawal transaction for the authenticated user. The system validates the user's available balance and processes the withdrawal request using the specified payment method and banking details.\n\n## Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n## Withdrawal Methods\n\n| Method | Type | Description | Required Fields |\n|--------|------|-------------|-----------------|\n| `SWIFT` | Bank Transfer | International bank transfer via SWIFT | bank_name, bank_swift_code, bank_account_number, bank_receiver_name |\n| `SEPA` | Bank Transfer | European bank transfer via SEPA | bank_name, bank_swift_code, bank_account_number, bank_receiver_name |\n| `USDT` | Cryptocurrency | USDT withdrawal to wallet | wallet_address |\n| `BTC` | Cryptocurrency | Bitcoin withdrawal to wallet | wallet_address |\n\n## Validation Rules\n- **Amount**: Must be numeric and greater than or equal to 0\n- **Method**: Must be one of the valid withdrawal methods\n- **Currency**: Required field\n- **Bank Details**: Required only for SWIFT and SEPA methods\n- **Wallet Address**: Required only for USDT and BTC methods\n\n## Balance Requirements\n- Withdrawals can only use **available balance** (active_balance + affiliate_earning_balance)\n- The system checks available balance before processing the withdrawal\n- Pending or locked balances cannot be withdrawn\n\n## Transaction Processing\n1. **Validation**: All required fields are validated based on the selected method\n2. **Balance Check**: System verifies sufficient available balance\n3. **Transaction Creation**: A new withdrawal transaction is created with status 'pending'\n4. **Banking Details**: Withdrawal-specific banking information is stored\n5. **Response**: Transaction details are returned for tracking",
+        "description": "Creates a new withdrawal transaction for the authenticated user. The system validates the user's available balance and processes the withdrawal request using the specified payment method and banking details.\n\n## Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n## Withdrawal Methods\n\n| Method | Type | Description | Required Fields |\n|--------|------|-------------|-----------------|\n| `SWIFT` | Bank Transfer | International bank transfer via SWIFT | bank_name, bank_swift_code, bank_account_number, bank_receiver_name |\n| `SEPA` | Bank Transfer | European bank transfer via SEPA | bank_name, bank_swift_code, bank_account_number, bank_receiver_name |\n| `USDT` | Cryptocurrency | USDT withdrawal to wallet | wallet_address |\n| `BTC` | Cryptocurrency | Bitcoin withdrawal to wallet | wallet_address |\n\n## Validation Rules\n- **Amount**: Must be numeric and greater than or equal to 0\n- **Method**: Must be one of the valid withdrawal methods\n- **Currency**: Required field\n- **Bank Details**: Required only for SWIFT and SEPA methods\n- **Wallet Address**: Required only for USDT and BTC methods\n\n## Balance Requirements\n- Withdrawals can only use **available balance** (active_balance + affiliate_earning_balance)\n- The system checks available balance before processing the withdrawal\n- Pending or locked balances cannot be withdrawn\n\n## Transaction Processing\n1. **Validation**: All required fields are validated based on the selected method\n2. **Balance Check**: System verifies sufficient available balance\n3. **Transaction Creation**: A new withdrawal transaction is created with status 'pending'\n4. **Banking Details**: Withdrawal-specific banking information is stored\n5. **Response**: Transaction details are returned for tracking\n\n## Banking Information Storage\n\nThe system stores the following withdrawal-specific information:\n- `withdrawal_bank_name` - Bank name for bank transfers\n- `withdrawal_bank_swift_code` - SWIFT code for bank transfers\n- `withdrawal_bank_account_number` - Account number for bank transfers\n- `withdrawal_bank_receiver_name` - Account holder name for bank transfers\n- `withdrawal_wallet_address` - Wallet address for cryptocurrency withdrawals\n\n## Notes\n- Withdrawal transactions are created with 'pending' status and require manual processing\n- All withdrawal attempts are logged for audit purposes\n- Banking details are securely stored for processing\n- Users can track withdrawal status through the `/transactions` endpoint\n- Withdrawal processing times vary by method (bank transfers typically take 1-3 business days)\n\n## Related Endpoints\n- `GET /transactions` - View transaction history including withdrawals\n- `GET /balance` - Check current available balance\n- `GET /payment-methods?type=withdrawal` - Get available withdrawal methods",
         "tags": [
           "Wallet"
         ],
@@ -9140,12 +7838,12 @@
                     "transaction_id": {
                       "type": "integer",
                       "example": 456,
-                      "description": "Internal transaction ID"
+                      "description": "Internal transaction ID (deprecated, use transaction_number)"
                     },
                     "transaction_number": {
                       "type": "string",
-                      "example": "TXN-2024-005678",
-                      "description": "Human-readable transaction number"
+                      "example": "20250125123456",
+                      "description": "Human-readable transaction number (primary identifier)"
                     }
                   }
                 },
@@ -9155,7 +7853,7 @@
                       "error": false,
                       "message": "Withdrawal submitted successfully",
                       "transaction_id": 456,
-                      "transaction_number": "TXN-2024-005678"
+                      "transaction_number": "20250125123456"
                     }
                   }
                 }
@@ -9289,7 +7987,7 @@
     "/transactions": {
       "get": {
         "summary": "Get Transactions List",
-        "description": "Retrieves a paginated list of the authenticated user's transactions with optional filtering by status and type. Supports pagination with customizable page size.",
+        "description": "Retrieves a paginated list of the authenticated user's transactions with optional filtering.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n#### Available Status Values\n- `pending` - Transaction is pending processing\n- `completed` - Transaction has been completed successfully\n- `failed` - Transaction has failed\n- `cancelled` - Transaction has been cancelled\n\n#### Available Transaction Types\n- `deposit` - Money deposit to user account\n- `subscription` - Subscription purchase\n- `budget_upgrade` - Budget upgrade payment\n- `withdrawal` - Money withdrawal from user account",
         "tags": [
           "Transactions"
         ],
@@ -9344,6 +8042,10 @@
                           "id": {
                             "type": "integer",
                             "description": "Transaction ID"
+                          },
+                          "transaction_number": {
+                            "type": "string",
+                            "description": "Human-readable transaction number"
                           },
                           "user_id": {
                             "type": "integer",
@@ -9610,6 +8312,7 @@
                       "transactions": [
                         {
                           "id": 1,
+                          "transaction_number": "20250125123456",
                           "user_id": 1,
                           "transaction_type": "subscription",
                           "type_label": "Subscription",
@@ -9653,12 +8356,9 @@
                               "transaction_id": 1,
                               "amount": 464.00,
                               "amount_trimmed": "464",
-                              "amount_in_lc": 464.00,
                               "currency": "USD",
                               "status": "completed",
                               "payment_method": "BTC",
-                              "payment_session_id": "cg_123456",
-                              "payment_url": "https://payment-gateway.com/pay/abc123",
                               "created_at": "2024-01-01T10:00:00.000000Z",
                               "updated_at": "2024-01-01T10:00:00.000000Z"
                             }
@@ -10546,21 +9246,21 @@
         ]
       }
     },
-    "/transactions/{id}": {
+    "/transactions/{transaction_number}": {
       "parameters": [
         {
           "schema": {
-            "type": "integer"
+            "type": "string"
           },
-          "name": "id",
+          "name": "transaction_number",
           "in": "path",
           "required": true,
-          "description": "Transaction ID"
+          "description": "Transaction number (e.g., \"20250125123456\")"
         }
       ],
       "get": {
         "summary": "Get Transaction Details",
-        "description": "Retrieves detailed information about a specific transaction, including related data like subscription plans, payments, and Stripe checkout sessions.",
+        "description": "Retrieves detailed information about a specific transaction, including related data like subscription plans, payments, and Stripe checkout sessions.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "tags": [
           "Transactions"
         ],
@@ -10581,6 +9281,10 @@
                         "id": {
                           "type": "integer",
                           "description": "Transaction ID"
+                        },
+                        "transaction_number": {
+                          "type": "string",
+                          "description": "Human-readable transaction number"
                         },
                         "user_id": {
                           "type": "integer",
@@ -10976,12 +9680,17 @@
                       "error": false,
                       "transaction": {
                         "id": 1,
+                        "transaction_number": "TXN-2024-001234",
                         "user_id": 1,
                         "transaction_type": "subscription",
                         "subscription_transaction_type": "subscription",
                         "currency": "USD",
                         "user_currency": "USD",
                         "status": "completed",
+                        "status_label": "Completed",
+                        "status_classes_str": "bg-green-100 text-green-700",
+                        "status_bg_color": "#dcfce7",
+                        "status_text_color": "#15803d",
                         "payment_method": "BTC",
                         "amount": 464.00,
                         "amount_in_lc": 464.00,
@@ -11098,7 +9807,7 @@
             }
           }
         },
-        "operationId": "get-transactions-id",
+        "operationId": "get-transactions-transaction-number",
         "security": [
           {
             "Authorization": []
@@ -11106,21 +9815,21 @@
         ]
       }
     },
-    "/transactions/{id}/status": {
+    "/transactions/{transaction_number}/status": {
       "parameters": [
         {
           "schema": {
-            "type": "integer"
+            "type": "string"
           },
-          "name": "id",
+          "name": "transaction_number",
           "in": "path",
           "required": true,
-          "description": "Transaction ID"
+          "description": "Transaction number (e.g., \"20250125123456\")"
         }
       ],
       "get": {
         "summary": "Get Transaction Status",
-        "description": "Retrieves only the status of a specific transaction. Useful for checking transaction status without loading full details.",
+        "description": "Retrieves only the status of a specific transaction. Useful for checking transaction status without loading full details.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "tags": [
           "Transactions"
         ],
@@ -11210,7 +9919,7 @@
             }
           }
         },
-        "operationId": "get-transactions-id-status",
+        "operationId": "get-transactions-transaction-number-status",
         "security": [
           {
             "Authorization": []
@@ -11218,21 +9927,21 @@
         ]
       }
     },
-    "/transactions/{id}/cancel": {
+    "/transactions/{transaction_number}/cancel": {
       "parameters": [
         {
           "schema": {
-            "type": "integer"
+            "type": "string"
           },
-          "name": "id",
+          "name": "transaction_number",
           "in": "path",
           "required": true,
-          "description": "Transaction ID"
+          "description": "Transaction number (e.g., \"20250125123456\")"
         }
       ],
       "post": {
         "summary": "Cancel Transaction",
-        "description": "Cancels a pending transaction. Only transactions in pending status can be cancelled.",
+        "description": "Cancels a pending transaction. Only transactions in pending status can be cancelled.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "tags": [
           "Transactions"
         ],
@@ -11348,7 +10057,7 @@
             }
           }
         },
-        "operationId": "post-transactions-id-cancel",
+        "operationId": "post-transactions-transaction-number-cancel",
         "security": [
           {
             "Authorization": []
@@ -21885,6 +20594,573 @@
           }
         }
       }
+    },
+    "/subscription/current": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Get Current Subscription",
+        "description": "Retrieves the authenticated user's current active subscription details.",
+        "security": [{"sanctum": []}],
+        "responses": {
+          "200": {
+            "description": "Success response with current subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": false},
+                    "active_subscription": {
+                      "oneOf": [
+                        {"$ref": "#/components/schemas/UserSubscription"},
+                        {"type": "null"}
+                      ]
+                    }
+                  }
+                },
+                "examples": {
+                  "with_subscription": {
+                    "summary": "User with active subscription",
+                    "value": {
+                      "error": false,
+                      "active_subscription": {
+                        "id": 1,
+                        "user_id": 1,
+                        "subscription_plan_id": 2,
+                        "transaction_id": 123,
+                        "transaction_number": "20250125123456",
+                        "start_date": "2024-01-01T00:00:00.000000Z",
+                        "end_date": "2024-12-31T23:59:59.000000Z",
+                        "status": "active",
+                        "price": 464.00,
+                        "currency": "USD",
+                        "days_left": "8 months 15 days 12 hours",
+                        "used_months": 3,
+                        "price_trimmed": "464",
+                        "plan": {
+                          "id": 2,
+                          "level": 2,
+                          "name": "Premium Annual Plan",
+                          "description": "Premium subscription plan with advanced features",
+                          "duration": 365,
+                          "features": [
+                            {
+                              "title": "All Standard Plan Features",
+                              "support": 1
+                            },
+                            {
+                              "title": "Unlimited chats",
+                              "support": 1
+                            }
+                          ]
+                        },
+                        "currency_details": {
+                          "id": 1,
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "symbol": "$"
+                        }
+                      }
+                    }
+                  },
+                  "no_subscription": {
+                    "summary": "User without active subscription",
+                    "value": {
+                      "error": false,
+                      "active_subscription": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscription/plans": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Get Subscription Plans",
+        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget. The system automatically uses the higher budget between the user and their partner (if budget_user_id is provided).",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Currency code for pricing (defaults to user's preferred currency)",
+            "required": false,
+            "schema": {"type": "string", "example": "USD"}
+          },
+          {
+            "name": "upgrade",
+            "in": "query",
+            "description": "Set to 'yes' to show only plans higher than current plan level",
+            "required": false,
+            "schema": {"type": "string", "enum": ["yes", "no"], "example": "no"}
+          },
+          {
+            "name": "budget_user_id",
+            "in": "query",
+            "description": "Partner's user ID to use their budget if higher than user's budget",
+            "required": false,
+            "schema": {"type": "integer", "example": 123}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response with available plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": false},
+                    "budget_user_id": {"type": "integer", "example": 123},
+                    "budget_used": {"type": "number", "example": 10000},
+                    "plans": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/SubscriptionPlanWithPricing"}
+                    },
+                    "currency": {"type": "string", "example": "USD"}
+                  }
+                },
+                "example": {
+                  "error": false,
+                  "budget_user_id": 123,
+                  "budget_used": 10000,
+                  "plans": [
+                    {
+                      "id": 1,
+                      "level": 1,
+                      "name": "Standard Annual Plan",
+                      "description": "Standard subscription plan with basic features",
+                      "duration": 365,
+                      "price": 696.00,
+                      "price_trimmed": "696",
+                      "currency": "USD",
+                      "currency_symbol": "$",
+                      "currency_detail": {
+                        "id": 1,
+                        "code": "USD",
+                        "name": "US Dollar",
+                        "symbol": "$"
+                      },
+                      "features": [
+                        {
+                          "title": "All Standard Plan Features",
+                          "support": 1
+                        },
+                        {
+                          "title": "Unlimited chats",
+                          "support": 1
+                        },
+                        {
+                          "title": "Up to 10 Test Moons",
+                          "support": 1
+                        }
+                      ]
+                    },
+                    {
+                      "id": 2,
+                      "level": 2,
+                      "name": "Premium Annual Plan",
+                      "description": "Premium subscription plan with advanced features",
+                      "duration": 365,
+                      "price": 928.00,
+                      "price_trimmed": "928",
+                      "currency": "USD",
+                      "currency_symbol": "$",
+                      "currency_detail": {
+                        "id": 1,
+                        "code": "USD",
+                        "name": "US Dollar",
+                        "symbol": "$"
+                      },
+                      "features": [
+                        {
+                          "title": "All Standard Plan Features",
+                          "support": 1
+                        },
+                        {
+                          "title": "Training and continuous assistance by MMM's staff",
+                          "support": 1
+                        },
+                        {
+                          "title": "Travel and booking assistance for mutual travels",
+                          "support": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "currency": "USD"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error response when no plans available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "There is no available plan for subscription at the moment. Please contact support."}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscription/submit": {
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Submit Subscription",
+        "description": "Submits a subscription purchase request. The system will create a transaction and process the payment.",
+        "security": [{"sanctum": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["subscription_id", "method"],
+                "properties": {
+                  "subscription_id": {
+                    "type": "integer",
+                    "description": "ID of the subscription plan to purchase",
+                    "example": 2
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "Payment method (e.g., 'BALANCE', 'BTC', 'USDT')",
+                    "example": "BALANCE"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Additional comment for the transaction",
+                    "example": "Annual subscription purchase"
+                  },
+                  "balance_amount": {
+                    "type": "number",
+                    "description": "Amount to use from user balance",
+                    "minimum": 0,
+                    "example": 100.00
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency for the transaction",
+                    "example": "USD"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Total transaction amount",
+                    "minimum": 0,
+                    "example": 464.00
+                  },
+                  "budget_user_id": {
+                    "type": "integer",
+                    "description": "Partner's user ID if using their budget",
+                    "example": 123
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "Subscription deposit submitted successfully"},
+                    "transaction_id": {"type": "integer", "example": 123},
+                    "transaction_number": {"type": "string", "example": "TXN-2024-001234"},
+                    "redirect_url": {"type": "string", "example": "https://payment-gateway.com/pay/abc123"}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": true},
+                    "message": {"type": "string"}
+                  }
+                },
+                "examples": {
+                  "invalid_plan": {
+                    "summary": "Invalid Plan",
+                    "value": {
+                      "error": true,
+                      "message": "Subscription plan is not valid"
+                    }
+                  },
+                  "downgrade_attempt": {
+                    "summary": "Downgrade Attempt",
+                    "value": {
+                      "error": true,
+                      "message": "You cannot downgrade your subscription."
+                    }
+                  },
+                  "already_subscribed": {
+                    "summary": "Already Subscribed",
+                    "value": {
+                      "error": true,
+                      "message": "You are already on this subscription plan."
+                    }
+                  },
+                  "insufficient_balance": {
+                    "summary": "Insufficient Balance",
+                    "value": {
+                      "error": true,
+                      "message": "Insufficient balance for the requested amount"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscription/budget-upgrade": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Get Budget Upgrade Information",
+        "description": "Retrieves information about budget upgrade options for users with pending budget changes.",
+        "security": [{"sanctum": []}],
+        "responses": {
+          "200": {
+            "description": "Success response with budget upgrade information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": false},
+                    "active_subscription": {"$ref": "#/components/schemas/BudgetUpgradeSubscription"},
+                    "financial_profile": {"$ref": "#/components/schemas/FinancialProfile"}
+                  }
+                },
+                "example": {
+                  "error": false,
+                  "active_subscription": {
+                    "id": 1,
+                    "user_id": 1,
+                    "subscription_plan_id": 2,
+                    "status": "active",
+                    "plan": {
+                      "id": 2,
+                      "level": 2,
+                      "name": "Premium Annual Plan"
+                    },
+                    "new_pricing": 580.00,
+                    "new_pricing_trimmed": "580",
+                    "upgrade_price": 116.00,
+                    "upgrade_price_trimmed": "116",
+                    "currency_details": {
+                      "id": 1,
+                      "code": "USD",
+                      "name": "US Dollar",
+                      "symbol": "$"
+                    }
+                  },
+                  "financial_profile": {
+                    "currency": "USD",
+                    "lifestyle_support_budget": 5000,
+                    "pending_lifestyle_support_budget": 1000,
+                    "budget_upgrade_payment": 1000
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": true},
+                    "message": {"type": "string"}
+                  }
+                },
+                "examples": {
+                  "no_pending_budget": {
+                    "summary": "No Pending Budget",
+                    "value": {
+                      "error": true,
+                      "message": "You don't have any pending budget upgrade."
+                    }
+                  },
+                  "no_active_subscription": {
+                    "summary": "No Active Subscription",
+                    "value": {
+                      "error": true,
+                      "message": "You are not subscribed to any plan."
+                    }
+                  },
+                  "invalid_budget_difference": {
+                    "summary": "Invalid Budget Difference",
+                    "value": {
+                      "error": true,
+                      "message": "The difference between the pending budget and the active subscription monthly budget is 0."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Submit Budget Upgrade",
+        "description": "Submits a budget upgrade request for users with pending budget changes.",
+        "security": [{"sanctum": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["method"],
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "description": "Payment method (e.g., 'BALANCE', 'BTC', 'USDT')",
+                    "example": "BALANCE"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Additional comment for the transaction",
+                    "example": "Budget upgrade payment"
+                  },
+                  "balance_amount": {
+                    "type": "number",
+                    "description": "Amount to use from user balance",
+                    "minimum": 0,
+                    "example": 50.00
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency for the transaction",
+                    "example": "USD"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Total transaction amount",
+                    "minimum": 0,
+                    "example": 116.00
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "Budget upgrade submitted successfully"},
+                    "transaction_id": {"type": "integer", "example": 124},
+                    "transaction_number": {"type": "string", "example": "20250125123457"},
+                    "redirect_url": {"type": "string", "example": "https://payment-gateway.com/pay/def456"}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {"type": "boolean", "example": true},
+                    "message": {"type": "string"}
+                  }
+                },
+                "examples": {
+                  "invalid_subscription": {
+                    "summary": "Invalid Subscription",
+                    "value": {
+                      "error": true,
+                      "message": "Subscription plan is not valid"
+                    }
+                  },
+                  "insufficient_balance": {
+                    "summary": "Insufficient Balance",
+                    "value": {
+                      "error": true,
+                      "message": "Insufficient balance for the requested amount"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -25713,7 +24989,104 @@
             "example": "https://example.com/profile_thumb.jpg"
           }
         }
-      }
+      },
+      "SubscriptionPlan": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "example": 1},
+          "level": {"type": "integer", "example": 1},
+          "name": {"type": "string", "example": "Standard Annual Plan"},
+          "description": {"type": "string", "example": "Standard subscription plan with basic features"},
+          "duration": {"type": "integer", "example": 365},
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "example": "Feature Title"},
+                "support": {"type": "integer", "example": 1},
+                "note": {"type": "string", "example": "Optional additional note"}
+              }
+            }
+          }
+        }
+      },
+      "SubscriptionPlanWithPricing": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "example": 1},
+          "level": {"type": "integer", "example": 1},
+          "name": {"type": "string", "example": "Standard Annual Plan"},
+          "description": {"type": "string", "example": "Standard subscription plan with basic features"},
+          "duration": {"type": "integer", "example": 365},
+          "price": {"type": "number", "example": 696.00},
+          "price_trimmed": {"type": "string", "example": "696"},
+          "currency": {"type": "string", "example": "USD"},
+          "currency_symbol": {"type": "string", "example": "$"},
+          "currency_detail": {"$ref": "#/components/schemas/CurrencyDetail"},
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "example": "Feature Title"},
+                "support": {"type": "integer", "example": 1}
+              }
+            }
+          }
+        }
+      },
+      "UserSubscription": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "example": 1},
+          "user_id": {"type": "integer", "example": 1},
+          "subscription_plan_id": {"type": "integer", "example": 2},
+          "transaction_id": {"type": "integer", "example": 123},
+          "transaction_number": {"type": "string", "example": "20250125123456"},
+          "start_date": {"type": "string", "format": "date-time", "example": "2024-01-01T00:00:00.000000Z"},
+          "end_date": {"type": "string", "format": "date-time", "example": "2024-12-31T23:59:59.000000Z"},
+          "status": {"type": "string", "example": "active"},
+          "price": {"type": "number", "example": 464.00},
+          "currency": {"type": "string", "example": "USD"},
+          "days_left": {"type": "string", "example": "8 months 15 days 12 hours"},
+          "used_months": {"type": "integer", "example": 3},
+          "price_trimmed": {"type": "string", "example": "464"},
+          "plan": {"$ref": "#/components/schemas/SubscriptionPlan"},
+          "currency_details": {"$ref": "#/components/schemas/CurrencyDetail"}
+        }
+      },
+      "BudgetUpgradeSubscription": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "example": 1},
+          "user_id": {"type": "integer", "example": 1},
+          "subscription_plan_id": {"type": "integer", "example": 2},
+          "status": {"type": "string", "example": "active"},
+          "plan": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "integer", "example": 2},
+              "level": {"type": "integer", "example": 2},
+              "name": {"type": "string", "example": "Premium Annual Plan"}
+            }
+          },
+          "new_pricing": {"type": "number", "example": 580.00},
+          "new_pricing_trimmed": {"type": "string", "example": "580"},
+          "upgrade_price": {"type": "number", "example": 116.00},
+          "upgrade_price_trimmed": {"type": "string", "example": "116"},
+          "currency_details": {"$ref": "#/components/schemas/CurrencyDetail"}
+        }
+      },
+      "FinancialProfile": {
+        "type": "object",
+        "properties": {
+          "currency": {"type": "string", "example": "USD"},
+          "lifestyle_support_budget": {"type": "number", "example": 5000},
+          "pending_lifestyle_support_budget": {"type": "number", "example": 1000},
+          "budget_upgrade_payment": {"type": "number", "example": 1000}
+        }
+      },
     },
     "securitySchemes": {
       "Authorization": {
