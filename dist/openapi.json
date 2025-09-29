@@ -20829,7 +20829,7 @@
       "get": {
         "tags": ["Subscription"],
         "summary": "Get Current Subscription",
-        "description": "Retrieves the authenticated user's current active subscription details.",
+        "description": "Retrieves the authenticated user's current active subscription details.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "security": [{"sanctum": []}],
         "responses": {
           "200": {
@@ -20919,7 +20919,7 @@
       "get": {
         "tags": ["Subscription"],
         "summary": "Get Subscription Plans",
-        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget. The system automatically uses the higher budget between the user and their partner (if budget_user_id is provided).",
+        "description": "Retrieves available subscription plans with pricing calculated based on the user's monthly lifestyle support budget.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n#### Budget Calculation Logic\n- **User's Budget**: Uses the user's current lifestyle support budget or active subscription monthly budget\n- **Partner's Budget**: **DISABLED** - Partner budget functionality is currently disabled in the system\n- **Currency Conversion**: Automatic currency conversion is available for multi-currency support\n- **Fallback**: System uses user's budget for all calculations",
         "security": [{"sanctum": []}],
         "parameters": [
           {
@@ -20939,7 +20939,7 @@
           {
             "name": "budget_user_id",
             "in": "query",
-            "description": "Partner's user ID to use their budget if higher than user's budget",
+            "description": "**DISABLED** - Partner's user ID functionality is currently disabled",
             "required": false,
             "schema": {"type": "integer", "example": 123}
           }
@@ -20964,7 +20964,7 @@
                 },
                 "example": {
                   "error": false,
-                  "budget_user_id": 123,
+                  "budget_user_id": null,
                   "budget_used": 10000,
                   "plans": [
                     {
@@ -20983,6 +20983,7 @@
                         "name": "US Dollar",
                         "symbol": "$"
                       },
+                      "icon_url": "https://startup2050.com/images/standard-plan-icon.png",
                       "features": [
                         {
                           "title": "All Standard Plan Features",
@@ -20996,7 +20997,17 @@
                           "title": "Up to 10 Test Moons",
                           "support": 1
                         }
-                      ]
+                      ],
+                      "price_calculation_contents": {
+                        "html": "<div class='space-y-4 text-sm'>...</div>",
+                        "raw": [
+                          "Your Standard annual subscription's cost is calculated as 20% of the monthly budget that you set for your future partner in the projection of 1 year:",
+                          "Your calculation: 10000.00USD × 12 months × 20% = 2400.00 USD",
+                          "For this amount, you get access to all major MatchMeMuch features for the period of one year.",
+                          "By buying a subscription, sponsors show the seriousness of their intent and their financial capacity. At the same time, the annual package allows to use MatchMeMuch service for extended time.",
+                          "The second and subsequent years cost twice less than the initial subscription's cost."
+                        ]
+                      }
                     },
                     {
                       "id": 2,
@@ -21014,6 +21025,7 @@
                         "name": "US Dollar",
                         "symbol": "$"
                       },
+                      "icon_url": "https://startup2050.com/images/premium-plan-icon.png",
                       "features": [
                         {
                           "title": "All Standard Plan Features",
@@ -21027,7 +21039,17 @@
                           "title": "Travel and booking assistance for mutual travels",
                           "support": 1
                         }
-                      ]
+                      ],
+                      "price_calculation_contents": {
+                        "html": "<div class='space-y-4 text-sm'>...</div>",
+                        "raw": [
+                          "Your Premium annual subscription's cost is calculated as 40% of the monthly budget that you set for your future partner in the projection of 1 year:",
+                          "Your calculation: 10000.00USD × 12 months × 40% = 4800.00 USD",
+                          "For this amount, you get access to all major MatchMeMuch features for the period of one year.",
+                          "By buying a subscription, sponsors show the seriousness of their intent and their financial capacity. At the same time, the annual package allows to use MatchMeMuch service for extended time.",
+                          "The second and subsequent years cost twice less than the initial subscription's cost."
+                        ]
+                      }
                     }
                   ],
                   "currency": "USD"
@@ -21064,7 +21086,7 @@
       "post": {
         "tags": ["Subscription"],
         "summary": "Submit Subscription",
-        "description": "Submits a subscription purchase request. The system will create a transaction and process the payment.",
+        "description": "Submits a subscription purchase request. The system will create a transaction and process the payment.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "security": [{"sanctum": []}],
         "requestBody": {
           "required": true,
@@ -21073,6 +21095,7 @@
               "schema": {
                 "type": "object",
                 "required": ["subscription_id", "method"],
+                "description": "Request body for subscription submission with validation rules:\n- `subscription_id`: Must be a valid plan ID\n- `method`: Required payment method\n- `balance_amount`: Min: 0, Max: available balance\n- `amount`: Min: 0\n- `budget_user_id`: Ignored if provided (disabled functionality)",
                 "properties": {
                   "subscription_id": {
                     "type": "integer",
@@ -21108,7 +21131,7 @@
                   },
                   "budget_user_id": {
                     "type": "integer",
-                    "description": "Partner's user ID if using their budget",
+                    "description": "**DISABLED** - Partner's user ID functionality is currently disabled",
                     "example": 123
                   }
                 }
@@ -21193,7 +21216,7 @@
       "get": {
         "tags": ["Subscription"],
         "summary": "Get Budget Upgrade Information",
-        "description": "Retrieves information about budget upgrade options for users with pending budget changes.",
+        "description": "Retrieves information about budget upgrade options for users with pending budget changes.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "security": [{"sanctum": []}],
         "responses": {
           "200": {
@@ -21291,7 +21314,7 @@
       "post": {
         "tags": ["Subscription"],
         "summary": "Submit Budget Upgrade",
-        "description": "Submits a budget upgrade request for users with pending budget changes.",
+        "description": "Submits a budget upgrade request for users with pending budget changes.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "security": [{"sanctum": []}],
         "requestBody": {
           "required": true,
@@ -21300,6 +21323,7 @@
               "schema": {
                 "type": "object",
                 "required": ["method"],
+                "description": "Request body for budget upgrade submission with validation rules:\n- `method`: Required payment method\n- `balance_amount`: Min: 0, Max: available balance\n- `amount`: Min: 0",
                 "properties": {
                   "method": {
                     "type": "string",
@@ -25254,6 +25278,7 @@
           "currency": {"type": "string", "example": "USD"},
           "currency_symbol": {"type": "string", "example": "$"},
           "currency_detail": {"$ref": "#/components/schemas/CurrencyDetail"},
+          "icon_url": {"type": "string", "example": "https://startup2050.com/images/standard-plan-icon.png"},
           "features": {
             "type": "array",
             "items": {
@@ -25261,6 +25286,23 @@
               "properties": {
                 "title": {"type": "string", "example": "Feature Title"},
                 "support": {"type": "integer", "example": 1}
+              }
+            }
+          },
+          "price_calculation_contents": {
+            "type": "object",
+            "properties": {
+              "html": {"type": "string", "example": "<div class='space-y-4 text-sm'>...</div>"},
+              "raw": {
+                "type": "array",
+                "items": {"type": "string"},
+                "example": [
+                  "Your Standard annual subscription's cost is calculated as 20% of the monthly budget that you set for your future partner in the projection of 1 year:",
+                  "Your calculation: 10000.00USD × 12 months × 20% = 2400.00 USD",
+                  "For this amount, you get access to all major MatchMeMuch features for the period of one year.",
+                  "By buying a subscription, sponsors show the seriousness of their intent and their financial capacity. At the same time, the annual package allows to use MatchMeMuch service for extended time.",
+                  "The second and subsequent years cost twice less than the initial subscription's cost."
+                ]
               }
             }
           }
