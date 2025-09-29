@@ -39,7 +39,7 @@
     },
     {
       "name": "Chat",
-      "description": "The Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging. Features include AI-powered content moderation, file attachments, real-time events, and rate limiting."
+      "description": "The Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging. Features include AI-powered content moderation with strike system, file attachments, real-time events, chat archiving, message search, and rate limiting. The API supports both text messages and file attachments, with automatic content moderation that can disable chat between users based on violation strikes."
     },
     {
       "name": "Reports & Interactions",
@@ -1307,7 +1307,7 @@
             }
           }
         },
-        "operationId": "get-profile-basic-info",
+        "operationId": "get-profile-basic-info"
       }
     },
     "/profile/relationship-info": {
@@ -1405,7 +1405,7 @@
             }
           }
         },
-        "operationId": "get-profile-relationship-info",
+        "operationId": "get-profile-relationship-info"
       }
     },
     "/profile/financial-info": {
@@ -1595,7 +1595,7 @@
             }
           }
         },
-        "operationId": "get-profile-living-info",
+        "operationId": "get-profile-living-info"
       }
     },
     "/profile/visibility-setting": {
@@ -12202,7 +12202,7 @@
           }
         ],
         "summary": "Get All Chats",
-        "description": "Retrieves all chat rooms for the authenticated user with filtering options. Supports filtering by chat type and read status.",
+        "description": "Retrieves all chat rooms for the authenticated user with filtering options. Supports filtering by chat type (all, archived, deleted) and read status (all, read, unread). Returns comprehensive chat room information including last message, chat partner details, subscription info, and room metadata. Excludes muted chats from unread counts.",
         "tags": [
           "Chat"
         ],
@@ -12237,7 +12237,8 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "data": {
                       "type": "object",
@@ -12249,18 +12250,224 @@
                           }
                         },
                         "count": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Number of chat rooms returned",
+                          "example": 1
                         },
                         "offset": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Pagination offset",
+                          "example": 0
                         },
                         "total": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "Total number of chat rooms",
+                          "example": 1
                         },
                         "success": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "example": true
                         }
                       }
+                    }
+                  },
+                  "x-examples": {
+                    "Example Response": {
+                      "error": false,
+                      "data": {
+                        "ims": [
+                          {
+                            "_id": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                            "t": "d",
+                            "usernames": ["mrriyous", "nuaira"],
+                            "usersCount": 2,
+                            "msgs": 4,
+                            "ts": "2025-08-01T13:14:47.204Z",
+                            "uids": ["JrLpEa6BqoncKDyy4", "NBKRo3zLWeBBzwJSh"],
+                            "default": false,
+                            "ro": false,
+                            "sysMes": true,
+                            "_USERNAMES": ["mrriyous", "nuaira"],
+                            "_updatedAt": "2025-08-03T15:51:48.248Z",
+                            "lastMessage": {
+                              "rid": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                              "msg": "testing bang",
+                              "attachments": [],
+                              "ts": "2025-08-03T15:51:48.215Z",
+                              "u": {
+                                "_id": "NBKRo3zLWeBBzwJSh",
+                                "username": "mrriyous",
+                                "name": "Alfi Syahri"
+                              },
+                              "_id": "ifo54W3D4WJSmg28F",
+                              "_updatedAt": "2025-08-03T15:51:48.237Z",
+                              "urls": [],
+                              "mentions": [],
+                              "channels": [],
+                              "md": [
+                                {
+                                  "type": "PARAGRAPH",
+                                  "value": [
+                                    {
+                                      "type": "PLAIN_TEXT",
+                                      "value": "testing bang"
+                                    }
+                                  ]
+                                }
+                              ],
+                              "ts_formatted_full_local": "August 03, 2025 10:51pm",
+                              "msg_shortened": "testing bang"
+                            },
+                            "lm": "2025-08-03T15:51:48.215Z",
+                            "subscription": {
+                              "_id": "ybAnZN3aMvc6xszFL",
+                              "rid": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                              "u": {
+                                "_id": "NBKRo3zLWeBBzwJSh",
+                                "username": "mrriyous"
+                              },
+                              "_updatedAt": "2025-08-05T12:58:38.234Z",
+                              "alert": false,
+                              "fname": "nuaira",
+                              "groupMentions": 0,
+                              "name": "nuaira",
+                              "open": true,
+                              "t": "d",
+                              "ts": "2025-08-01T13:14:47.224Z",
+                              "unread": 0,
+                              "userMentions": 0,
+                              "ls": "2025-08-05T12:58:38.234Z",
+                              "ls_in_unix": 1754398718234,
+                              "ls_in_date": "2025-08-05 19:58:38",
+                              "ls_formatted": "07:58 pm",
+                              "ls_formatted_full": "05 August 2025, 07:58pm",
+                              "ts_in_unix": 1754054087224,
+                              "ts_in_date": "2025-08-01 20:14:47",
+                              "ts_formatted": "08:14 pm",
+                              "ts_formatted_full": "01 August 2025, 08:14pm",
+                              "has_unread_messages": false,
+                              "unread_count": 0
+                            },
+                            "chat_partner": {
+                              "id": 17,
+                              "login_name": "nuaira",
+                              "public_username": "nuaira",
+                              "first_name": "Nuaira",
+                              "last_name": "Nadira",
+                              "email": "nuaira_nadira_nnansndad123@gmail.com",
+                              "email_verified_at": null,
+                              "hide_images": 0,
+                              "email_verified": 1,
+                              "gender": "female",
+                              "partner_preference": "male",
+                              "relationship_goals": "long_term",
+                              "role": "srs",
+                              "created_at": "2025-08-01T13:11:46.000000Z",
+                              "updated_at": "2025-08-04T13:28:21.000000Z",
+                              "deleted_at": null,
+                              "rocketchat_registered": 1,
+                              "rocketchat_user_id": "JrLpEa6BqoncKDyy4",
+                              "rocketchat_username": "nuaira",
+                              "rocketchat_token": "vXyNyiD8eepEwueqICeeBaoYM45Dp6L7GI9i2bli0-v",
+                              "rocketchat_token_expires_at": "2025-10-30 13:13:54",
+                              "timeoffset": 420,
+                              "affiliate_code": "27F4F9",
+                              "referred_by_code": null,
+                              "referred_by_user_id": null,
+                              "profile_picture_album_url": "http://localhost:8001/images/placeholder_empty_female.png",
+                              "profile_picture_url": "http://localhost:8001/images/avatar_female.png",
+                              "full_name": "Nuaira Nadira"
+                            },
+                            "updated_at_in_unixms": 1754236308248,
+                            "ts_local": "2025-08-01T20:14:47.204Z",
+                            "ts_formatted_local": "August 01, 2025 08:14pm",
+                            "message_unread": false,
+                            "chatroom_meta": {
+                              "id": 2,
+                              "room_id": 1,
+                              "rocketchat_room_id": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                              "user_id": 16,
+                              "rocketchat_user_id": "NBKRo3zLWeBBzwJSh",
+                              "rocketchat_username": "mrriyous",
+                              "last_seen_at": 1754398718237,
+                              "unread_count": 0,
+                              "closed_at": null,
+                              "deleted_messages_count": 0,
+                              "created_at": "2025-08-01T13:15:07.000000Z",
+                              "updated_at": "2025-08-05T12:58:38.000000Z",
+                              "deleted_at": null,
+                              "archived_at": null,
+                              "archived": 0,
+                              "mute": 0,
+                              "last_seen_at_ts": "2025-08-05 12:58:38",
+                              "last_seen_at_ts_local": "2025-08-05 19:58:38"
+                            },
+                            "partners_room_meta": {
+                              "id": 1,
+                              "room_id": 1,
+                              "rocketchat_room_id": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                              "user_id": 17,
+                              "rocketchat_user_id": "JrLpEa6BqoncKDyy4",
+                              "rocketchat_username": "nuaira",
+                              "last_seen_at": 1754236292985,
+                              "unread_count": 0,
+                              "closed_at": null,
+                              "deleted_messages_count": 0,
+                              "created_at": "2025-08-01T13:14:47.000000Z",
+                              "updated_at": "2025-08-03T15:51:32.000000Z",
+                              "deleted_at": null,
+                              "archived_at": null,
+                              "archived": 0,
+                              "mute": 1,
+                              "last_seen_at_ts": "2025-08-03 15:51:32",
+                              "last_seen_at_ts_local": "2025-08-03 22:51:32"
+                            },
+                            "is_archived": false,
+                            "chat_disabled": false,
+                            "is_deleted_after_last_message": false
+                          }
+                        ],
+                        "offset": 0,
+                        "count": 1,
+                        "total": 1,
+                        "success": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - RocketChat authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to authenticate user in RocketChat"
                     }
                   }
                 }
@@ -12277,8 +12484,8 @@
             "Authorization": []
           }
         ],
-        "summary": "Get unread messages count",
-        "description": "Retrieves the total count of unread messages across all chat rooms for the authenticated user.",
+        "summary": "Get Unread Count",
+        "description": "Retrieves the total unread message count across all chats for the authenticated user (excluding muted chats). This endpoint provides a quick way to get the total number of unread messages without fetching all chat data.",
         "tags": [
           "Chat"
         ],
@@ -12348,13 +12555,13 @@
         }
       }
     },
-    "/chats/{publicUsername}": {
+    "/chats/{username}": {
       "parameters": [
         {
           "schema": {
             "type": "string"
           },
-          "name": "publicUsername",
+          "name": "username",
           "in": "path",
           "required": true,
           "description": "Public username of the chat partner"
@@ -12367,7 +12574,7 @@
           }
         ],
         "summary": "Get Chat Room",
-        "description": "Retrieves information about a specific chat room with a user.",
+        "description": "Retrieves comprehensive information about a specific chat room with a user, including room metadata, last message, chat partner details, subscription information, and room settings. Returns detailed chat room data with timestamps, unread counts, and user preferences.",
         "tags": [
           "Chat"
         ],
@@ -12388,21 +12595,21 @@
                   }
                 },
                 "x-examples": {
-                  "Example 1": {
+                  "Example Response": {
                     "error": false,
                     "data": {
-                      "_id": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                      "_id": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
                       "t": "d",
                       "usernames": [
                         "mrriyous",
                         "nuaira"
                       ],
                       "usersCount": 2,
-                      "msgs": 201,
-                      "ts": "2025-07-02T17:40:29.214Z",
+                      "msgs": 4,
+                      "ts": "2025-08-01T13:14:47.204Z",
                       "uids": [
-                        "PLN7BBfiHDZFgQqE9",
-                        "ugEqHdBXruwxZgt7a"
+                        "JrLpEa6BqoncKDyy4",
+                        "NBKRo3zLWeBBzwJSh"
                       ],
                       "default": false,
                       "ro": false,
@@ -12411,19 +12618,19 @@
                         "mrriyous",
                         "nuaira"
                       ],
-                      "_updatedAt": "2025-07-13T14:10:31.942Z",
+                      "_updatedAt": "2025-08-03T15:51:48.248Z",
                       "lastMessage": {
-                        "rid": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
-                        "msg": "testing2",
+                        "rid": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                        "msg": "testing bang",
                         "attachments": [],
-                        "ts": "2025-07-13T14:10:31.932Z",
+                        "ts": "2025-08-03T15:51:48.215Z",
                         "u": {
-                          "_id": "ugEqHdBXruwxZgt7a",
-                          "username": "nuaira",
-                          "name": "nuaira"
+                          "_id": "NBKRo3zLWeBBzwJSh",
+                          "username": "mrriyous",
+                          "name": "Alfi Syahri"
                         },
-                        "_id": "9qbE9Nw4JSopxDdhC",
-                        "_updatedAt": "2025-07-13T14:10:31.938Z",
+                        "_id": "ifo54W3D4WJSmg28F",
+                        "_updatedAt": "2025-08-03T15:51:48.237Z",
                         "urls": [],
                         "mentions": [],
                         "channels": [],
@@ -12433,63 +12640,177 @@
                             "value": [
                               {
                                 "type": "PLAIN_TEXT",
-                                "value": "testing2"
+                                "value": "testing bang"
                               }
                             ]
                           }
                         ],
-                        "ts_formatted_full_local": "July 13, 2025 09:10pm",
-                        "msg_shortened": "testing2"
+                        "ts_formatted_full_local": "August 03, 2025 10:51pm",
+                        "msg_shortened": "testing bang"
                       },
-                      "lm": "2025-07-13T14:10:31.932Z",
+                      "lm": "2025-08-03T15:51:48.215Z",
                       "subscription": {
-                        "_id": "sbruJaHHChAsuxqoY",
-                        "rid": "PLN7BBfiHDZFgQqE9ugEqHdBXruwxZgt7a",
+                        "_id": "ybAnZN3aMvc6xszFL",
+                        "rid": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
                         "u": {
-                          "_id": "PLN7BBfiHDZFgQqE9",
+                          "_id": "NBKRo3zLWeBBzwJSh",
                           "username": "mrriyous"
                         },
-                        "_updatedAt": "2025-07-13T16:34:02.904Z",
+                        "_updatedAt": "2025-08-05T12:58:38.234Z",
                         "alert": false,
                         "fname": "nuaira",
                         "groupMentions": 0,
                         "name": "nuaira",
                         "open": true,
                         "t": "d",
-                        "ts": "2025-07-02T17:40:29.217Z",
+                        "ts": "2025-08-01T13:14:47.224Z",
                         "unread": 0,
                         "userMentions": 0,
-                        "ls": "2025-07-13T16:34:02.904Z"
+                        "ls": "2025-08-05T12:58:38.234Z",
+                        "ls_in_unix": 1754398718234,
+                        "ls_in_date": "2025-08-05 19:58:38",
+                        "ls_formatted": "07:58 pm",
+                        "ls_formatted_full": "05 August 2025, 07:58pm",
+                        "ts_in_unix": 1754054087224,
+                        "ts_in_date": "2025-08-01 20:14:47",
+                        "ts_formatted": "08:14 pm",
+                        "ts_formatted_full": "01 August 2025, 08:14pm",
+                        "has_unread_messages": false,
+                        "unread_count": 0
                       },
                       "chat_partner": {
-                        "id": 59,
+                        "id": 17,
                         "login_name": "nuaira",
                         "public_username": "nuaira",
                         "first_name": "Nuaira",
                         "last_name": "Nadira",
-                        "email": "nuaira@testing.com",
+                        "email": "nuaira_nadira_nnansndad123@gmail.com",
                         "email_verified_at": null,
                         "hide_images": 0,
                         "email_verified": 1,
                         "gender": "female",
                         "partner_preference": "male",
-                        "relationship_goals": "medium_term",
+                        "relationship_goals": "long_term",
                         "role": "srs",
-                        "created_at": "2025-07-01T10:26:09.000000Z",
-                        "updated_at": "2025-07-07T08:53:07.000000Z",
+                        "created_at": "2025-08-01T13:11:46.000000Z",
+                        "updated_at": "2025-08-04T13:28:21.000000Z",
                         "deleted_at": null,
                         "rocketchat_registered": 1,
-                        "rocketchat_user_id": "ugEqHdBXruwxZgt7a",
+                        "rocketchat_user_id": "JrLpEa6BqoncKDyy4",
                         "rocketchat_username": "nuaira",
-                        "rocketchat_token": "iVR2JtCwdbuAyKjfuf2UKOh612zFvJCUHHs1UnT-O-Q",
-                        "rocketchat_token_expires_at": "2025-09-30 17:41:07",
-                        "timeoffset": 7,
-                        "profile_picture_album_url": "http://localhost:8000/storage/profile-pictures/59_1751378283.jpg",
-                        "profile_picture_url": "http://localhost:8000/storage/profile-pictures/59_1751378283.jpg"
+                        "rocketchat_token": "vXyNyiD8eepEwueqICeeBaoYM45Dp6L7GI9i2bli0-v",
+                        "rocketchat_token_expires_at": "2025-10-30 13:13:54",
+                        "timeoffset": 420,
+                        "affiliate_code": "27F4F9",
+                        "referred_by_code": null,
+                        "referred_by_user_id": null,
+                        "profile_picture_album_url": "http://localhost:8001/images/placeholder_empty_female.png",
+                        "profile_picture_url": "http://localhost:8001/images/avatar_female.png",
+                        "full_name": "Nuaira Nadira"
                       },
-                      "updated_at_in_unixms": 1752415831942,
-                      "ts_formatted_local": "July 03, 2025 12:40am",
-                      "message_unread": false
+                      "updated_at_in_unixms": 1754236308248,
+                      "ts_local": "2025-08-01T20:14:47.204Z",
+                      "ts_formatted_local": "August 01, 2025 08:14pm",
+                      "message_unread": false,
+                      "chatroom_meta": {
+                        "id": 2,
+                        "room_id": 1,
+                        "rocketchat_room_id": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                        "user_id": 16,
+                        "rocketchat_user_id": "NBKRo3zLWeBBzwJSh",
+                        "rocketchat_username": "mrriyous",
+                        "last_seen_at": 1754398718237,
+                        "unread_count": 0,
+                        "closed_at": null,
+                        "deleted_messages_count": 0,
+                        "created_at": "2025-08-01T13:15:07.000000Z",
+                        "updated_at": "2025-08-05T12:58:38.000000Z",
+                        "deleted_at": null,
+                        "archived_at": null,
+                        "archived": 0,
+                        "mute": 0,
+                        "last_seen_at_ts": "2025-08-05 12:58:38",
+                        "last_seen_at_ts_local": "2025-08-05 19:58:38"
+                      },
+                      "partners_room_meta": {
+                        "id": 1,
+                        "room_id": 1,
+                        "rocketchat_room_id": "JrLpEa6BqoncKDyy4NBKRo3zLWeBBzwJSh",
+                        "user_id": 17,
+                        "rocketchat_user_id": "JrLpEa6BqoncKDyy4",
+                        "rocketchat_username": "nuaira",
+                        "last_seen_at": 1754236292985,
+                        "unread_count": 0,
+                        "closed_at": null,
+                        "deleted_messages_count": 0,
+                        "created_at": "2025-08-01T13:14:47.000000Z",
+                        "updated_at": "2025-08-03T15:51:32.000000Z",
+                        "deleted_at": null,
+                        "archived_at": null,
+                        "archived": 0,
+                        "mute": 1,
+                        "last_seen_at_ts": "2025-08-03 15:51:32",
+                        "last_seen_at_ts_local": "2025-08-03 22:51:32"
+                      },
+                      "is_archived": false,
+                      "chat_disabled": false,
+                      "is_deleted_after_last_message": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Chat room not found or user doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Chat room not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - RocketChat authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to authenticate user in RocketChat"
                     }
                   }
                 }
@@ -12518,7 +12839,7 @@
           }
         ],
         "summary": "Get Room Subscription Info",
-        "description": "Retrieves detailed subscription information for a specific chat room.",
+        "description": "Retrieves detailed subscription information for a specific chat room, including read status, unread counts, timestamps, and partner room metadata. Optionally marks the chat as read when fetching the information.",
         "tags": [
           "Chat"
         ],
@@ -12730,19 +13051,21 @@
           }
         ],
         "summary": "Get Messages",
-        "description": "Retrieves messages from a specific chat room with pagination.",
+        "description": "Retrieves messages from a specific chat room with pagination support. Returns message history with comprehensive details including timestamps, sender information, read status, and message metadata. Supports pagination to handle large message histories efficiently.",
         "tags": [
           "Chat"
         ],
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
             },
             "in": "query",
             "name": "page",
-            "description": "Page number for pagination",
-            "example": "1"
+            "description": "Page number for pagination (default: 1)",
+            "example": 1
           }
         ],
         "responses": {
@@ -12988,7 +13311,7 @@
           }
         ],
         "summary": "Send Message",
-        "description": "Sends a message to a specific user. Supports text messages and file attachments. AI moderation is applied to all messages.",
+        "description": "Sends a message to a specific user. Supports both text messages and file attachments. Either message text or file attachment is required. AI-powered content moderation is applied to all messages, with inappropriate content being blocked and users receiving strikes. Supports message replies via replying_message_id parameter.",
         "tags": [
           "Chat"
         ],
@@ -13233,7 +13556,7 @@
           }
         ],
         "summary": "Edit Message",
-        "description": "Edits an existing message (only within 6 minutes of sending). AI moderation is applied to edited messages.",
+        "description": "Edits an existing message within 6 minutes of sending. Only the original sender can edit their messages. AI-powered content moderation is applied to edited messages, with inappropriate content being blocked and users receiving strikes. Message content is limited to 1000 characters.",
         "tags": [
           "Chat"
         ],
@@ -13454,7 +13777,7 @@
           }
         ],
         "summary": "Delete Message",
-        "description": "Deletes a message from the chat. Only the message sender can delete their own messages.",
+        "description": "Permanently deletes a message from the chat. Only the original sender can delete their own messages. Deleted messages cannot be recovered and are removed from the chat history for all participants.",
         "tags": [
           "Chat"
         ],
@@ -13618,7 +13941,7 @@
           }
         ],
         "summary": "Mark as Read",
-        "description": "Marks a chat room as read and updates the user's last seen timestamp.",
+        "description": "Marks a chat room as read and updates the user's last seen timestamp. This action clears the unread count for the chat room and updates the user's last seen time to the current timestamp. Used to indicate that the user has viewed the chat.",
         "tags": [
           "Chat"
         ],
@@ -13732,7 +14055,7 @@
           }
         ],
         "summary": "Archive Chat",
-        "description": "Archives a chat room (moves it to archived list). Archived chats can be restored by sending a new message.",
+        "description": "Archives a chat room, moving it to the archived list. Archived chats are hidden from the main chat list but can be restored by sending a new message. This action is reversible and does not delete the chat history.",
         "tags": [
           "Chat"
         ],
@@ -13783,7 +14106,7 @@
           }
         ],
         "summary": "Delete Chat",
-        "description": "Permanently deletes a chat room. Deleted chats cannot be recovered.",
+        "description": "Permanently deletes a chat room and all associated messages. This action is irreversible and cannot be undone. The chat will be removed from both participants' chat lists and all message history will be lost.",
         "tags": [
           "Chat"
         ],
@@ -13823,7 +14146,7 @@
           }
         ],
         "summary": "Get All Subscriptions",
-        "description": "Retrieves all room subscriptions for the authenticated user.",
+        "description": "Retrieves all room subscriptions for the authenticated user. Returns subscription information including room IDs, user details, read status, unread counts, and timestamps for all chat rooms the user is subscribed to.",
         "tags": [
           "Chat"
         ],
@@ -13923,7 +14246,7 @@
           }
         ],
         "summary": "Search Messages",
-        "description": "Searches for messages in a specific chat room.",
+        "description": "Searches for messages in a specific chat room using text matching. Returns matching messages with relevance scores, supporting pagination with configurable result limits. Search text must be between 1-100 characters.",
         "tags": [
           "Chat"
         ],
@@ -14017,6 +14340,62 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request - Invalid search parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Search text must be between 1-100 characters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -14040,7 +14419,7 @@
           }
         ],
         "summary": "Mute Notifications",
-        "description": "Toggles mute status for chat notifications.",
+        "description": "Toggles mute status for chat notifications. When muted, the user will not receive push notifications for new messages in this chat. Muted chats are excluded from unread counts. The mute status can be toggled on/off as needed.",
         "tags": [
           "Chat"
         ],
@@ -14119,7 +14498,7 @@
           }
         ],
         "summary": "Request Webview",
-        "description": "Generates a webview URL for accessing the chat in a web browser.",
+        "description": "Generates a secure webview URL for accessing the chat in a web browser. The URL includes a temporary token that allows web-based access to the chat interface. Useful for embedding chat functionality in web applications or providing browser-based chat access.",
         "tags": [
           "Chat"
         ],
@@ -21572,7 +21951,8 @@
           "ts_date_formatted": { "type": "string" },
           "is_sent_by_logged_in_user": { "type": "boolean" },
           "editable": { "type": "boolean" },
-          "is_edited": { "type": "boolean" }
+          "is_edited": { "type": "boolean" },
+          "msg_shortened": { "type": "string" }
         }
       },
       "ChatPartner": {
@@ -21600,8 +21980,12 @@
           "rocketchat_token": { "type": "string", "nullable": true },
           "rocketchat_token_expires_at": { "type": "string", "nullable": true },
           "timeoffset": { "type": "integer" },
+          "affiliate_code": { "type": "string", "nullable": true },
+          "referred_by_code": { "type": "string", "nullable": true },
+          "referred_by_user_id": { "type": "integer", "nullable": true },
           "profile_picture_album_url": { "type": "string" },
-          "profile_picture_url": { "type": "string" }
+          "profile_picture_url": { "type": "string" },
+          "full_name": { "type": "string" }
         }
       },
       "Subscription": {
@@ -21620,7 +22004,17 @@
           "ts": { "type": "string", "format": "date-time" },
           "unread": { "type": "integer" },
           "userMentions": { "type": "integer" },
-          "ls": { "type": "string", "format": "date-time" }
+          "ls": { "type": "string", "format": "date-time" },
+          "ls_in_unix": { "type": "integer" },
+          "ls_in_date": { "type": "string" },
+          "ls_formatted": { "type": "string" },
+          "ls_formatted_full": { "type": "string" },
+          "ts_in_unix": { "type": "integer" },
+          "ts_in_date": { "type": "string" },
+          "ts_formatted": { "type": "string" },
+          "ts_formatted_full": { "type": "string" },
+          "has_unread_messages": { "type": "boolean" },
+          "unread_count": { "type": "integer" }
         }
       },
       "LastMessage": {
@@ -21685,8 +22079,58 @@
           "subscription": { "$ref": "#/components/schemas/Subscription" },
           "chat_partner": { "$ref": "#/components/schemas/ChatPartner" },
           "updated_at_in_unixms": { "type": "integer" },
+          "ts_local": { "type": "string", "format": "date-time" },
           "ts_formatted_local": { "type": "string" },
-          "message_unread": { "type": "boolean" }
+          "message_unread": { "type": "boolean" },
+          "chatroom_meta": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "room_id": { "type": "integer" },
+              "rocketchat_room_id": { "type": "string" },
+              "user_id": { "type": "integer" },
+              "rocketchat_user_id": { "type": "string" },
+              "rocketchat_username": { "type": "string" },
+              "last_seen_at": { "type": "integer" },
+              "unread_count": { "type": "integer" },
+              "closed_at": { "type": "string", "nullable": true },
+              "deleted_messages_count": { "type": "integer" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "updated_at": { "type": "string", "format": "date-time" },
+              "deleted_at": { "type": "string", "nullable": true },
+              "archived_at": { "type": "string", "nullable": true },
+              "archived": { "type": "integer" },
+              "mute": { "type": "integer" },
+              "last_seen_at_ts": { "type": "string" },
+              "last_seen_at_ts_local": { "type": "string" }
+            }
+          },
+          "partners_room_meta": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "room_id": { "type": "integer" },
+              "rocketchat_room_id": { "type": "string" },
+              "user_id": { "type": "integer" },
+              "rocketchat_user_id": { "type": "string" },
+              "rocketchat_username": { "type": "string" },
+              "last_seen_at": { "type": "integer" },
+              "unread_count": { "type": "integer" },
+              "closed_at": { "type": "string", "nullable": true },
+              "deleted_messages_count": { "type": "integer" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "updated_at": { "type": "string", "format": "date-time" },
+              "deleted_at": { "type": "string", "nullable": true },
+              "archived_at": { "type": "string", "nullable": true },
+              "archived": { "type": "integer" },
+              "mute": { "type": "integer" },
+              "last_seen_at_ts": { "type": "string" },
+              "last_seen_at_ts_local": { "type": "string" }
+            }
+          },
+          "is_archived": { "type": "boolean" },
+          "chat_disabled": { "type": "boolean" },
+          "is_deleted_after_last_message": { "type": "boolean" }
         }
       },
       "ChatRoomData": {
@@ -21718,8 +22162,58 @@
           "subscription": { "$ref": "#/components/schemas/Subscription" },
           "chat_partner": { "$ref": "#/components/schemas/ChatPartner" },
           "updated_at_in_unixms": { "type": "integer" },
+          "ts_local": { "type": "string", "format": "date-time" },
           "ts_formatted_local": { "type": "string" },
-          "message_unread": { "type": "boolean" }
+          "message_unread": { "type": "boolean" },
+          "chatroom_meta": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "room_id": { "type": "integer" },
+              "rocketchat_room_id": { "type": "string" },
+              "user_id": { "type": "integer" },
+              "rocketchat_user_id": { "type": "string" },
+              "rocketchat_username": { "type": "string" },
+              "last_seen_at": { "type": "integer" },
+              "unread_count": { "type": "integer" },
+              "closed_at": { "type": "string", "nullable": true },
+              "deleted_messages_count": { "type": "integer" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "updated_at": { "type": "string", "format": "date-time" },
+              "deleted_at": { "type": "string", "nullable": true },
+              "archived_at": { "type": "string", "nullable": true },
+              "archived": { "type": "integer" },
+              "mute": { "type": "integer" },
+              "last_seen_at_ts": { "type": "string" },
+              "last_seen_at_ts_local": { "type": "string" }
+            }
+          },
+          "partners_room_meta": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "room_id": { "type": "integer" },
+              "rocketchat_room_id": { "type": "string" },
+              "user_id": { "type": "integer" },
+              "rocketchat_user_id": { "type": "string" },
+              "rocketchat_username": { "type": "string" },
+              "last_seen_at": { "type": "integer" },
+              "unread_count": { "type": "integer" },
+              "closed_at": { "type": "string", "nullable": true },
+              "deleted_messages_count": { "type": "integer" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "updated_at": { "type": "string", "format": "date-time" },
+              "deleted_at": { "type": "string", "nullable": true },
+              "archived_at": { "type": "string", "nullable": true },
+              "archived": { "type": "integer" },
+              "mute": { "type": "integer" },
+              "last_seen_at_ts": { "type": "string" },
+              "last_seen_at_ts_local": { "type": "string" }
+            }
+          },
+          "is_archived": { "type": "boolean" },
+          "chat_disabled": { "type": "boolean" },
+          "is_deleted_after_last_message": { "type": "boolean" }
         }
       },
       "ContractListResponse": {
