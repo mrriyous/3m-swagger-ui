@@ -17485,6 +17485,236 @@
         }
       }
     },
+    "/people/{public_username}/contract-status": {
+      "get": {
+        "summary": "Get Contract Status",
+        "description": "Retrieve the contract status between the authenticated user and the specified user. This endpoint provides comprehensive contract information including financial details, status, dates, and actions that can be performed on the contract.",
+        "tags": ["People"],
+        "parameters": [
+          {
+            "name": "public_username",
+            "in": "path",
+            "description": "The public username of the user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contract status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "contract": {
+                      "$ref": "#/components/schemas/Contract"
+                    }
+                  }
+                },
+                "examples": {
+                  "contract_status_example": {
+                    "summary": "Active contract status",
+                    "value": {
+                      "error": false,
+                      "contract": {
+                        "id": 123,
+                        "seeker_id": 456,
+                        "sponsor_id": 789,
+                        "contract_id": "CTR-2024-001",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "duration_days": 30,
+                        "monthly_amount": "5000.00",
+                        "monthly_amount_formatted": "$5,000.00",
+                        "monthly_budget_per_child": "1000.00",
+                        "monthly_budget_per_child_formatted": "$1,000.00",
+                        "financial_gift_per_milestone": "2000.00",
+                        "financial_gift_per_milestone_formatted": "$2,000.00",
+                        "financial_gift_upon_marriage": "50000.00",
+                        "financial_gift_upon_marriage_formatted": "$50,000.00",
+                        "capital_growth_bonus": "10000.00",
+                        "capital_growth_bonus_formatted": "$10,000.00",
+                        "relationship_termination_compensation": "5000.00",
+                        "relationship_termination_compensation_formatted": "$5,000.00",
+                        "currency": "USD",
+                        "financial_settings": {
+                          "monthly_amount": "5000.00",
+                          "monthly_budget_per_child": "1000.00",
+                          "financial_gift_per_milestone": "2000.00",
+                          "financial_gift_upon_marriage": "50000.00",
+                          "capital_growth_bonus": "10000.00",
+                          "relationship_termination_compensation": "5000.00"
+                        },
+                        "start_date": "2024-01-15",
+                        "start_date_str": "Jan 15, 2024",
+                        "end_date": "2024-02-14",
+                        "end_date_str": "Feb 14, 2024",
+                        "expiration_date": "2024-02-14",
+                        "expiration_date_str": "Feb 14, 2024",
+                        "paused_at": null,
+                        "stopped_at": null,
+                        "status": "active",
+                        "status_str": "Active",
+                        "status_bg_color": "#10B981",
+                        "status_text_color": "#FFFFFF",
+                        "overal_contract_status": "Active",
+                        "status_classes_str": "bg-green-500 text-white",
+                        "is_test_moon": true,
+                        "is_preliminary": false,
+                        "is_main": false,
+                        "official_agreement_signed": true,
+                        "created_at": "2024-01-15T10:30:00.000000Z",
+                        "updated_at": "2024-01-20T14:45:00.000000Z",
+                        "sponsor": {
+                          "id": 789,
+                          "public_username": "sponsor_user",
+                          "first_name": "Jane",
+                          "last_name": "Smith",
+                          "email": "jane@example.com",
+                          "gender": "female",
+                          "partner_preference": "male",
+                          "relationship_goals": "marriage",
+                          "role": "user",
+                          "profile_picture_url": "https://example.com/jane_profile.jpg",
+                          "hide_images": 0,
+                          "initials": "JS"
+                        },
+                        "seeker": {
+                          "id": 456,
+                          "public_username": "john_doe",
+                          "first_name": "John",
+                          "last_name": "Doe",
+                          "email": "john@example.com",
+                          "gender": "male",
+                          "partner_preference": "female",
+                          "relationship_goals": "marriage",
+                          "role": "user",
+                          "profile_picture_url": "https://example.com/john_profile.jpg",
+                          "hide_images": 0,
+                          "initials": "JD"
+                        },
+                        "template": {
+                          "id": 1,
+                          "name": "Test Moon Template",
+                          "description": "A template for test moon contracts",
+                          "contract_type": "test_moon",
+                          "monthly_amount": "5000.00",
+                          "currency": "USD",
+                          "financial_settings": {
+                            "monthly_amount": "5000.00",
+                            "monthly_budget_per_child": "1000.00",
+                            "financial_gift_per_milestone": "2000.00",
+                            "financial_gift_upon_marriage": "50000.00",
+                            "capital_growth_bonus": "10000.00",
+                            "relationship_termination_compensation": "5000.00"
+                          },
+                          "default_duration_days": 30
+                        },
+                        "actions": [
+                          {
+                            "id": 1,
+                            "action_type": "contract_created",
+                            "status": "approved",
+                            "description": "Contract created successfully",
+                            "created_at": "2024-01-15T10:30:00.000000Z",
+                            "performed_by": {
+                              "id": 789,
+                              "public_username": "sponsor_user",
+                              "first_name": "Jane",
+                              "last_name": "Smith",
+                              "initials": "JS"
+                            },
+                            "approved_by": {
+                              "id": 456,
+                              "public_username": "john_doe",
+                              "first_name": "John",
+                              "last_name": "Doe",
+                              "initials": "JD"
+                            },
+                            "rejected_by": null
+                          }
+                        ],
+                        "partner": {
+                          "id": 456,
+                          "public_username": "john_doe",
+                          "first_name": "John",
+                          "last_name": "Doe",
+                          "email": "john@example.com",
+                          "gender": "male",
+                          "partner_preference": "female",
+                          "relationship_goals": "marriage",
+                          "role": "user",
+                          "profile_picture_url": "https://example.com/john_profile.jpg",
+                          "hide_images": 0,
+                          "initials": "JD"
+                        },
+                        "is_sponsor": true,
+                        "is_seeker": false,
+                        "can_be_changed": true,
+                        "can_be_extended": true,
+                        "can_be_upgraded": false,
+                        "can_be_stopped": true,
+                        "can_be_restarted": false,
+                        "total_duration_days": 30,
+                        "created_by": 789
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          },
+          "404": {
+            "description": "User not found or no contract found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "user_not_found": {
+                    "summary": "User not found",
+                    "value": {
+                      "error": true,
+                      "message": "User not found"
+                    }
+                  },
+                  "no_contract_found": {
+                    "summary": "No contract found",
+                    "value": {
+                      "error": true,
+                      "message": "No contract found between you and this user"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-tickets/categories": {
       "get": {
         "summary": "Get Support Ticket Categories",
@@ -25086,7 +25316,7 @@
           "pending_lifestyle_support_budget": {"type": "number", "example": 1000},
           "budget_upgrade_payment": {"type": "number", "example": 1000}
         }
-      },
+      }
     },
     "securitySchemes": {
       "Authorization": {
