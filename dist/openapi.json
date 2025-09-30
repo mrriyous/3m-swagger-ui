@@ -307,113 +307,266 @@
         ],
         "responses": {
           "200": {
-            "description": "Response For Step 1",
-            "headers": {
-              "header-0": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
+            "description": "Step 1 - Initial Validation Success",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "error": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "description": "Indicates if there was an error",
+                      "example": false
                     },
                     "recaptcha_session_id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Session ID for Step 2 reCAPTCHA verification",
+                      "example": "abc123xyz456..."
                     }
                   },
-                  "x-examples": {
-                    "Example 1": {
+                  "required": ["error", "recaptcha_session_id"]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Successful Step 1 validation",
+                    "value": {
                       "error": false,
-                      "recaptcha_session_id": "MVlNNTExVFZ3ZFd5Wk9SaDYxRmd0UU9CMFRQQUJYY0cyMDI1LTA2LTA2IDE0OjUxOjIyMTI3LjAuMC4x"
+                      "recaptcha_session_id": "abc123xyz456..."
                     }
                   }
                 }
               }
             }
           },
-          "2XX": {
-            "description": "Response For STEP 2",
+          "400": {
+            "description": "Step 1 - Validation Error",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "user": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "Indicates there was an error",
+                      "example": true
+                    },
+                    "errors": {
                       "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "role": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "null"
-                        },
-                        "gender": {
-                          "type": "string"
-                        },
-                        "last_name": {
-                          "type": "null"
-                        },
-                        "created_at": {
-                          "type": "string"
-                        },
-                        "first_name": {
-                          "type": "null"
-                        },
-                        "login_name": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "public_username": {
-                          "type": "string"
-                        },
-                        "partner_preference": {
-                          "type": "string"
-                        },
-                        "relationship_goals": {
-                          "type": "string"
-                        },
-                        "profile_picture_url": {
+                      "description": "Validation error details",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
                           "type": "string"
                         }
+                      },
+                      "example": {
+                        "login_name": ["This login name is already taken"],
+                        "password": ["Password must contain at least one special character"]
                       }
-                    },
-                    "error": {
-                      "type": "boolean"
-                    },
-                    "token": {
-                      "type": "string"
                     }
                   },
-                  "x-examples": {
-                    "Example 1": {
-                      "user": {
-                        "id": 55,
-                        "role": "rs",
-                        "email": null,
-                        "gender": "male",
-                        "last_name": null,
-                        "created_at": "2025-06-06T15:11:21.000000Z",
-                        "first_name": null,
-                        "login_name": "nabil",
-                        "updated_at": "2025-06-06T15:11:21.000000Z",
-                        "public_username": "ellain",
-                        "partner_preference": "female",
-                        "relationship_goals": "long_term",
-                        "profile_picture_url": "http://localhost:8001/images/placeholder-profile.png"
+                  "required": ["error", "errors"]
+                },
+                "examples": {
+                  "Validation Error": {
+                    "summary": "Step 1 validation failed",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "login_name": ["This login name is already taken"],
+                        "password": ["Password must contain at least one special character"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Step 2 - Registration Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "Indicates if there was an error",
+                      "example": false
+                    },
+                    "user": {
+                      "type": "object",
+                      "description": "Created user information",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "User ID",
+                          "example": 1
+                        },
+                        "login_name": {
+                          "type": "string",
+                          "description": "User's login name",
+                          "example": "johndoe123"
+                        },
+                        "public_username": {
+                          "type": "string",
+                          "description": "User's public display name",
+                          "example": "JohnDoe"
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "description": "User's first name",
+                          "example": "John"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "description": "User's last name",
+                          "example": "Doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "User's email address",
+                          "nullable": true,
+                          "example": "john@example.com"
+                        },
+                        "gender": {
+                          "type": "string",
+                          "description": "User's gender",
+                          "example": "male"
+                        },
+                        "partner_preference": {
+                          "type": "string",
+                          "description": "User's partner preference",
+                          "example": "female"
+                        },
+                        "duration_preference": {
+                          "type": "string",
+                          "description": "User's relationship duration preference",
+                          "nullable": true,
+                          "example": "long_term_relationship"
+                        },
+                        "role": {
+                          "type": "string",
+                          "description": "User's role in the platform",
+                          "example": "rs"
+                        },
+                        "affiliate_code": {
+                          "type": "string",
+                          "description": "User's generated affiliate code",
+                          "example": "ABC123XYZ"
+                        },
+                        "is_test_user": {
+                          "type": "integer",
+                          "description": "Indicates if user is a test user",
+                          "example": 0
+                        },
+                        "timeoffset": {
+                          "type": "number",
+                          "description": "User's timezone offset in minutes",
+                          "nullable": true,
+                          "example": -300
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "User creation timestamp",
+                          "example": "2024-03-20T10:00:00Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "User last update timestamp",
+                          "example": "2024-03-20T10:00:00Z"
+                        }
                       },
+                      "required": ["id", "login_name", "public_username", "first_name", "last_name", "gender", "partner_preference", "role", "affiliate_code", "is_test_user", "created_at", "updated_at"]
+                    },
+                    "token": {
+                      "type": "string",
+                      "description": "Authentication token for the created user",
+                      "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                    }
+                  },
+                  "required": ["error", "user", "token"]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Successful registration",
+                    "value": {
                       "error": false,
-                      "token": "186|KGMppv3ksgOibqtcVqLXSWfo7GiUkdxD0fsIRLso423dc7da"
+                      "user": {
+                        "id": 1,
+                        "login_name": "johndoe123",
+                        "public_username": "JohnDoe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john@example.com",
+                        "gender": "male",
+                        "partner_preference": "female",
+                        "duration_preference": "long_term_relationship",
+                        "role": "rs",
+                        "affiliate_code": "ABC123XYZ",
+                        "is_test_user": 0,
+                        "timeoffset": -300,
+                        "created_at": "2024-03-20T10:00:00Z",
+                        "updated_at": "2024-03-20T10:00:00Z"
+                      },
+                      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Step 2 - Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "Indicates there was an error",
+                      "example": true
+                    },
+                    "errors": {
+                      "type": "object",
+                      "description": "Validation error details",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "recaptcha_session_id": ["reCAPTCHA verification failed. Please try again"],
+                        "gender": ["Gender is required"],
+                        "partner_preference": ["Partner preference is required"],
+                        "duration_preference": ["Please select your relationship duration preference"],
+                        "role": ["Role is required"],
+                        "budget": ["Minimum budget required is 100"],
+                        "currency": ["Invalid currency"]
+                      }
+                    }
+                  },
+                  "required": ["error", "errors"]
+                },
+                "examples": {
+                  "Validation Error": {
+                    "summary": "Step 2 validation failed",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "recaptcha_session_id": ["reCAPTCHA verification failed. Please try again"],
+                        "gender": ["Gender is required"],
+                        "partner_preference": ["Partner preference is required"],
+                        "duration_preference": ["Please select your relationship duration preference"],
+                        "role": ["Role is required"],
+                        "budget": ["Minimum budget required is 100"],
+                        "currency": ["Invalid currency"]
+                      }
                     }
                   }
                 }
@@ -422,105 +575,212 @@
           }
         },
         "operationId": "registration",
-        "description": "Registration will be having 2 steps for captcha verification at step 1\n",
+        "description": "Registration API with two-step process for user account creation.\n\n## Step 1: Initial Validation\nValidates user credentials and performs reCAPTCHA verification. Returns a session ID for Step 2.\n\n## Step 2: Complete Registration\nCompletes user registration with additional profile information and creates the user account.\n\n### Key Features:\n- Two-step registration process with reCAPTCHA verification\n- Mobile registration support (skips reCAPTCHA when is_mobile=Y)\n- Comprehensive validation for all fields\n- Automatic profile creation (financial, relationship, visibility settings)\n- Affiliate/referral system support\n- Timezone handling with offset or timezone identifier\n- Budget conversion to system default currency\n- RocketChat integration\n- Email verification and welcome notifications\n- Test user detection (login_name starting with 'test_')\n\n### Validation Rules:\n- login_name: 4-20 chars, alphanumeric with ._\n- public_username: 3-20 chars, alphanumeric with ._\n- password: min 8 chars, 1 uppercase, 1 number, 1 special char\n- email: valid email format (optional)\n- budget: minimum 100\n- gender: male, female, other\n- partner_preference: male, female, any\n- duration_preference: short_term_relationship, medium_term_relationship, long_term_relationship\n- role: rs, srs\n- currency: valid currency code\n",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "x-examples": {
-                  "Example 1": {
-                    "role": "rs",
-                    "step": 2,
-                    "email": "testinguser@testing.cmo",
-                    "budget": 2500,
-                    "gender": "male",
-                    "currency": "SGD",
-                    "password": "Password1234!",
-                    "last_name": null,
-                    "recaptcha": "03AFcWeA5rVkRfV13la_jGmC6huebt2MolXokDFeMjS5NjJLACG7oKIqk6uPpzm98U4tkTZxT9I5qekOsX9e2ewL-J-LJ3fQbN90Dd9EwpxgzvEAepmh2MGqwMpUkpXLoIeDMd5FuZjulmJzKhsQwsIsCeNsXKGSVHI7G9I77mNJgMm8ouYcct0H0p-TeYHXATHUqoYXrn2Ky-2waZGwuWNfXKRsTNPf0SK82t4ixzV1tYddKkAPJdMd7Y2WgpcW1U8_WqcdkVewNYZGh8CyaqeDhVMJu6JvQfAdXyGYD5PRMMnyu9HuFq1jauyyV5ybsaNTLtm5--c1jVmNnylUeo4GebZ3rNSpxYkxLcg1Y_A-dSVfB6UneTHRXWakkqWJNcQAgD6vfctoqgDjBdXCbj_mXlJp0mZ24E7E4-0z8sN4ksg-luXgrY20WEIjaGgLOm_9R2rnbjqUN05A1sEmI8W_2xOiZqbhHfBiyW71f1oWCbJ3KubYw7loriHaJy4YjzoFQjhzdkbx9O--NUPs_sKa2Xybh6PpROHHGEJgWxqzRglIeaCegXwdzFoqnc0fnaSbQMwSrimjIBLWTIb4G9l5XnS6b83EC-mmS6ORQzDfIspMgjFEkza3KOytYZxf2dKwCkKNowdT9awBcNORb7luy6TrMDL-wRb9NY6TyRPqSkBCdbaZgUKW0N2TTUS1-I0y6QaXeA8PaLbTRyY4VKxveZBdJwul5X--AyD9dRYZzdE0xLng9d-xAHdUJKIzQ18NAgx-be-JnQDoM-RMpDFK4C7tXDtpOdcZUA_6HLZLrBbyaMEOyajxdy5e9rXKizo8bCFyYq-wb60B_5lU27-KvbywRFCN7XvMGL4Ax9hBgJYRqCCsgKZZP26BY56EpXwCWYfqriB6fO8nHM431pyLn3vXuN9mik2FL2wuuOtaAhR7I4OUJMetxrYdYt3dL27vMT7xf3Sny1JEGWljnNBS9PEd14bVgaPkYgxeEj61R6mrMKOwJulB35jlWXmSHP7e_ywUSh75O97jBmEOxdDWKzDpv5uYuF17OH_kPsCbwPSSBCSp_RmviIwIG0-IBzx7Iv5-5_OjZs8DaPlO7wUrpZYMRjM_p1FisFx1qJuOcP34lB19SqZykalerF7DedkgZcMuSPKaf7VSs7nL4Br7kgAQxR21_WltgCojUbT5CbaCTN0a6r5tfYTlGXziYUE5Hf2TutA2bwPB_GkFznQ8V_w5APFkrxCdKtJhVVFqDkzdLtcFBvO0skoOVxg8iSEYj6DRbB3NF7LHqFwG7Q9_NmoH23jGIg5aIsQnDzGxkkJ2nz-r8VLhUFP0NbYmyv-2_SJJSr39nHIMdaod5q3kbXcPk8TxFSsL0MTRS8dtkSY12rNCJkN0m2QvBYNx5h_NFToAdFRXcQbVfibHWee_bajsKcbcw9WfjGS4-cbui7eqM0Ff5wN7CzFNpE5vdJRyrJjU2Nbf81x1qei2hL9eG7aWZFtjKesVN4y0B8X_GvxLM4tQZef3EIS9K1__fUb4ouX2IdgIghS8bUXFV9jeVRlAK0wjR1k7PcW9ZIn3dMkg6ci4qKfeNSdMPZQkFiT8hYl1Y_LZk2jjQqYh_ntUlqSAaEk6CWFtWVkSKnlGqVCgBQlJPEYG20mtPgD3dUh1EPW63sQtzdXxsyp78df_2nV1VT1-hVT2kgFOh8_0KNaoVqx8Ig6GLMJw1Pl8V0KzMzEXINn31axRp5GOBbOLA-0-aqmmN-K72RO7-vyyk4bGK2IGn_x56Wf2eBc9Nd9m3Wso0JqJyrU04tXhg6iCRr8uqigCD26hxWkW3V9CBAEJAMzzJ--da4RMR5RtqJclGEvUoOBFCtOi0l0zxLumAWGxHej9LfF182xORIxFhm-_BI4rLH2FTmPUFCFfuzKr08sSTDSThT_4D51q_6Lz1tcpFtY12CUCZWJbPy-QCzAmbWR-ap9IuMPj4u5pYfCXBsc_AZsoKwuRhJNTl6iei2tispfP259aKQOvX6fZn6jKngZM6yd03hlnnqlKJWk0EM81Au4k1YFjDJxhKjLnWB_twNPNUGiDQ-qC8RleXgllDGSX3WBoU",
-                    "first_name": null,
-                    "login_name": "joshua_jonan",
+                  "Step 1 - Initial Validation": {
+                    "step": 1,
+                    "login_name": "johndoe123",
+                    "public_username": "JohnDoe",
+                    "email": "john@example.com",
+                    "password": "Password123!",
+                    "password_confirmation": "Password123!",
                     "terms_accepted": "1",
-                    "public_username": "joshua_jonan",
+                    "recaptcha": "03AFcWeA5...",
+                    "is_mobile": "N"
+                  },
+                  "Step 2 - Complete Registration": {
+                    "step": 2,
+                    "login_name": "johndoe123",
+                    "public_username": "JohnDoe",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "email": "john@example.com",
+                    "password": "Password123!",
+                    "password_confirmation": "Password123!",
+                    "terms_accepted": "1",
+                    "recaptcha": "03AFcWeA5...",
+                    "recaptcha_session_id": "abc123xyz456...",
+                    "is_mobile": "N",
+                    "gender": "male",
                     "partner_preference": "female",
-                    "relationship_goals": "medium_term",
-                    "recaptcha_session_id": "c3g4UEx4b0NFd2FOajdVMGltd0FLbTk3dGFEOG82dzkyMDI1LTA2LTA2IDE1OjA0OjE5MTI3LjAuMC4x",
-                    "password_confirmation": "Password1234!"
+                    "duration_preference": "long_term_relationship",
+                    "role": "rs",
+                    "budget": 5000,
+                    "currency": "USD",
+                    "timeoffset": -300,
+                    "affiliate_code": "REF123ABC"
+                  },
+                  "Mobile Registration (Step 1)": {
+                    "step": 1,
+                    "login_name": "johndoe123",
+                    "public_username": "JohnDoe",
+                    "email": "john@example.com",
+                    "password": "Password123!",
+                    "password_confirmation": "Password123!",
+                    "terms_accepted": "1",
+                    "is_mobile": "Y"
+                  },
+                  "Mobile Registration (Step 2)": {
+                    "step": 2,
+                    "login_name": "johndoe123",
+                    "public_username": "JohnDoe",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "email": "john@example.com",
+                    "password": "Password123!",
+                    "password_confirmation": "Password123!",
+                    "terms_accepted": "1",
+                    "is_mobile": "Y",
+                    "gender": "male",
+                    "partner_preference": "female",
+                    "duration_preference": "long_term_relationship",
+                    "role": "rs",
+                    "budget": 5000,
+                    "currency": "USD",
+                    "timezone": "America/New_York",
+                    "affiliate_code": "REF123ABC"
                   }
                 },
                 "properties": {
-                  "role": {
-                    "enum": [
-                      "rs",
-                      "srs"
-                    ]
-                  },
                   "step": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Registration step number. Must be 1 for initial validation or 2 for complete registration.",
+                    "enum": [1, 2],
+                    "example": 1
                   },
-                  "email": {
-                    "type": "string"
+                  "login_name": {
+                    "type": "string",
+                    "description": "Unique identifier for login. 4-20 characters, alphanumeric with ._ allowed.",
+                    "minLength": 4,
+                    "maxLength": 20,
+                    "pattern": "^[a-zA-Z0-9._]+$",
+                    "example": "johndoe123"
                   },
-                  "budget": {
-                    "type": "integer"
+                  "public_username": {
+                    "type": "string",
+                    "description": "Display name visible to other users. 3-20 characters, alphanumeric with ._ allowed.",
+                    "minLength": 3,
+                    "maxLength": 20,
+                    "pattern": "^[a-zA-Z0-9._]+$",
+                    "example": "JohnDoe"
                   },
-                  "gender": {
-                    "type": "string"
-                  },
-                  "currency": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
+                  "first_name": {
+                    "type": "string",
+                    "description": "User's first name. Required for Step 2.",
+                    "nullable": true,
+                    "example": "John"
                   },
                   "last_name": {
-                    "nullable": true
+                    "type": "string",
+                    "description": "User's last name. Required for Step 2.",
+                    "nullable": true,
+                    "example": "Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email address. Optional but recommended.",
+                    "nullable": true,
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Account password. Minimum 8 characters, must contain 1 uppercase letter, 1 number, and 1 special character.",
+                    "minLength": 8,
+                    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]",
+                    "example": "Password123!"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "description": "Password confirmation. Must match the password field.",
+                    "example": "Password123!"
+                  },
+                  "terms_accepted": {
+                    "type": "string",
+                    "description": "Terms and conditions acceptance. Must be '1' to accept.",
+                    "enum": ["1"],
+                    "example": "1"
                   },
                   "recaptcha": {
                     "type": "string",
-                    "description": "required on step 1, and if is_mobile != Y"
-                  },
-                  "first_name": {
-                    "nullable": true
-                  },
-                  "login_name": {
-                    "type": "string"
-                  },
-                  "terms_accepted": {
-                    "type": "string"
-                  },
-                  "public_username": {
-                    "type": "string"
-                  },
-                  "partner_preference": {
-                    "type": "string"
-                  },
-                  "relationship_goals": {
-                    "type": "string"
+                    "description": "Google reCAPTCHA response token. Required for Step 1 and Step 2 unless is_mobile=Y.",
+                    "nullable": true,
+                    "example": "03AFcWeA5..."
                   },
                   "recaptcha_session_id": {
                     "type": "string",
-                    "description": "Required on step2, and is_mobile != Y"
-                  },
-                  "password_confirmation": {
-                    "type": "string"
+                    "description": "Session ID from Step 1. Required for Step 2 unless is_mobile=Y.",
+                    "nullable": true,
+                    "example": "abc123xyz456..."
                   },
                   "is_mobile": {
-                    "x-stoplight": {
-                      "id": "9z1603rfe2g9y"
-                    },
-                    "enum": [
-                      "Y",
-                      "N"
-                    ]
+                    "type": "string",
+                    "description": "Set to 'Y' for mobile registration to skip reCAPTCHA verification.",
+                    "enum": ["Y", "N"],
+                    "default": "N",
+                    "example": "N"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "description": "User's gender. Required for Step 2.",
+                    "enum": ["male", "female", "other"],
+                    "example": "male"
+                  },
+                  "partner_preference": {
+                    "type": "string",
+                    "description": "Preferred partner gender. Required for Step 2.",
+                    "enum": ["male", "female", "any"],
+                    "example": "female"
+                  },
+                  "duration_preference": {
+                    "type": "string",
+                    "description": "Preferred relationship duration. Optional for Step 2.",
+                    "enum": ["short_term_relationship", "medium_term_relationship", "long_term_relationship"],
+                    "nullable": true,
+                    "example": "long_term_relationship"
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "User's role in the platform. Required for Step 2.",
+                    "enum": ["rs", "srs"],
+                    "example": "rs"
+                  },
+                  "budget": {
+                    "type": "number",
+                    "description": "User's budget preference. Required for Step 2, minimum 100.",
+                    "minimum": 100,
+                    "example": 5000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "User's preferred currency code. Required for Step 2.",
+                    "example": "USD"
+                  },
+                  "timeoffset": {
+                    "type": "number",
+                    "description": "User's timezone offset in minutes (JavaScript getTimezoneOffset() value). Optional.",
+                    "nullable": true,
+                    "example": -300
+                  },
+                  "timezone": {
+                    "type": "string",
+                    "description": "User's timezone identifier (alternative to timeoffset). Optional.",
+                    "nullable": true,
+                    "example": "America/New_York"
                   },
                   "affiliate_code": {
                     "type": "string",
-                    "description": "Optional affiliate code for referral tracking",
-                    "nullable": true
+                    "description": "Referral code from another user. Optional.",
+                    "nullable": true,
+                    "example": "REF123ABC"
                   }
-                }
+                },
+                "required": ["step", "login_name", "public_username", "password", "password_confirmation", "terms_accepted"]
               },
               "examples": {}
             }
