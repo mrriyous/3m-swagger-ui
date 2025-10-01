@@ -1570,6 +1570,294 @@
         "operationId": "get-profile-basic-info"
       }
     },
+    "/profile/completion-percentage": {
+      "get": {
+        "summary": "Get Profile Completion Percentage",
+        "description": "Get your profile completion percentage and detailed breakdown of completed sections. The completion percentage is calculated in real-time based on current profile data.",
+        "tags": [
+          "Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile completion percentage retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "percentage": {
+                          "type": "integer",
+                          "description": "Overall profile completion percentage (0-100)",
+                          "example": 75
+                        },
+                        "breakdown": {
+                          "type": "object",
+                          "description": "Detailed breakdown of completion by category",
+                          "properties": {
+                            "personal_photos": {
+                              "type": "object",
+                              "description": "Personal photos completion (14% weight, 2% per photo, max 7 photos)",
+                              "properties": {
+                                "fields": {
+                                  "type": "string",
+                                  "description": "Field name in profile",
+                                  "example": "album.my_photos"
+                                },
+                                "count": {
+                                  "type": "integer",
+                                  "description": "Number of photos uploaded",
+                                  "example": 5
+                                },
+                                "required": {
+                                  "type": "integer",
+                                  "description": "Maximum number of photos for full completion",
+                                  "example": 7
+                                },
+                                "percentage": {
+                                  "type": "integer",
+                                  "description": "Completion percentage for this category",
+                                  "example": 10
+                                },
+                                "completed": {
+                                  "type": "boolean",
+                                  "description": "Whether this category is fully completed",
+                                  "example": false
+                                }
+                              }
+                            },
+                            "monthly_budget": {
+                              "type": "object",
+                              "description": "Monthly budget completion (10% weight)",
+                              "properties": {
+                                "fields": {
+                                  "type": "string",
+                                  "description": "Field name in profile",
+                                  "example": "lifestyle_support_budget"
+                                },
+                                "completed": {
+                                  "type": "boolean",
+                                  "description": "Whether lifestyle support budget is set",
+                                  "example": true
+                                },
+                                "percentage": {
+                                  "type": "integer",
+                                  "description": "Completion percentage for this category",
+                                  "example": 10
+                                }
+                              }
+                            },
+                            "description": {
+                              "type": "object",
+                              "description": "Profile description completion (10% weight)",
+                              "properties": {
+                                "fields": {
+                                  "type": "string",
+                                  "description": "Field name in profile",
+                                  "example": "short_intro"
+                                },
+                                "completed": {
+                                  "type": "boolean",
+                                  "description": "Whether short introduction is provided",
+                                  "example": true
+                                },
+                                "percentage": {
+                                  "type": "integer",
+                                  "description": "Completion percentage for this category",
+                                  "example": 10
+                                }
+                              }
+                            },
+                            "languages": {
+                              "type": "object",
+                              "description": "Languages completion (5% weight)",
+                              "properties": {
+                                "fields": {
+                                  "type": "string",
+                                  "description": "Field name in profile",
+                                  "example": "user_languages"
+                                },
+                                "completed": {
+                                  "type": "boolean",
+                                  "description": "Whether at least one language with fluency > 0 is set",
+                                  "example": true
+                                },
+                                "percentage": {
+                                  "type": "integer",
+                                  "description": "Completion percentage for this category",
+                                  "example": 5
+                                }
+                              }
+                            },
+                            "geo_search": {
+                              "type": "object",
+                              "description": "Geographic search preferences completion (10% weight)",
+                              "properties": {
+                                "fields": {
+                                  "type": "string",
+                                  "description": "Field names in profile",
+                                  "example": "location_search,location_search_place_id"
+                                },
+                                "completed": {
+                                  "type": "boolean",
+                                  "description": "Whether search location preferences are set",
+                                  "example": true
+                                },
+                                "percentage": {
+                                  "type": "integer",
+                                  "description": "Completion percentage for this category",
+                                  "example": 10
+                                }
+                              }
+                            },
+                            "remaining_fields": {
+                              "type": "object",
+                              "description": "All other profile fields completion (51% weight)",
+                              "properties": {
+                                "empty_remaining_fields": {
+                                  "type": "array",
+                                  "description": "List of empty fields that need completion",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "example": ["weight", "height", "education_level", "profession"]
+                                },
+                                "total_fields": {
+                                  "type": "integer",
+                                  "description": "Total number of remaining fields",
+                                  "example": 12
+                                },
+                                "completed_fields": {
+                                  "type": "integer",
+                                  "description": "Number of completed remaining fields",
+                                  "example": 8
+                                },
+                                "percentage": {
+                                  "type": "integer",
+                                  "description": "Completion percentage for remaining fields",
+                                  "example": 34
+                                },
+                                "is_sponsor": {
+                                  "type": "boolean",
+                                  "description": "Whether the user is a sponsor (role: 'rs')",
+                                  "example": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "percentage": 75,
+                        "breakdown": {
+                          "personal_photos": {
+                            "fields": "album.my_photos",
+                            "count": 5,
+                            "required": 7,
+                            "percentage": 10,
+                            "completed": false
+                          },
+                          "monthly_budget": {
+                            "fields": "lifestyle_support_budget",
+                            "completed": true,
+                            "percentage": 10
+                          },
+                          "description": {
+                            "fields": "short_intro",
+                            "completed": true,
+                            "percentage": 10
+                          },
+                          "languages": {
+                            "fields": "user_languages",
+                            "completed": true,
+                            "percentage": 5
+                          },
+                          "geo_search": {
+                            "fields": "location_search,location_search_place_id",
+                            "completed": true,
+                            "percentage": 10
+                          },
+                          "remaining_fields": {
+                            "empty_remaining_fields": [
+                              "weight",
+                              "height",
+                              "education_level",
+                              "profession"
+                            ],
+                            "total_fields": 12,
+                            "completed_fields": 8,
+                            "percentage": 34,
+                            "is_sponsor": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to calculate profile completion percentage"
+                    },
+                    "error_detail": {
+                      "type": "string",
+                      "description": "Detailed error message"
+                    },
+                    "error_line": {
+                      "type": "integer",
+                      "description": "Line number where error occurred",
+                      "example": 865
+                    }
+                  }
+                },
+                "examples": {
+                  "Error Response": {
+                    "value": {
+                      "error": true,
+                      "message": "Failed to calculate profile completion percentage",
+                      "error_detail": "Detailed error message",
+                      "error_line": 865
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-profile-completion-percentage"
+      }
+    },
     "/profile/relationship-info": {
       "get": {
         "summary": "Get Relationship Info",
