@@ -2149,7 +2149,7 @@
     "/profile/visibility-setting": {
       "get": {
         "summary": "Get Visibility Setting",
-        "description": "Get your current profile visibility settings.",
+        "description": "Get your current profile visibility settings.\n\n**Status of Registration**: Choose whether unregistered visitors can see your profile. Note that some registered users may use for their search another device whilst being not logged in. However, if the parameter is not set to registered users only, the photos will become publicly available the same way as they would in Instagram or other social networks.\n\n**Financial Verification Status**: Financial verification means that a user stating certain monthly budget confirms his commitment by buying the annual subscription that costs multiple amounts of the monthly budget and confirms by that his financial soundness. Note that this does not amount to a full guarantee of the financial soundness. Even if you choose \"All Users\", only those having purchased Annual subscription would be able to contact you. This setting affects only the visibility to those without the Annual subscription. Your profile will not be seen even by those who have verified their monthly budget but set it lower than the budget set by SP.\n\n**Mutual Interest Requirement**: Indicate whether there is a requirement that the user should be marked by you as interesting before they are able to see your profile. If this option is set, your profile will be invisible for everyone except those whose profiles were found by you on the Search Page and marked as Interesting.",
         "tags": [
           "Profile"
         ],
@@ -2184,19 +2184,22 @@
                           "example": 123
                         },
                         "status_of_registration": {
-                          "type": "boolean",
-                          "description": "Registration status visibility",
-                          "example": true
+                          "type": "string",
+                          "description": "Registration status visibility - \"all\" (Any Visitor) or \"registered\" (Registered Visitor)",
+                          "enum": ["all", "registered"],
+                          "example": "registered"
                         },
                         "financial_verification_status": {
-                          "type": "boolean",
-                          "description": "Financial verification status visibility",
-                          "example": true
+                          "type": "string",
+                          "description": "Financial verification status - \"verified\" (Only Verified-Finance Users) or \"all\" (All Users)",
+                          "enum": ["verified", "all"],
+                          "example": "verified"
                         },
                         "mutual_interest_requirement": {
-                          "type": "boolean",
-                          "description": "Require mutual interest for visibility",
-                          "example": false
+                          "type": "string",
+                          "description": "Mutual interest requirement - \"all\" (Any Visitors) or \"marked\" (Only marked by me)",
+                          "enum": ["all", "marked"],
+                          "example": "marked"
                         },
                         "created_at": {
                           "type": "string",
@@ -4730,7 +4733,7 @@
     "/profile/visibility": {
       "post": {
         "summary": "Update Visibility Settings",
-        "description": "Update your profile visibility settings.",
+        "description": "Update your profile visibility settings.\n\n**Status of Registration**: Choose whether unregistered visitors can see your profile. Note that some registered users may use for their search another device whilst being not logged in. However, if the parameter is not set to registered users only, the photos will become publicly available the same way as they would in Instagram or other social networks.\n\n**Financial Verification Status**: Financial verification means that a user stating certain monthly budget confirms his commitment by buying the annual subscription that costs multiple amounts of the monthly budget and confirms by that his financial soundness. Note that this does not amount to a full guarantee of the financial soundness. Even if you choose \"All Users\", only those having purchased Annual subscription would be able to contact you. This setting affects only the visibility to those without the Annual subscription. Your profile will not be seen even by those who have verified their monthly budget but set it lower than the budget set by SP.\n\n**Mutual Interest Requirement**: Indicate whether there is a requirement that the user should be marked by you as interesting before they are able to see your profile. If this option is set, your profile will be invisible for everyone except those whose profiles were found by you on the Search Page and marked as Interesting.",
         "tags": [
           "Profile"
         ],
@@ -4747,27 +4750,30 @@
                 "type": "object",
                 "properties": {
                   "status_of_registration": {
-                    "type": "boolean",
-                    "description": "Registration status visibility",
-                    "example": true
+                    "type": "string",
+                    "description": "Choose who can see your profile based on registration status",
+                    "enum": ["all", "registered"],
+                    "example": "registered"
                   },
                   "financial_verification_status": {
-                    "type": "boolean",
-                    "description": "Financial verification status visibility",
-                    "example": true
+                    "type": "string",
+                    "description": "Choose who can see your profile based on financial verification",
+                    "enum": ["verified", "all"],
+                    "example": "verified"
                   },
                   "mutual_interest_requirement": {
-                    "type": "boolean",
-                    "description": "Require mutual interest for visibility",
-                    "example": false
+                    "type": "string",
+                    "description": "Require mutual interest for profile visibility",
+                    "enum": ["all", "marked"],
+                    "example": "marked"
                   }
                 }
               },
               "x-examples": {
                 "Example 1": {
-                  "status_of_registration": true,
-                  "financial_verification_status": true,
-                  "mutual_interest_requirement": false
+                  "status_of_registration": "registered",
+                  "financial_verification_status": "verified",
+                  "mutual_interest_requirement": "marked"
                 }
               }
             }
@@ -4803,19 +4809,22 @@
                           "example": 123
                         },
                         "status_of_registration": {
-                          "type": "boolean",
-                          "description": "Registration status visibility",
-                          "example": true
+                          "type": "string",
+                          "description": "Registration status visibility - \"all\" (Any Visitor) or \"registered\" (Registered Visitor)",
+                          "enum": ["all", "registered"],
+                          "example": "registered"
                         },
                         "financial_verification_status": {
-                          "type": "boolean",
-                          "description": "Financial verification status visibility",
-                          "example": true
+                          "type": "string",
+                          "description": "Financial verification status - \"verified\" (Only Verified-Finance Users) or \"all\" (All Users)",
+                          "enum": ["verified", "all"],
+                          "example": "verified"
                         },
                         "mutual_interest_requirement": {
-                          "type": "boolean",
-                          "description": "Require mutual interest for visibility",
-                          "example": false
+                          "type": "string",
+                          "description": "Mutual interest requirement - \"all\" (Any Visitors) or \"marked\" (Only marked by me)",
+                          "enum": ["all", "marked"],
+                          "example": "marked"
                         },
                         "created_at": {
                           "type": "string",
@@ -4839,9 +4848,9 @@
                       "data": {
                         "id": 1,
                         "user_id": 123,
-                        "status_of_registration": true,
-                        "financial_verification_status": true,
-                        "mutual_interest_requirement": false,
+                        "status_of_registration": "registered",
+                        "financial_verification_status": "verified",
+                        "mutual_interest_requirement": "marked",
                         "created_at": "2024-01-15T10:30:00.000000Z",
                         "updated_at": "2024-01-20T14:45:00.000000Z"
                       }
