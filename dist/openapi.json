@@ -1959,13 +1959,24 @@
     "/profile/financial-info": {
       "get": {
         "summary": "Get Financial Info",
-        "description": "Get your financial profile information including lifestyle support budget, capital level, income details, child payments, marriage gifts, and milestone settings.",
+        "description": "Get your financial profile information including lifestyle support budget, capital level, income details, child payments, marriage gifts, and milestone settings. Supports currency conversion via query parameter.",
         "tags": [
           "Profile"
         ],
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Currency code for viewing amounts in a different currency (e.g., 'AED', 'EUR'). If not provided, uses the user's default currency.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -17844,7 +17855,7 @@
     "/people/{public_username}/financial": {
       "get": {
         "summary": "Get User Financial Information",
-        "description": "Retrieve a user's financial profile information including budget, capital level, income, milestone gifts, and financial preferences. This endpoint provides comprehensive financial data that helps users understand each other's financial capabilities and expectations in relationships.",
+        "description": "Retrieve a user's financial profile information including budget, capital level, income, milestone gifts, and financial preferences. This endpoint provides comprehensive financial data that helps users understand each other's financial capabilities and expectations in relationships. Supports currency conversion via query parameter.",
         "tags": ["People"],
         "parameters": [
           {
@@ -17852,6 +17863,15 @@
             "in": "path",
             "description": "The public username of the user",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Currency code for viewing amounts in a different currency (e.g., 'AED', 'EUR'). If not provided, uses the user's default currency.",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -24440,6 +24460,16 @@
             "description": "Formatted lifestyle support budget in system currency",
             "example": "5,000"
           },
+          "lifestyle_support_budget_trimmed_in_lc": {
+            "type": "number",
+            "description": "Lifestyle support budget converted to local/viewing currency",
+            "example": 18350
+          },
+          "lifestyle_support_budget_trimmed_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget in local currency with thousand separators",
+            "example": "18,350"
+          },
           "budget_upgrade_payment": {
             "type": "number",
             "description": "Payment amount for budget upgrade",
@@ -24455,25 +24485,65 @@
             "description": "Precise capital level value",
             "example": "1000000"
           },
+          "capital_level_precise_in_lc": {
+            "type": "number",
+            "description": "Precise capital level converted to local currency",
+            "example": 3670000
+          },
+          "capital_level_precise_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted precise capital level in local currency",
+            "example": "3,670,000"
+          },
           "capital_level_less_precise": {
             "type": "string",
             "description": "Less precise capital level value",
             "example": "1M+"
+          },
+          "capital_level_less_precise_in_lc": {
+            "type": "string",
+            "description": "Less precise capital level label in local currency",
+            "example": "3.67M+ AED"
           },
           "monthly_income_precise": {
             "type": "string",
             "description": "Precise monthly income value",
             "example": "50000"
           },
+          "monthly_income_precise_in_lc": {
+            "type": "number",
+            "description": "Precise monthly income converted to local currency",
+            "example": 183500
+          },
+          "monthly_income_precise_in_lc_trimed": {
+            "type": "string",
+            "description": "Formatted precise monthly income in local currency (Note: API uses 'trimed' with typo)",
+            "example": "183,500"
+          },
           "monthly_income_less_precise": {
             "type": "string",
             "description": "Less precise monthly income value",
             "example": "50K+"
           },
+          "monthly_income_less_precise_in_lc": {
+            "type": "string",
+            "description": "Less precise monthly income label in local currency",
+            "example": "183.5K+ AED"
+          },
           "first_child_payment": {
             "type": "number",
             "description": "Payment amount for first child",
             "example": 10000
+          },
+          "first_child_payment_in_lc": {
+            "type": "number",
+            "description": "First child payment converted to local currency",
+            "example": 36700
+          },
+          "first_child_payment_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted first child payment in local currency",
+            "example": "36,700"
           },
           "first_child_payment_trimmed": {
             "type": "string",
@@ -24485,6 +24555,16 @@
             "description": "Payment amount for second child",
             "example": 8000
           },
+          "second_child_payment_in_lc": {
+            "type": "number",
+            "description": "Second child payment converted to local currency",
+            "example": 29360
+          },
+          "second_child_payment_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted second child payment in local currency",
+            "example": "29,360"
+          },
           "second_child_payment_trimmed": {
             "type": "string",
             "description": "Formatted second child payment",
@@ -24494,6 +24574,16 @@
             "type": "number",
             "description": "Payment amount for subsequent children",
             "example": 5000
+          },
+          "subsequent_child_payment_in_lc": {
+            "type": "number",
+            "description": "Subsequent child payment converted to local currency",
+            "example": 18350
+          },
+          "subsequent_child_payment_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted subsequent child payment in local currency",
+            "example": "18,350"
           },
           "subsequent_child_payment_trimmed": {
             "type": "string",
@@ -24505,6 +24595,16 @@
             "description": "Monthly budget for children",
             "example": 2000
           },
+          "monthly_child_budget_in_lc": {
+            "type": "number",
+            "description": "Monthly child budget converted to local currency",
+            "example": 7340
+          },
+          "monthly_child_budget_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted monthly child budget in local currency",
+            "example": "7,340"
+          },
           "monthly_child_budget_trimmed": {
             "type": "string",
             "description": "Formatted monthly child budget",
@@ -24515,6 +24615,16 @@
             "description": "Gift amount for marriage milestone",
             "example": 50000
           },
+          "marriage_gift_in_lc": {
+            "type": "number",
+            "description": "Marriage gift converted to local currency",
+            "example": 183500
+          },
+          "marriage_gift_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted marriage gift in local currency",
+            "example": "183,500"
+          },
           "marriage_gift_trimmed": {
             "type": "string",
             "description": "Formatted marriage gift amount",
@@ -24524,6 +24634,16 @@
             "type": "number",
             "description": "Termination compensation amount",
             "example": 10000
+          },
+          "termination_comp_in_lc": {
+            "type": "number",
+            "description": "Termination compensation converted to local currency",
+            "example": 36700
+          },
+          "termination_comp_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted termination compensation in local currency",
+            "example": "36,700"
           },
           "termination_comp_trimmed": {
             "type": "string",
@@ -24547,6 +24667,16 @@
             "description": "Total amount of all milestone gifts",
             "example": 5000
           },
+          "milestone_gifts_total_in_lc": {
+            "type": "number",
+            "description": "Total milestone gifts converted to local currency",
+            "example": 18350
+          },
+          "milestone_gifts_total_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted total milestone gifts in local currency",
+            "example": "18,350"
+          },
           "milestone_gifts_total_trimmed": {
             "type": "string",
             "description": "Formatted total milestone gifts amount",
@@ -24559,6 +24689,16 @@
             "type": "integer",
             "description": "Growth bonus percentage",
             "example": 10
+          },
+          "growth_bonus_in_lc": {
+            "type": "integer",
+            "description": "Growth bonus in local currency (same as original for percentages)",
+            "example": 10
+          },
+          "growth_bonus_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted growth bonus",
+            "example": "10"
           },
           "growth_bonus_trimmed": {
             "type": "string",
@@ -24649,18 +24789,39 @@
         "type": "object",
         "description": "Financial profile options data structure",
         "properties": {
-          "capital_level": {
+          "capital_level_precise": {
             "type": "array",
-            "description": "Available capital level options",
+            "description": "Available precise capital level options",
             "items": {
-              "$ref": "#/components/schemas/OptionItem"
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "capital_level_less_precise": {
+            "type": "array",
+            "description": "Available less precise capital level options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "monthly_income_precise": {
+            "type": "array",
+            "description": "Available precise monthly income options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
+            }
+          },
+          "monthly_income_less_precise": {
+            "type": "array",
+            "description": "Available less precise monthly income options",
+            "items": {
+              "$ref": "#/components/schemas/FinancialOption"
             }
           },
           "relationship_milestone_durations": {
             "type": "array",
             "description": "Available milestone duration options",
             "items": {
-              "$ref": "#/components/schemas/OptionItem"
+              "$ref": "#/components/schemas/FinancialOption"
             }
           }
         }
@@ -24695,9 +24856,24 @@
             "description": "User's preferred currency code",
             "example": "USD"
           },
+          "pending_lifestyle_support_budget": {
+            "type": "number",
+            "description": "Pending lifestyle support budget for subscription upgrades",
+            "example": 0
+          },
+          "pending_lifestyle_support_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted pending lifestyle support budget",
+            "example": "0"
+          },
           "lifestyle_support_budget": {
             "type": "number",
             "description": "Monthly lifestyle support budget amount",
+            "example": 5000
+          },
+          "lifestyle_support_budget_in_sc": {
+            "type": "number",
+            "description": "Lifestyle support budget in system currency",
             "example": 5000
           },
           "lifestyle_support_budget_trimmed": {
@@ -24705,55 +24881,200 @@
             "description": "Formatted lifestyle support budget with thousand separators",
             "example": "5,000"
           },
+          "lifestyle_support_budget_trimmed_in_sc": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget in system currency",
+            "example": "5,000"
+          },
+          "lifestyle_support_budget_trimmed_in_lc": {
+            "type": "number",
+            "description": "Lifestyle support budget converted to local/viewing currency",
+            "example": 18350
+          },
+          "lifestyle_support_budget_trimmed_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted lifestyle support budget in local currency with thousand separators",
+            "example": "18,350"
+          },
+          "budget_upgrade_payment": {
+            "type": "number",
+            "description": "Payment amount for budget upgrade",
+            "example": 1000
+          },
+          "budget_upgrade_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted budget upgrade payment",
+            "example": "1,000"
+          },
           "capital_level_precise": {
             "type": "string",
             "description": "Precise capital level value",
             "example": "1000000"
+          },
+          "capital_level_precise_in_lc": {
+            "type": "number",
+            "description": "Precise capital level converted to local currency",
+            "example": 3670000
+          },
+          "capital_level_precise_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted precise capital level in local currency",
+            "example": "3,670,000"
           },
           "capital_level_less_precise": {
             "type": "string",
             "description": "Less precise capital level value",
             "example": "1M+"
           },
+          "capital_level_less_precise_in_lc": {
+            "type": "string",
+            "description": "Less precise capital level label in local currency",
+            "example": "3.67M+ AED"
+          },
           "monthly_income_precise": {
             "type": "string",
             "description": "Precise monthly income value",
             "example": "50000"
+          },
+          "monthly_income_precise_in_lc": {
+            "type": "number",
+            "description": "Precise monthly income converted to local currency",
+            "example": 183500
+          },
+          "monthly_income_precise_in_lc_trimed": {
+            "type": "string",
+            "description": "Formatted precise monthly income in local currency (Note: API uses 'trimed' with typo)",
+            "example": "183,500"
           },
           "monthly_income_less_precise": {
             "type": "string",
             "description": "Less precise monthly income value",
             "example": "50K+"
           },
+          "monthly_income_less_precise_in_lc": {
+            "type": "string",
+            "description": "Less precise monthly income label in local currency",
+            "example": "183.5K+ AED"
+          },
           "first_child_payment": {
             "type": "number",
             "description": "Payment amount for first child",
             "example": 10000
+          },
+          "first_child_payment_in_lc": {
+            "type": "number",
+            "description": "First child payment converted to local currency",
+            "example": 36700
+          },
+          "first_child_payment_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted first child payment in local currency",
+            "example": "36,700"
+          },
+          "first_child_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted first child payment",
+            "example": "10,000"
           },
           "second_child_payment": {
             "type": "number",
             "description": "Payment amount for second child",
             "example": 8000
           },
+          "second_child_payment_in_lc": {
+            "type": "number",
+            "description": "Second child payment converted to local currency",
+            "example": 29360
+          },
+          "second_child_payment_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted second child payment in local currency",
+            "example": "29,360"
+          },
+          "second_child_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted second child payment",
+            "example": "8,000"
+          },
           "subsequent_child_payment": {
             "type": "number",
             "description": "Payment amount for subsequent children",
             "example": 5000
+          },
+          "subsequent_child_payment_in_lc": {
+            "type": "number",
+            "description": "Subsequent child payment converted to local currency",
+            "example": 18350
+          },
+          "subsequent_child_payment_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted subsequent child payment in local currency",
+            "example": "18,350"
+          },
+          "subsequent_child_payment_trimmed": {
+            "type": "string",
+            "description": "Formatted subsequent child payment",
+            "example": "5,000"
           },
           "monthly_child_budget": {
             "type": "number",
             "description": "Monthly budget for children",
             "example": 2000
           },
+          "monthly_child_budget_in_lc": {
+            "type": "number",
+            "description": "Monthly child budget converted to local currency",
+            "example": 7340
+          },
+          "monthly_child_budget_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted monthly child budget in local currency",
+            "example": "7,340"
+          },
+          "monthly_child_budget_trimmed": {
+            "type": "string",
+            "description": "Formatted monthly child budget",
+            "example": "2,000"
+          },
           "marriage_gift": {
             "type": "number",
             "description": "Gift amount for marriage milestone",
             "example": 50000
           },
+          "marriage_gift_in_lc": {
+            "type": "number",
+            "description": "Marriage gift converted to local currency",
+            "example": 183500
+          },
+          "marriage_gift_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted marriage gift in local currency",
+            "example": "183,500"
+          },
+          "marriage_gift_trimmed": {
+            "type": "string",
+            "description": "Formatted marriage gift amount",
+            "example": "50,000"
+          },
           "termination_comp": {
             "type": "number",
             "description": "Termination compensation amount",
             "example": 10000
+          },
+          "termination_comp_in_lc": {
+            "type": "number",
+            "description": "Termination compensation converted to local currency",
+            "example": 36700
+          },
+          "termination_comp_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted termination compensation in local currency",
+            "example": "36,700"
+          },
+          "termination_comp_trimmed": {
+            "type": "string",
+            "description": "Formatted termination compensation",
+            "example": "10,000"
           },
           "termination_clause": {
             "type": "integer",
@@ -24767,8 +25088,53 @@
               "$ref": "#/components/schemas/MilestoneGift"
             }
           },
+          "milestone_gifts_total": {
+            "type": "number",
+            "description": "Total amount of all milestone gifts",
+            "example": 5000
+          },
+          "milestone_gifts_total_in_lc": {
+            "type": "number",
+            "description": "Total milestone gifts converted to local currency",
+            "example": 18350
+          },
+          "milestone_gifts_total_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted total milestone gifts in local currency",
+            "example": "18,350"
+          },
+          "milestone_gifts_total_trimmed": {
+            "type": "string",
+            "description": "Formatted total milestone gifts amount",
+            "example": "5,000"
+          },
           "currency_detail": {
             "$ref": "#/components/schemas/CurrencyDetail"
+          },
+          "growth_bonus": {
+            "type": "integer",
+            "description": "Growth bonus percentage",
+            "example": 10
+          },
+          "growth_bonus_in_lc": {
+            "type": "integer",
+            "description": "Growth bonus in local currency (same as original for percentages)",
+            "example": 10
+          },
+          "growth_bonus_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted growth bonus",
+            "example": "10"
+          },
+          "growth_bonus_trimmed": {
+            "type": "string",
+            "description": "Formatted growth bonus percentage",
+            "example": "10"
+          },
+          "growth_clause": {
+            "type": "integer",
+            "description": "Growth clause duration in months",
+            "example": 12
           }
         }
       },
