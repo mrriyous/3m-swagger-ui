@@ -2825,7 +2825,7 @@
                     },
                     "changes": {
                       "type": "object",
-                      "description": "Object containing all modified fields with old and new values",
+                      "description": "Object containing all modified fields with old values, new values, and formatted messages. Only changed fields are included.",
                       "additionalProperties": {
                         "type": "object",
                         "properties": {
@@ -2834,6 +2834,10 @@
                           },
                           "new": {
                             "description": "New value"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
                           }
                         }
                       }
@@ -2902,27 +2906,33 @@
                       "changes": {
                         "public_username": {
                           "old": "john_doe_old",
-                          "new": "john_doe"
+                          "new": "john_doe",
+                          "message": "Username has been changed to john_doe"
                         },
                         "short_intro": {
                           "old": "Old introduction",
-                          "new": "Looking for meaningful connections"
+                          "new": "Looking for meaningful connections",
+                          "message": "Short introduction has been changed to Looking for meaningful connections"
                         },
                         "weight": {
                           "old": 75,
-                          "new": 70
+                          "new": 70,
+                          "message": "Weight has been changed to 70 kg"
                         },
                         "extended_description": {
                           "old": ["Old description"],
-                          "new": ["I love traveling and exploring new cultures"]
+                          "new": ["I love traveling and exploring new cultures"],
+                          "message": "Extended descriptions have been updated"
                         },
                         "languages": {
                           "old": {"en": 4, "fr": 2},
-                          "new": {"en": 5, "es": 3}
+                          "new": {"en": 5, "es": 3},
+                          "message": "Languages have been updated"
                         },
                         "hobbies": {
                           "old": ["Photography", "Reading"],
-                          "new": ["Photography", "Cooking"]
+                          "new": ["Photography", "Cooking"],
+                          "message": "Hobbies have been updated"
                         }
                       }
                     }
@@ -3155,6 +3165,25 @@
                           "description": "Last update timestamp"
                         }
                       }
+                    },
+                    "changes": {
+                      "type": "object",
+                      "description": "Object containing all modified fields with old values, new values, and formatted messages. Only changed fields are included.",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "old": {
+                            "description": "Previous value"
+                          },
+                          "new": {
+                            "description": "New value"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                          }
+                        }
+                      }
                     }
                   },
                   "x-examples": {
@@ -3172,6 +3201,18 @@
                         "available_time_evening": false,
                         "created_at": "2024-01-15T10:30:00.000000Z",
                         "updated_at": "2024-01-20T14:45:00.000000Z"
+                      },
+                      "changes": {
+                        "relationship_goals": {
+                          "old": "casual",
+                          "new": "marriage",
+                          "message": "Relationship goals has been changed to marriage"
+                        },
+                        "duration_preference": {
+                          "old": "short_term",
+                          "new": "long_term",
+                          "message": "Duration preference has been changed to long_term"
+                        }
                       }
                     }
                   }
@@ -3414,6 +3455,66 @@
                     "data": {
                       "type": "object",
                       "description": "Updated financial profile data"
+                    },
+                    "changes": {
+                      "type": "object",
+                      "description": "Object containing all modified fields with old values, new values, and formatted messages. Only changed fields are included.",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "old": {
+                            "description": "Previous value"
+                          },
+                          "new": {
+                            "description": "New value"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Financial profile has been updated successfully",
+                      "data": {
+                        "id": 1,
+                        "user_id": 123,
+                        "lifestyle_support_budget": "5000.00",
+                        "capital_level_precise": "100000-250000",
+                        "monthly_income_precise": "10000-15000",
+                        "first_child_payment": "5000.00",
+                        "second_child_payment": "3000.00",
+                        "subsequent_child_payment": "2000.00",
+                        "monthly_child_budget": "1500.00",
+                        "marriage_gift": "10000.00",
+                        "growth_bonus": "10",
+                        "growth_clause": "12",
+                        "termination_comp": "15000.00",
+                        "termination_clause": "6",
+                        "created_at": "2024-01-15T10:30:00.000000Z",
+                        "updated_at": "2024-01-20T14:45:00.000000Z"
+                      },
+                      "changes": {
+                        "lifestyle_support_budget": {
+                          "old": "4000.00",
+                          "new": "5000.00",
+                          "message": "Lifestyle support budget has been changed to 5000.00"
+                        },
+                        "first_child_payment": {
+                          "old": "4000.00",
+                          "new": "5000.00",
+                          "message": "First child payment has been changed to 5000.00"
+                        },
+                        "milestone_gifts": {
+                          "old": [{"amount": "5000", "period": "6_months"}],
+                          "new": [{"amount": "10000", "period": "12_months"}],
+                          "message": "Milestone gifts have been updated"
+                        }
+                      }
                     }
                   }
                 }
@@ -3657,6 +3758,25 @@
                           "description": "Last update timestamp"
                         }
                       }
+                    },
+                    "changes": {
+                      "type": "object",
+                      "description": "Object containing all modified fields with old values, new values, and formatted messages. Only changed fields are included. Image uploads show messages like 'New photo of [Type] has been uploaded'.",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "old": {
+                            "description": "Previous value"
+                          },
+                          "new": {
+                            "description": "New value"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                          }
+                        }
+                      }
                     }
                   },
                   "x-examples": {
@@ -3678,6 +3798,28 @@
                         "housing_image_thumbnail": "living-form-pictures/123_housing_thumb_1640995200.jpg",
                         "created_at": "2024-01-15T10:30:00.000000Z",
                         "updated_at": "2024-01-20T14:45:00.000000Z"
+                      },
+                      "changes": {
+                        "driving_license_availability": {
+                          "old": false,
+                          "new": true,
+                          "message": "Driving license availability has been enabled"
+                        },
+                        "living_format_test_moon": {
+                          "old": "house",
+                          "new": "apartment",
+                          "message": "Test moon living format has been changed to apartment"
+                        },
+                        "living_format_test_moon_image": {
+                          "old": "living-form-pictures/123_test_moon_old.jpg",
+                          "new": "uploaded",
+                          "message": "New photo of Test Moon has been uploaded"
+                        },
+                        "housing_image": {
+                          "old": null,
+                          "new": "uploaded",
+                          "message": "New photo of Living Accommodation has been uploaded"
+                        }
                       }
                     }
                   }
@@ -4839,6 +4981,25 @@
                           "example": "2024-01-20T14:45:00.000000Z"
                         }
                       }
+                    },
+                    "changes": {
+                      "type": "object",
+                      "description": "Object containing all modified fields with old values, new values, and formatted messages. Only changed fields are included.",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "old": {
+                            "description": "Previous value"
+                          },
+                          "new": {
+                            "description": "New value"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                          }
+                        }
+                      }
                     }
                   },
                   "x-examples": {
@@ -4853,6 +5014,18 @@
                         "mutual_interest_requirement": "marked",
                         "created_at": "2024-01-15T10:30:00.000000Z",
                         "updated_at": "2024-01-20T14:45:00.000000Z"
+                      },
+                      "changes": {
+                        "status_of_registration": {
+                          "old": "all",
+                          "new": "registered",
+                          "message": "Status of registration has been changed to Registered Visitor"
+                        },
+                        "financial_verification_status": {
+                          "old": "all",
+                          "new": "verified",
+                          "message": "Financial verification status has been changed to Only Verified-Finance Users"
+                        }
                       }
                     }
                   }
