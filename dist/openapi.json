@@ -3607,6 +3607,211 @@
         }
       }
     },
+    "/profile/monthly-budget": {
+      "post": {
+        "summary": "Update Monthly Budget",
+        "description": "Quick update for monthly lifestyle support budget without affecting other financial profile fields. For RS (Relationship Sponsor) users with active subscriptions, budget changes are queued as pending_lifestyle_support_budget until a budget upgrade payment is processed. The actual budget remains unchanged until payment. Automatic currency conversion is applied. If no financial profile exists, returns 404 error.",
+        "tags": [
+          "Financial Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "lifestyle_support_budget": {
+                    "type": "number",
+                    "description": "Monthly lifestyle support budget",
+                    "minimum": 0,
+                    "example": 5000
+                  }
+                },
+                "required": ["lifestyle_support_budget"]
+              },
+              "x-examples": {
+                "Example 1": {
+                  "lifestyle_support_budget": 5000
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Monthly budget updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Monthly budget has been updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lifestyle_support_budget": {
+                          "type": "number",
+                          "description": "Current lifestyle support budget",
+                          "example": 5000
+                        },
+                        "lifestyle_support_budget_in_sc": {
+                          "type": "number",
+                          "description": "Lifestyle support budget in system currency",
+                          "example": 5000
+                        },
+                        "pending_lifestyle_support_budget": {
+                          "type": "number",
+                          "description": "Pending lifestyle support budget (for RS users with active subscription)",
+                          "example": 0
+                        },
+                        "currency": {
+                          "type": "string",
+                          "description": "Currency code",
+                          "example": "USD"
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": false,
+                      "message": "Monthly budget has been updated successfully",
+                      "data": {
+                        "lifestyle_support_budget": 5000,
+                        "lifestyle_support_budget_in_sc": 5000,
+                        "pending_lifestyle_support_budget": 0,
+                        "currency": "USD"
+                      }
+                    },
+                    "Example 2 - RS User with Active Subscription": {
+                      "error": false,
+                      "message": "Monthly budget has been updated successfully",
+                      "data": {
+                        "lifestyle_support_budget": 3000,
+                        "lifestyle_support_budget_in_sc": 3000,
+                        "pending_lifestyle_support_budget": 5000,
+                        "currency": "USD"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Financial profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Financial profile not found. Please complete your profile first."
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": {
+                      "error": true,
+                      "message": "Financial profile not found. Please complete your profile first."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please check your inputs and try again."
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "lifestyle_support_budget": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["The lifestyle support budget field is required."]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sorry, Something went wrong. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/profile/living": {
       "post": {
         "summary": "Update Living Profile",
@@ -11888,7 +12093,9 @@
                             },
                             "is_archived": false,
                             "chat_disabled": false,
-                            "is_deleted_after_last_message": false
+                            "is_deleted_after_last_message": false,
+                            "message_hidden": false,
+                            "message_hidden_text": ""
                           }
                         ],
                         "offset": 0,
@@ -12218,7 +12425,9 @@
                       },
                       "is_archived": false,
                       "chat_disabled": false,
-                      "is_deleted_after_last_message": false
+                      "is_deleted_after_last_message": false,
+                      "message_hidden": false,
+                      "message_hidden_text": ""
                     }
                   }
                 }
@@ -21976,6 +22185,173 @@
         }
       }
     },
+    "/subscription/calculate-annual-price": {
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Calculate Annual Subscription Price",
+        "description": "Preview annual subscription cost based on monthly budget and selected plan. Does not create a transaction. Pricing formula: Standard Plan (Level 1) = Monthly Budget × 12 × 20%, Premium Plan (Level 2) = Monthly Budget × 12 × 40%, VIP Plan (Level 3) = Monthly Budget × 12 × 60%.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
+        "security": [{"sanctum": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["monthly_budget", "plan_id"],
+                "properties": {
+                  "monthly_budget": {
+                    "type": "number",
+                    "description": "Monthly lifestyle support budget amount",
+                    "example": 10000,
+                    "minimum": 0
+                  },
+                  "plan_id": {
+                    "type": "integer",
+                    "description": "Subscription plan ID (1=Standard, 2=Premium, 3=VIP)",
+                    "example": 2,
+                    "enum": [1, 2, 3]
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency code (optional, defaults to user's currency)",
+                    "example": "USD"
+                  }
+                }
+              },
+              "examples": {
+                "calculate_premium": {
+                  "summary": "Calculate Premium Plan Price",
+                  "value": {
+                    "monthly_budget": 10000,
+                    "plan_id": 2,
+                    "currency": "USD"
+                  }
+                },
+                "calculate_standard": {
+                  "summary": "Calculate Standard Plan Price",
+                  "value": {
+                    "monthly_budget": 5000,
+                    "plan_id": 1,
+                    "currency": "USD"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Price calculation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "annual_price": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Calculated annual subscription price",
+                      "example": 48000.00
+                    },
+                    "formatted_price": {
+                      "type": "string",
+                      "description": "Formatted price with thousand separators",
+                      "example": "48000"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "description": "Currency code",
+                      "example": "USD"
+                    },
+                    "currency_symbol": {
+                      "type": "string",
+                      "description": "Currency symbol",
+                      "example": "$"
+                    },
+                    "monthly_budget": {
+                      "type": "number",
+                      "description": "Monthly budget used in calculation",
+                      "example": 10000
+                    },
+                    "plan_id": {
+                      "type": "integer",
+                      "description": "Plan ID used in calculation",
+                      "example": 2
+                    }
+                  }
+                },
+                "examples": {
+                  "premium_plan": {
+                    "summary": "Premium Plan Calculation",
+                    "value": {
+                      "error": false,
+                      "annual_price": 48000.00,
+                      "formatted_price": "48,000",
+                      "currency": "USD",
+                      "currency_symbol": "$",
+                      "monthly_budget": 10000,
+                      "plan_id": 2
+                    }
+                  },
+                  "standard_plan": {
+                    "summary": "Standard Plan Calculation",
+                    "value": {
+                      "error": false,
+                      "annual_price": 12000.00,
+                      "formatted_price": "12,000",
+                      "currency": "USD",
+                      "currency_symbol": "$",
+                      "monthly_budget": 5000,
+                      "plan_id": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid plan ID or monthly budget"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ValidationErrorResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
     "/subscription/budget-upgrade": {
       "get": {
         "tags": ["Subscription"],
@@ -22424,7 +22800,17 @@
           },
           "is_archived": { "type": "boolean" },
           "chat_disabled": { "type": "boolean" },
-          "is_deleted_after_last_message": { "type": "boolean" }
+          "is_deleted_after_last_message": { "type": "boolean" },
+          "message_hidden": { 
+            "type": "boolean",
+            "description": "Indicates if messages should be hidden due to budget or subscription requirements",
+            "example": false
+          },
+          "message_hidden_text": { 
+            "type": "string",
+            "description": "Text to display when messages are hidden (e.g., 'Subscribe now to view message' or 'Upgrade monthly budget to view message')",
+            "example": ""
+          }
         }
       },
       "ChatRoomData": {
@@ -22507,7 +22893,17 @@
           },
           "is_archived": { "type": "boolean" },
           "chat_disabled": { "type": "boolean" },
-          "is_deleted_after_last_message": { "type": "boolean" }
+          "is_deleted_after_last_message": { "type": "boolean" },
+          "message_hidden": { 
+            "type": "boolean",
+            "description": "Indicates if messages should be hidden due to budget or subscription requirements",
+            "example": false
+          },
+          "message_hidden_text": { 
+            "type": "string",
+            "description": "Text to display when messages are hidden (e.g., 'Subscribe now to view message' or 'Upgrade monthly budget to view message')",
+            "example": ""
+          }
         }
       },
       "ContractListResponse": {
@@ -24460,15 +24856,15 @@
             "description": "Formatted lifestyle support budget in system currency",
             "example": "5,000"
           },
-          "lifestyle_support_budget_trimmed_in_lc": {
+          "lifestyle_support_budget_in_lc": {
             "type": "number",
-            "description": "Lifestyle support budget converted to local/viewing currency",
-            "example": 18350
+            "description": "Lifestyle support budget converted to local/display currency",
+            "example": 5000
           },
-          "lifestyle_support_budget_trimmed_in_lc_trimmed": {
+          "lifestyle_support_budget_in_lc_trimmed": {
             "type": "string",
             "description": "Formatted lifestyle support budget in local currency with thousand separators",
-            "example": "18,350"
+            "example": "5,000"
           },
           "budget_upgrade_payment": {
             "type": "number",
@@ -24886,15 +25282,15 @@
             "description": "Formatted lifestyle support budget in system currency",
             "example": "5,000"
           },
-          "lifestyle_support_budget_trimmed_in_lc": {
+          "lifestyle_support_budget_in_lc": {
             "type": "number",
-            "description": "Lifestyle support budget converted to local/viewing currency",
-            "example": 18350
+            "description": "Lifestyle support budget converted to local/display currency",
+            "example": 5000
           },
-          "lifestyle_support_budget_trimmed_in_lc_trimmed": {
+          "lifestyle_support_budget_in_lc_trimmed": {
             "type": "string",
             "description": "Formatted lifestyle support budget in local currency with thousand separators",
-            "example": "18,350"
+            "example": "5,000"
           },
           "budget_upgrade_payment": {
             "type": "number",
