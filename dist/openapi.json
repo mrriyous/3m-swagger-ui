@@ -8550,13 +8550,19 @@
                     "transaction_number": {
                       "type": "string",
                       "description": "Human-readable transaction number",
-                      "example": "TXN-2024-001234"
+                      "example": "20250125123456"
                     },
                     "redirect_url": {
                       "type": "string",
                       "nullable": true,
                       "description": "External payment URL for completion (if applicable)",
                       "example": "https://checkout.stripe.com/pay/cs_test_..."
+                    },
+                    "webview_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Internal payment waiting page URL with authentication token",
+                      "example": "https://startup2050.com/finance/payment/waiting/20250125123456?token=abc123..."
                     }
                   }
                 },
@@ -8567,8 +8573,9 @@
                       "error": false,
                       "message": "Deposit submitted successfully",
                       "transaction_id": 123,
-                      "transaction_number": "TXN-2024-001234",
-                      "redirect_url": "https://checkout.stripe.com/pay/cs_test_..."
+                      "transaction_number": "20250125123456",
+                      "redirect_url": "https://checkout.stripe.com/pay/cs_test_...",
+                      "webview_url": "https://startup2050.com/finance/payment/waiting/20250125123456?token=abc123..."
                     }
                   },
                   "Success without Redirect": {
@@ -8577,8 +8584,9 @@
                       "error": false,
                       "message": "Deposit submitted successfully",
                       "transaction_id": 124,
-                      "transaction_number": "TXN-2024-001235",
-                      "redirect_url": null
+                      "transaction_number": "20250125123457",
+                      "redirect_url": null,
+                      "webview_url": "https://startup2050.com/finance/payment/waiting/20250125123457?token=def456..."
                     }
                   }
                 }
@@ -8804,6 +8812,12 @@
                       "type": "string",
                       "example": "20250125123456",
                       "description": "Human-readable transaction number (primary identifier)"
+                    },
+                    "webview_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Internal payment waiting page URL with authentication token",
+                      "example": "https://startup2050.com/finance/payment/waiting/20250125123456?token=abc123..."
                     }
                   }
                 },
@@ -8813,7 +8827,8 @@
                       "error": false,
                       "message": "Withdrawal submitted successfully",
                       "transaction_id": 456,
-                      "transaction_number": "20250125123456"
+                      "transaction_number": "20250125123456",
+                      "webview_url": "https://startup2050.com/finance/payment/waiting/20250125123456?token=abc123..."
                     }
                   }
                 }
@@ -22123,8 +22138,19 @@
                     "error": {"type": "boolean", "example": false},
                     "message": {"type": "string", "example": "Subscription deposit submitted successfully"},
                     "transaction_id": {"type": "integer", "example": 123},
-                    "transaction_number": {"type": "string", "example": "TXN-2024-001234"},
-                    "redirect_url": {"type": "string", "example": "https://payment-gateway.com/pay/abc123"}
+                    "transaction_number": {"type": "string", "example": "20250125123456"},
+                    "redirect_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "External payment URL for completion (if applicable)",
+                      "example": "https://checkout.stripe.com/pay/cs_test_..."
+                    },
+                    "webview_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Internal payment waiting page URL with authentication token",
+                      "example": "https://startup2050.com/finance/payment/waiting/20250125123456?token=abc123..."
+                    }
                   }
                 }
               }
@@ -22509,7 +22535,18 @@
                     "message": {"type": "string", "example": "Budget upgrade submitted successfully"},
                     "transaction_id": {"type": "integer", "example": 124},
                     "transaction_number": {"type": "string", "example": "20250125123457"},
-                    "redirect_url": {"type": "string", "example": "https://payment-gateway.com/pay/def456"}
+                    "redirect_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "External payment URL for completion (if applicable)",
+                      "example": "https://checkout.stripe.com/pay/cs_test_..."
+                    },
+                    "webview_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Internal payment waiting page URL with authentication token",
+                      "example": "https://startup2050.com/finance/payment/waiting/20250125123457?token=def456..."
+                    }
                   }
                 }
               }
