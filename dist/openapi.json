@@ -71,7 +71,7 @@
     },
     {
       "name": "Search",
-      "description": "Endpoints for searching user profiles with advanced filtering options including location, budget, languages, and custom parameters. Supports pagination, sorting, and role-based filtering. All endpoints require Bearer token authentication."
+      "description": "Endpoints for searching user profiles with advanced filtering options including location, budget, languages, and custom parameters. Features automatic role-based filtering (sponsors see seekers, seekers see sponsors), mutual interest visibility, location-based search using Haversine formula, currency conversion for budget comparisons, and comprehensive custom parameter filtering across general info, relationship preferences, financial details, and living preferences. Supports pagination, sorting by budget/age/created date, and subscription-based filtering. All endpoints require Bearer token authentication."
     },
     {
       "name": "Subscription",
@@ -6594,6 +6594,334 @@
         ]
       }
     },
+    "/custom-parameter-categories/v2": {
+      "get": {
+        "summary": "Get All Custom Parameter Categories (v2)",
+        "tags": [
+          "Search"
+        ],
+        "description": "Returns a comprehensive list of all available custom parameter categories grouped by logical sections (General Info, Relationship and Availability, Financial Profile, Living Preferences). Each category contains fields with their types, options, and configurations that can be used for profile creation, editing, advanced search criteria, search templates, and custom matching algorithms.\n\n## Field Types\n\n- **dropdown**: Select from predefined options\n- **currency**: Monetary value input that supports range filtering (min-max)\n- **range_number**: Numeric range input (e.g., hours of availability)\n\n## Currency Handling\n\n- Uses the authenticated user's preferred currency from their financial profile\n- Defaults to USD if no user currency is set\n- Currency fields with `range: true` support minimum and maximum value filtering\n- Currency values are automatically converted using real-time exchange rates for consistent comparisons during search\n\n## Search Implementation\n\n- All fields can be used with `scopeCustomSearch` method for filtering user profiles\n- Range fields (`range_number`, `currency` with `range: true`) accept `valueRange` parameter with `min` and `max` values\n- Dropdown fields accept single `value` parameter matching one of the predefined options\n- Age, weight, and height use range-based filtering with hyphenated values (e.g., \"25-33\")\n\n## Special Search Behaviors\n\n- **Age**: Calculated dynamically from birth_date, not stored as a static value\n- **Hobbies**: Uses relationship query to match user hobbies\n- **Currency Fields**: Automatically converts between user currencies using exchange rates before comparison\n- **Capital Growth Bonus**: Stored as percentage/ratio (no currency conversion applied)\n- **Available Time Fields**: Support range filtering for morning, afternoon, and evening availability\n\n## Use Cases\n\n- Advanced search criteria to filter profiles\n- Profile creation and editing\n- Search templates for saved searches\n- Custom matching algorithms\n- Lifestyle, financial expectations, and relationship preference matching",
+        "responses": {
+          "200": {
+            "description": "OK - Successfully retrieved all custom parameter categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "Indicates if there was an error"
+                    },
+                    "data": {
+                      "type": "array",
+                      "description": "Array of category objects",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "description": "Unique identifier for the category"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Display name of the category"
+                          },
+                          "fields": {
+                            "type": "array",
+                            "description": "Array of field objects in this category",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Unique identifier for the field"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "description": "Display name of the field"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "dropdown",
+                                    "currency",
+                                    "range_number"
+                                  ],
+                                  "description": "Type of input field"
+                                },
+                                "options": {
+                                  "type": "array",
+                                  "description": "Array of options (only present for dropdown type)",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "label": {
+                                        "type": "string",
+                                        "description": "Display label for the option"
+                                      },
+                                      "value": {
+                                        "oneOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "integer"
+                                          }
+                                        ],
+                                        "description": "Value of the option (can be string or integer)"
+                                      }
+                                    }
+                                  }
+                                },
+                                "range": {
+                                  "type": "boolean",
+                                  "description": "Boolean indicating if the field accepts range values (for currency type)"
+                                },
+                                "suffix": {
+                                  "type": "string",
+                                  "description": "Text suffix for the field (e.g., 'Hour' for time fields)"
+                                }
+                              },
+                              "required": [
+                                "key",
+                                "name",
+                                "type"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "name",
+                          "fields"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "data"
+                  ]
+                },
+                "examples": {
+                  "Success Example": {
+                    "value": {
+                      "error": false,
+                      "data": [
+                        {
+                          "key": "general_info",
+                          "name": "General Info",
+                          "fields": [
+                            {
+                              "key": "age",
+                              "name": "Age",
+                              "type": "dropdown",
+                              "options": [
+                                {
+                                  "label": "18-24",
+                                  "value": "18-24"
+                                },
+                                {
+                                  "label": "25-33",
+                                  "value": "25-33"
+                                },
+                                {
+                                  "label": "33-40",
+                                  "value": "33-40"
+                                },
+                                {
+                                  "label": "40-49",
+                                  "value": "40-49"
+                                },
+                                {
+                                  "label": "50-59",
+                                  "value": "50-59"
+                                },
+                                {
+                                  "label": "60-69",
+                                  "value": "60-69"
+                                }
+                              ]
+                            },
+                            {
+                              "key": "religion",
+                              "name": "Religion",
+                              "type": "dropdown",
+                              "options": [
+                                {
+                                  "label": "Christianity",
+                                  "value": "christianity"
+                                },
+                                {
+                                  "label": "Islam",
+                                  "value": "islam"
+                                },
+                                {
+                                  "label": "Hinduism",
+                                  "value": "hinduism"
+                                },
+                                {
+                                  "label": "Buddhism",
+                                  "value": "buddhism"
+                                }
+                              ]
+                            },
+                            {
+                              "key": "hobbies",
+                              "name": "Hobbies",
+                              "type": "dropdown",
+                              "options": [
+                                {
+                                  "value": 1,
+                                  "label": "Reading"
+                                },
+                                {
+                                  "value": 2,
+                                  "label": "Photography"
+                                },
+                                {
+                                  "value": 3,
+                                  "label": "Gaming"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "key": "relationship_and_availability",
+                          "name": "Relationship and Availability",
+                          "fields": [
+                            {
+                              "key": "relationship_goals",
+                              "name": "Relationship Goals",
+                              "type": "dropdown",
+                              "options": [
+                                {
+                                  "label": "Just Relationship Itself",
+                                  "value": "just_relationship"
+                                },
+                                {
+                                  "label": "Relationship Itself and Possibly Kids",
+                                  "value": "relationship_and_possibly_kids"
+                                },
+                                {
+                                  "label": "Relationship and Kids",
+                                  "value": "relationship_and_kids"
+                                }
+                              ]
+                            },
+                            {
+                              "key": "available_time_morning",
+                              "name": "Available Time – Morning",
+                              "type": "range_number",
+                              "suffix": "Hour"
+                            }
+                          ]
+                        },
+                        {
+                          "key": "financial_profile",
+                          "name": "Financial Profile",
+                          "fields": [
+                            {
+                              "key": "capital_level_precise",
+                              "name": "Capital Level (Precise)",
+                              "type": "currency",
+                              "range": true
+                            },
+                            {
+                              "key": "monthly_income_precise",
+                              "name": "Monthly Income (Precise)",
+                              "type": "currency",
+                              "range": true
+                            }
+                          ]
+                        },
+                        {
+                          "key": "living_preferences",
+                          "name": "Living Preferences",
+                          "fields": [
+                            {
+                              "key": "driving_license_availability",
+                              "name": "Driving License Availability",
+                              "type": "dropdown",
+                              "options": [
+                                {
+                                  "value": "yes",
+                                  "label": "Yes"
+                                },
+                                {
+                                  "value": "no",
+                                  "label": "No"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "Error Example": {
+                    "value": {
+                      "error": true,
+                      "message": "Sorry, Something went wrong. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-custom-parameter-categories-v2",
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Dropdown Field Search Example",
+            "source": "// Example: Search by religion\nconst searchCriteria = {\n  category: \"general_info\",\n  field: \"religion\",\n  value: \"islam\"\n};"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Range Number Field Search Example",
+            "source": "// Example: Search by available time\nconst searchCriteria = {\n  category: \"relationship_and_availability\",\n  field: \"available_time_morning\",\n  valueRange: {\n    min: 2,\n    max: 5\n  }\n};"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Currency Range Field Search Example",
+            "source": "// Example: Search by monthly income\nconst searchCriteria = {\n  category: \"financial_profile\",\n  field: \"monthly_income_precise\",\n  valueRange: {\n    min: 5000,\n    max: 10000\n  },\n  filterCurrency: \"USD\"\n};"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Range Value Field Search Example",
+            "source": "// Example: Search by age range\nconst searchCriteria = {\n  category: \"general_info\",\n  field: \"age\",\n  value: \"25-33\"\n};"
+          }
+        ]
+      }
+    },
     "/search-templates": {
       "get": {
         "summary": "Get User's Search Templates",
@@ -7485,7 +7813,7 @@
     "/search": {
       "post": {
         "summary": "Search Profiles",
-        "description": "Search for user profiles with advanced filtering options. Supports location-based search, budget filtering, language matching, and custom parameter filtering. Results are automatically filtered based on user role and mutual interest settings.",
+        "description": "Search for user profiles with advanced filtering options. Supports location-based search, budget filtering, language matching, and custom parameter filtering.\n\n## Key Features\n\n**Role-based Filtering**: Results are automatically filtered based on user's role:\n- \"rs\" (sponsor) users see only \"srs\" (seeker) profiles\n- \"srs\" (seeker) users see only \"rs\" (sponsor) profiles\n\n**Automatic Exclusions**: Excludes deleted users, current user, deleted profiles, and archived profiles\n\n**Mutual Interest**: Respects visibility settings (\"all\" visible to everyone, \"marked\" only visible to marked users)\n\n**Location Search**: Uses Haversine formula for distance calculations, supports multiple locations with different radii, defaults to user's location with 10km radius\n\n**Monthly Budget**: Handles currency conversion automatically using latest exchange rates, considers user's minimum budget requirements\n\n**Language Matching**: Considers fluency level with \"any\" (matches any language) or \"all\" (matches all languages) modes\n\n**Custom Parameters**: Supports filtering by:\n- **General Info**: age, weight, height, orientation, education_level, profession, religion, ethnicity, hobbies\n- **Relationship & Availability**: relationship_goals, partner_preferences, duration_of_relationship, available_time_morning, available_time_afternoon, available_time_evening\n- **Financial Profile**: capital_level_less_precise, capital_level_precise, monthly_income_less_precise, monthly_income_precise, one_time_payment_first_child, one_time_payment_second_child, one_time_payment_third_child, monthly_budget_per_child, financial_gift_upon_marriage, capital_growth_bonus, relationship_termination_compensation\n- **Living Preferences**: driving_license_availability, car_availability, driver_availability, living_format_test_moon, living_format_preliminary_contract, living_format_final_contract\n\n**Sorting Options**: Sort by monthly_budget (converted to search currency), age (birth date), or created_at (default)\n\n**Subscription-based Filtering**: Sponsors without active subscriptions only see profiles that don't require financial verification\n\n**Range-based Searches**: Age, weight, height use hyphenated format (e.g., \"25-33\"). Time availability and currency fields use value_range object with min/max properties (numeric). Currency fields should include filter_currency for cross-currency comparisons.",
         "tags": [
           "Search"
         ],
@@ -7508,13 +7836,13 @@
                     "properties": {
                       "page": {
                         "type": "integer",
-                        "description": "The page number for pagination",
+                        "description": "The page number for pagination (default: 1)",
                         "default": 1,
                         "minimum": 1
                       },
                       "per_page": {
                         "type": "integer",
-                        "description": "Number of results per page",
+                        "description": "Number of results per page (default: 10)",
                         "default": 10,
                         "minimum": 1,
                         "maximum": 100
@@ -7527,13 +7855,13 @@
                     "properties": {
                       "by": {
                         "type": "string",
-                        "description": "Field to sort by",
+                        "description": "Field to sort by. Options: monthly_budget, age, created_at (default: created_at)",
                         "enum": ["monthly_budget", "age", "created_at"],
                         "default": "created_at"
                       },
                       "order": {
                         "type": "string",
-                        "description": "Sort direction",
+                        "description": "Sort direction. Options: asc, desc (default: desc)",
                         "enum": ["asc", "desc"],
                         "default": "desc"
                       }
@@ -7561,14 +7889,14 @@
                                 "latitude": {
                                   "type": "number",
                                   "format": "double",
-                                  "description": "Location latitude",
+                                  "description": "Location latitude (required if places provided)",
                                   "minimum": -90,
                                   "maximum": 90
                                 },
                                 "longitude": {
                                   "type": "number",
                                   "format": "double",
-                                  "description": "Location longitude",
+                                  "description": "Location longitude (required if places provided)",
                                   "minimum": -180,
                                   "maximum": 180
                                 }
@@ -7577,7 +7905,7 @@
                             "radius": {
                               "type": "number",
                               "format": "double",
-                              "description": "Search radius in kilometers",
+                              "description": "Search radius in kilometers (required if places provided)",
                               "minimum": 0.1,
                               "maximum": 1000
                             }
@@ -7620,7 +7948,7 @@
                       },
                       "match_mode": {
                         "type": "string",
-                        "description": "How to match languages",
+                        "description": "How to match languages. Options: any, all (required if languages.selected is provided)",
                         "enum": ["any", "all"]
                       }
                     }
@@ -7630,31 +7958,38 @@
                     "description": "Array of custom parameter objects for advanced filtering",
                     "items": {
                       "type": "object",
-                      "required": ["category_key", "field_key", "value"],
+                      "required": ["category_key", "field_key"],
                       "properties": {
                         "category_key": {
                           "type": "string",
-                          "description": "Custom parameter category key"
+                          "description": "Custom parameter category key (required)"
                         },
                         "field_key": {
                           "type": "string",
-                          "description": "Custom parameter field key"
+                          "description": "Custom parameter field key (required)"
                         },
                         "value": {
                           "type": "string",
-                          "description": "Value to match against"
+                          "description": "Value to match against (required for dropdown and single-value fields)"
                         },
                         "value_range": {
                           "type": "object",
-                          "description": "Range object with min/max values for range-based searches",
+                          "description": "Range object with min/max values for range-based searches (required for currency and range_number fields)",
                           "properties": {
                             "min": {
-                              "type": "string"
+                              "type": "number",
+                              "description": "Minimum value for range"
                             },
                             "max": {
-                              "type": "string"
+                              "type": "number",
+                              "description": "Maximum value for range"
                             }
                           }
+                        },
+                        "filter_currency": {
+                          "type": "string",
+                          "description": "Currency code for financial field searches (e.g., 'USD'). Used to convert values for comparison",
+                          "pattern": "^[A-Z]{3}$"
                         }
                       }
                     }
@@ -7695,12 +8030,29 @@
                       {
                         "category_key": "general_info",
                         "field_key": "education_level",
-                        "value": "bachelor"
+                        "value": "bachelor_science"
                       },
                       {
                         "category_key": "general_info",
                         "field_key": "age",
-                        "value": "25-35"
+                        "value": "25-33"
+                      },
+                      {
+                        "category_key": "relationship_and_availability",
+                        "field_key": "available_time_morning",
+                        "value_range": {
+                          "min": 2,
+                          "max": 5
+                        }
+                      },
+                      {
+                        "category_key": "financial_profile",
+                        "field_key": "monthly_income_precise",
+                        "value_range": {
+                          "min": 5000,
+                          "max": 15000
+                        },
+                        "filter_currency": "USD"
                       }
                     ]
                   }
@@ -7708,8 +8060,8 @@
               },
               "examples": {
                 "Comprehensive Search Example": {
-                  "summary": "Search for profiles in Dubai with specific criteria",
-                  "description": "Search for profiles within 10km of Dubai with budget between $1,000-$10,000, who speak English or Arabic, with bachelor's education and age 25-35",
+                  "summary": "Search for profiles in Dubai with advanced criteria",
+                  "description": "Search for profiles within 10km of Dubai with budget between $1,000-$10,000, who speak English or Arabic, with various custom parameters including education, age ranges, time availability, and financial criteria",
                   "value": {
                     "pagination": {
                       "page": 1,
@@ -7744,12 +8096,29 @@
                       {
                         "category_key": "general_info",
                         "field_key": "education_level",
-                        "value": "bachelor"
+                        "value": "bachelor_science"
                       },
                       {
                         "category_key": "general_info",
                         "field_key": "age",
-                        "value": "25-35"
+                        "value": "25-33"
+                      },
+                      {
+                        "category_key": "relationship_and_availability",
+                        "field_key": "available_time_morning",
+                        "value_range": {
+                          "min": 2,
+                          "max": 5
+                        }
+                      },
+                      {
+                        "category_key": "financial_profile",
+                        "field_key": "monthly_income_precise",
+                        "value_range": {
+                          "min": 5000,
+                          "max": 15000
+                        },
+                        "filter_currency": "USD"
                       }
                     ]
                   }
