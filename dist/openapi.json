@@ -11,8 +11,8 @@
     }
   ],
   "info": {
-    "description": "3M Platform API - A comprehensive platform for user interactions, messaging, financial management, and profile management.\n\n## Overview\n\nThis API provides a complete solution for the 3M Platform, featuring user authentication, profile management, real-time messaging, financial transactions, and support systems. All endpoints use Laravel Sanctum for authentication with Bearer tokens.\n\n## Key Features\n\n- **User Management**: Complete profile and financial profile management\n- **Real-time Communication**: Chat system with AI moderation and file attachments\n- **Financial Services**: Wallet management, transactions, and subscription plans\n- **Social Features**: User interactions, blocking, and reporting systems\n- **Support System**: Ticket management with file attachments and spam protection\n- **Search & Discovery**: Advanced user search with filtering and pagination\n- **Options API**: Static configuration options and predefined values for UI components\n\n## Authentication\n\nMost endpoints require Bearer token authentication:\n```\nAuthorization: Bearer {your_token}\n```\n\n## Rate Limiting\n\n- Chat: 60 requests/minute (30 for sending messages)\n- Support: 10 requests/day per IP\n- General: Varies by endpoint\n\nFor detailed information about specific API sections, please refer to the individual tag descriptions below.",
-    "version": "1.0.0",
+    "description": "3M Platform API - A comprehensive platform for user interactions, messaging, financial management, and profile management.\n\n## Overview\n\nThis API provides a complete solution for the 3M Platform, featuring user authentication, profile management, real-time messaging, financial transactions, and support systems. All endpoints use Laravel Sanctum for authentication with Bearer tokens.\n\n## Latest Updates (October 17, 2025)\n\n**Budget Upgrade Feature:**\n- Added budget upgrade pricing calculation endpoint\n- Added budget upgrade payment submission endpoint\n- Enhanced insufficient budget flow for users with active subscriptions\n- Added detailed pricing breakdown for budget upgrades\n- Enhanced chat endpoints with message visibility based on budget and subscription status\n\n## Key Features\n\n- **User Management**: Complete profile and financial profile management\n- **Real-time Communication**: Chat system with AI moderation, file attachments, and budget-based message visibility\n- **Financial Services**: Wallet management, transactions, subscription plans, and budget upgrade functionality\n- **Social Features**: User interactions, blocking, and reporting systems\n- **Support System**: Ticket management with file attachments and spam protection\n- **Search & Discovery**: Advanced user search with filtering and pagination\n- **Options API**: Static configuration options and predefined values for UI components\n\n## Authentication\n\nMost endpoints require Bearer token authentication:\n```\nAuthorization: Bearer {your_token}\n```\n\n## Rate Limiting\n\n- Chat: 60 requests/minute (30 for sending messages)\n- Support: 10 requests/day per IP\n- General: Varies by endpoint\n\nFor detailed information about specific API sections, please refer to the individual tag descriptions below.",
+    "version": "1.1.0",
     "title": "3M Api",
     "contact": {
       "email": "alfi.dev@startup2050.com",
@@ -22750,9 +22750,22 @@
     "/subscription/budget-upgrade": {
       "get": {
         "tags": ["Subscription"],
-        "summary": "Get Budget Upgrade Information",
-        "description": "Retrieves information about budget upgrade options for users with pending budget changes.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
+        "summary": "Calculate Budget Upgrade Pricing",
+        "description": "Calculate the additional payment required when upgrading monthly budget for users with active subscriptions. If `amount` parameter is provided, calculates upgrade cost from current budget to the new amount. If no `amount` parameter is provided, uses the `pending_lifestyle_support_budget` from user's financial profile.\n\n#### Important Notes\n- Only works for users with active subscriptions\n- Returns error if user has no active subscription\n- Returns error if upgrade amount is less than or equal to current budget\n- Returns error if no pending budget exists (when amount not provided)\n- The `pricing_calculation_details` array provides step-by-step calculation for UI display\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login",
         "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "description": "The new budget amount for upgrade calculation (optional). If not provided, uses pending_lifestyle_support_budget from financial profile.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "example": 10000,
+              "minimum": 0
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success response with budget upgrade information",
@@ -22769,31 +22782,45 @@
                 "example": {
                   "error": false,
                   "active_subscription": {
-                    "id": 1,
-                    "user_id": 1,
-                    "subscription_plan_id": 2,
-                    "status": "active",
+                    "id": 123,
+                    "monthly_budget": 5000,
+                    "monthly_budget_trimmed": "5,000",
+                    "new_monthly_budget": 10000,
+                    "new_monthly_budget_trimmed": "10,000",
+                    "price": 12000.00,
+                    "price_trimmed": "12,000",
+                    "new_pricing": 24000.00,
+                    "new_pricing_trimmed": "24,000",
+                    "upgrade_price": 12000.00,
+                    "upgrade_price_trimmed": "12,000",
+                    "currency": "USD",
                     "plan": {
-                      "id": 2,
-                      "level": 2,
-                      "name": "Premium Annual Plan"
-                    },
-                    "new_pricing": 580.00,
-                    "new_pricing_trimmed": "580",
-                    "upgrade_price": 116.00,
-                    "upgrade_price_trimmed": "116",
-                    "currency_details": {
                       "id": 1,
-                      "code": "USD",
-                      "name": "US Dollar",
-                      "symbol": "$"
-                    }
+                      "name": "Standard",
+                      "level": 1
+                    },
+                    "pricing_calculation_details": [
+                      {
+                        "label": "Current",
+                        "calculation": "5,000 x 12 x 20%",
+                        "results": "12,000"
+                      },
+                      {
+                        "label": "New",
+                        "calculation": "10,000 x 12 x 20%",
+                        "results": "24,000"
+                      },
+                      {
+                        "label": "Additional Payment",
+                        "calculation": "24,000 - 12,000",
+                        "results": "12,000"
+                      }
+                    ]
                   },
                   "financial_profile": {
                     "currency": "USD",
                     "lifestyle_support_budget": 5000,
-                    "pending_lifestyle_support_budget": 1000,
-                    "budget_upgrade_payment": 1000
+                    "pending_lifestyle_support_budget": 10000
                   }
                 }
               }
@@ -23061,7 +23088,13 @@
           "referred_by_user_id": { "type": "integer", "nullable": true },
           "profile_picture_album_url": { "type": "string" },
           "profile_picture_url": { "type": "string" },
-          "full_name": { "type": "string" }
+          "full_name": { "type": "string" },
+          "lifestyle_support_budget_in_sc": { 
+            "type": "number",
+            "description": "Chat partner's lifestyle support budget in system currency (used for budget comparison)",
+            "example": 5000,
+            "nullable": true
+          }
         }
       },
       "Subscription": {
@@ -27243,23 +27276,58 @@
       "BudgetUpgradeSubscription": {
         "type": "object",
         "properties": {
-          "id": {"type": "integer", "example": 1},
+          "id": {"type": "integer", "example": 123},
           "user_id": {"type": "integer", "example": 1},
-          "subscription_plan_id": {"type": "integer", "example": 2},
+          "subscription_plan_id": {"type": "integer", "example": 1},
           "status": {"type": "string", "example": "active"},
+          "monthly_budget": {"type": "number", "description": "Current monthly budget", "example": 5000},
+          "monthly_budget_trimmed": {"type": "string", "description": "Formatted current monthly budget", "example": "5,000"},
+          "new_monthly_budget": {"type": "number", "description": "New monthly budget after upgrade", "example": 10000},
+          "new_monthly_budget_trimmed": {"type": "string", "description": "Formatted new monthly budget", "example": "10,000"},
+          "price": {"type": "number", "description": "Current subscription price", "example": 12000.00},
+          "price_trimmed": {"type": "string", "description": "Formatted current subscription price", "example": "12,000"},
+          "new_pricing": {"type": "number", "description": "New subscription price after upgrade", "example": 24000.00},
+          "new_pricing_trimmed": {"type": "string", "description": "Formatted new subscription price", "example": "24,000"},
+          "upgrade_price": {"type": "number", "description": "Additional payment required for upgrade", "example": 12000.00},
+          "upgrade_price_trimmed": {"type": "string", "description": "Formatted upgrade price", "example": "12,000"},
+          "currency": {"type": "string", "description": "Currency code", "example": "USD"},
           "plan": {
             "type": "object",
             "properties": {
-              "id": {"type": "integer", "example": 2},
-              "level": {"type": "integer", "example": 2},
-              "name": {"type": "string", "example": "Premium Annual Plan"}
+              "id": {"type": "integer", "example": 1},
+              "name": {"type": "string", "example": "Standard"},
+              "level": {"type": "integer", "example": 1}
             }
           },
-          "new_pricing": {"type": "number", "example": 580.00},
-          "new_pricing_trimmed": {"type": "string", "example": "580"},
-          "upgrade_price": {"type": "number", "example": 116.00},
-          "upgrade_price_trimmed": {"type": "string", "example": "116"},
-          "currency_details": {"$ref": "#/components/schemas/CurrencyDetail"}
+          "pricing_calculation_details": {
+            "type": "array",
+            "description": "Step-by-step calculation breakdown for UI display",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {"type": "string", "description": "Calculation step label", "example": "Current"},
+                "calculation": {"type": "string", "description": "Calculation formula", "example": "5,000 x 12 x 20%"},
+                "results": {"type": "string", "description": "Calculation result", "example": "12,000"}
+              }
+            },
+            "example": [
+              {
+                "label": "Current",
+                "calculation": "5,000 x 12 x 20%",
+                "results": "12,000"
+              },
+              {
+                "label": "New",
+                "calculation": "10,000 x 12 x 20%",
+                "results": "24,000"
+              },
+              {
+                "label": "Additional Payment",
+                "calculation": "24,000 - 12,000",
+                "results": "12,000"
+              }
+            ]
+          }
         }
       },
       "FinancialProfile": {
