@@ -2296,7 +2296,7 @@
                   "profile_picture": {
                     "type": "string",
                     "format": "binary",
-                    "description": "Profile picture image file (max 5MB, formats: jpeg, png, jpg, gif, heic, heif, webp)"
+                    "description": "Profile picture image file (max 10MB, formats: jpeg, png, jpg, gif, heic, heif, webp)"
                   }
                 },
                 "required": ["profile_picture"]
@@ -2370,7 +2370,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "The profile picture must not be larger than 5MB."
+                      "example": "The profile picture must not be larger than 10MB."
                     },
                     "errors": {
                       "type": "object",
@@ -2380,7 +2380,7 @@
                           "items": {
                             "type": "string"
                           },
-                          "example": ["The profile picture must not be larger than 5MB."]
+                          "example": ["The profile picture must not be larger than 10MB."]
                         }
                       }
                     }
@@ -2415,7 +2415,7 @@
     "/profile/about": {
       "post": {
         "summary": "Update About Section",
-        "description": "Update your profile's about section including basic information, personal details, location preferences, languages, hobbies, and extended descriptions.",
+        "description": "Update your profile's about section including basic information, personal details, location preferences, languages, hobbies, partner preference, lifestyle support budget, and extended descriptions. For users with active subscriptions (role: 'rs'), lifestyle support budget changes are stored as pending and applied after subscription ends. Currency conversion is automatic if user's currency differs from system default.",
         "tags": [
           "Profile"
         ],
@@ -2605,9 +2605,22 @@
                   "hobbies": {
                     "type": "string",
                     "description": "Comma-separated hobby IDs"
+                  },
+                  "partner_preference": {
+                    "type": "string",
+                    "description": "Preferred partner gender: 'male', 'female', or 'any'",
+                    "enum": ["male", "female", "any"],
+                    "example": "female"
+                  },
+                  "lifestyle_support_budget": {
+                    "type": "number",
+                    "description": "Monthly lifestyle support budget (0-1000000). For users with active subscriptions (role: 'rs'), changes are stored as pending and applied after subscription ends. Automatically converted to system currency if user's currency differs.",
+                    "minimum": 0,
+                    "maximum": 1000000,
+                    "example": 5000
                   }
                 },
-                "required": ["public_username", "birth_date", "age_display"]
+                "required": ["public_username", "birth_date", "age_display", "partner_preference"]
               },
               "x-examples": {
                 "Example 1": {
@@ -2654,7 +2667,9 @@
                       "fluency": 3
                     }
                   ],
-                  "hobbies": "1,5,12,23"
+                  "hobbies": "1,5,12,23",
+                  "partner_preference": "female",
+                  "lifestyle_support_budget": 5000
                 }
               }
             }
@@ -2944,6 +2959,16 @@
                           "old": ["Photography", "Reading"],
                           "new": ["Photography", "Cooking"],
                           "message": "Hobbies have been updated"
+                        },
+                        "partner_preference": {
+                          "old": "any",
+                          "new": "female",
+                          "message": "Partner preference has been changed to female"
+                        },
+                        "lifestyle_support_budget": {
+                          "old": "4000.00",
+                          "new": "5000.00",
+                          "message": "Lifestyle support budget has been changed to 5000.00"
                         }
                       }
                     }
@@ -3051,7 +3076,7 @@
     "/profile/relationship": {
       "post": {
         "summary": "Update Relationship Preferences",
-        "description": "Update your relationship preferences and goals including partner preferences, relationship goals, duration preferences, and availability times.",
+        "description": "Update your relationship preferences and goals including relationship goals, duration preferences, and availability times. Note: Partner preference is managed through the /api/profile/about endpoint.",
         "tags": [
           "Profile"
         ],
@@ -3071,12 +3096,6 @@
                     "type": "string",
                     "description": "Your relationship goals",
                     "example": "marriage"
-                  },
-                  "partner_preference": {
-                    "type": "string",
-                    "description": "Preferred partner gender",
-                    "enum": ["male", "female", "any"],
-                    "example": "female"
                   },
                   "duration_preference": {
                     "type": "string",
@@ -3098,13 +3117,11 @@
                     "description": "Available in evening",
                     "example": false
                   }
-                },
-                "required": ["partner_preference"]
+                }
               },
               "x-examples": {
                 "Example 1": {
                   "relationship_goals": "marriage",
-                  "partner_preference": "female",
                   "duration_preference": "long_term",
                   "available_time_morning": true,
                   "available_time_afternoon": true,
@@ -3144,10 +3161,6 @@
                         "relationship_goals": {
                           "type": "string",
                           "description": "Relationship goals"
-                        },
-                        "partner_preference": {
-                          "type": "string",
-                          "description": "Partner preference"
                         },
                         "duration_preference": {
                           "type": "string",
@@ -3205,7 +3218,6 @@
                         "id": 1,
                         "user_id": 123,
                         "relationship_goals": "marriage",
-                        "partner_preference": "female",
                         "duration_preference": "long_term",
                         "available_time_morning": true,
                         "available_time_afternoon": true,
@@ -3309,7 +3321,7 @@
     "/profile/financial": {
       "post": {
         "summary": "Update Financial Profile",
-        "description": "Update your financial profile information including lifestyle support budget, capital level, income details, child payments, marriage gifts, and milestone settings. For detailed financial profile documentation, see Financial Profile API.",
+        "description": "Update your financial profile information including capital level, income details, child payments, marriage gifts, and milestone settings. Note: The lifestyle_support_budget field has been moved to /api/profile/about endpoint. For detailed financial profile documentation, see Financial Profile API.",
         "tags": [
           "Profile"
         ],
@@ -3325,12 +3337,6 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "lifestyle_support_budget": {
-                    "type": "number",
-                    "description": "Monthly lifestyle support budget (required)",
-                    "minimum": 0,
-                    "example": 5000
-                  },
                   "capital_level_precise": {
                     "type": "string",
                     "description": "Precise capital level value (mutually exclusive with capital_level_less_precise)",
@@ -3423,12 +3429,10 @@
                     },
                     "example": ["6 months", "12 months"]
                   }
-                },
-                "required": ["lifestyle_support_budget"]
+                }
               },
               "x-examples": {
                 "Example 1": {
-                  "lifestyle_support_budget": 5000,
                   "capital_level_precise": "1000000",
                   "monthly_income_precise": "50000",
                   "first_child_payment": 10000,
@@ -3494,7 +3498,6 @@
                       "data": {
                         "id": 1,
                         "user_id": 123,
-                        "lifestyle_support_budget": "5000.00",
                         "capital_level_precise": "100000-250000",
                         "monthly_income_precise": "10000-15000",
                         "first_child_payment": "5000.00",
@@ -3510,11 +3513,6 @@
                         "updated_at": "2024-01-20T14:45:00.000000Z"
                       },
                       "changes": {
-                        "lifestyle_support_budget": {
-                          "old": "4000.00",
-                          "new": "5000.00",
-                          "message": "Lifestyle support budget has been changed to 5000.00"
-                        },
                         "first_child_payment": {
                           "old": "4000.00",
                           "new": "5000.00",
