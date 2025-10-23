@@ -2863,7 +2863,17 @@
                           },
                           "message": {
                             "type": "string",
-                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                            "description": "HTML-formatted user-friendly description of the change (formatted by ChangeFormatterService)"
+                          },
+                          "plain_message": {
+                            "type": "string",
+                            "description": "Plain text version of the change message for mobile display"
+                          },
+                          "display_value": {
+                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                          },
+                          "old_display_value": {
+                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
                           }
                         }
                       }
@@ -2933,42 +2943,66 @@
                         "public_username": {
                           "old": "john_doe_old",
                           "new": "john_doe",
-                          "message": "Username has been changed to john_doe"
+                          "message": "Username has been changed from john_doe_old to john_doe",
+                          "plain_message": "Username has been changed from john_doe_old to john_doe",
+                          "display_value": "john_doe",
+                          "old_display_value": "john_doe_old"
                         },
                         "short_intro": {
                           "old": "Old introduction",
                           "new": "Looking for meaningful connections",
-                          "message": "Short introduction has been changed to Looking for meaningful connections"
+                          "message": "Short introduction has been changed from Old introduction to Looking for meaningful connections",
+                          "plain_message": "Short introduction has been changed from Old introduction to Looking for meaningful connections",
+                          "display_value": "Looking for meaningful connections",
+                          "old_display_value": "Old introduction"
                         },
                         "weight": {
                           "old": 75,
                           "new": 70,
-                          "message": "Weight has been changed to 70 kg"
+                          "message": "Weight has been changed from 75 kg to 70 kg",
+                          "plain_message": "Weight has been changed from 75 kg to 70 kg",
+                          "display_value": "70 kg",
+                          "old_display_value": "75 kg"
                         },
                         "extended_description": {
                           "old": ["Old description"],
                           "new": ["I love traveling and exploring new cultures"],
-                          "message": "Extended descriptions have been updated"
+                          "message": "Extended descriptions have been updated",
+                          "plain_message": "Extended descriptions have been updated",
+                          "display_value": null,
+                          "old_display_value": null
                         },
                         "languages": {
                           "old": {"en": 4, "fr": 2},
                           "new": {"en": 5, "es": 3},
-                          "message": "Languages have been updated"
+                          "message": "Languages have been updated",
+                          "plain_message": "Languages have been updated",
+                          "display_value": null,
+                          "old_display_value": null
                         },
                         "hobbies": {
                           "old": ["Photography", "Reading"],
                           "new": ["Photography", "Cooking"],
-                          "message": "Hobbies have been updated"
+                          "message": "Hobbies have been updated",
+                          "plain_message": "Hobbies have been updated",
+                          "display_value": null,
+                          "old_display_value": null
                         },
                         "partner_preference": {
                           "old": "any",
                           "new": "female",
-                          "message": "Partner preference has been changed to female"
+                          "message": "Partner preference has been changed from any to female",
+                          "plain_message": "Partner preference has been changed from any to female",
+                          "display_value": "female",
+                          "old_display_value": "any"
                         },
                         "lifestyle_support_budget": {
                           "old": "4000.00",
                           "new": "5000.00",
-                          "message": "Lifestyle support budget has been changed to 5000.00"
+                          "message": "Lifestyle support budget has been changed from 4000.00 to 5000.00",
+                          "plain_message": "Lifestyle support budget has been changed from 4000.00 to 5000.00",
+                          "display_value": "5000.00",
+                          "old_display_value": "4000.00"
                         }
                       }
                     }
@@ -3204,7 +3238,17 @@
                           },
                           "message": {
                             "type": "string",
-                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                            "description": "HTML-formatted user-friendly description of the change (formatted by ChangeFormatterService)"
+                          },
+                          "plain_message": {
+                            "type": "string",
+                            "description": "Plain text version of the change message for mobile display"
+                          },
+                          "display_value": {
+                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                          },
+                          "old_display_value": {
+                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
                           }
                         }
                       }
@@ -3229,12 +3273,18 @@
                         "relationship_goals": {
                           "old": "casual",
                           "new": "marriage",
-                          "message": "Relationship goals has been changed to marriage"
+                          "message": "Relationship goals has been changed from casual to marriage",
+                          "plain_message": "Relationship goals has been changed from casual to marriage",
+                          "display_value": "marriage",
+                          "old_display_value": "casual"
                         },
                         "duration_preference": {
                           "old": "short_term",
                           "new": "long_term",
-                          "message": "Duration preference has been changed to long_term"
+                          "message": "Duration preference has been changed from short_term to long_term",
+                          "plain_message": "Duration preference has been changed from short_term to long_term",
+                          "display_value": "long_term",
+                          "old_display_value": "short_term"
                         }
                       }
                     }
@@ -3485,7 +3535,17 @@
                           },
                           "message": {
                             "type": "string",
-                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                            "description": "HTML-formatted user-friendly description of the change (formatted by ChangeFormatterService)"
+                          },
+                          "plain_message": {
+                            "type": "string",
+                            "description": "Plain text version of the change message for mobile display"
+                          },
+                          "display_value": {
+                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                          },
+                          "old_display_value": {
+                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
                           }
                         }
                       }
@@ -3516,12 +3576,18 @@
                         "first_child_payment": {
                           "old": "4000.00",
                           "new": "5000.00",
-                          "message": "First child payment has been changed to 5000.00"
+                          "message": "First child payment has been changed from 4000.00 to 5000.00",
+                          "plain_message": "First child payment has been changed from 4000.00 to 5000.00",
+                          "display_value": "5000.00",
+                          "old_display_value": "4000.00"
                         },
                         "milestone_gifts": {
                           "old": [{"amount": "5000", "period": "6_months"}],
                           "new": [{"amount": "10000", "period": "12_months"}],
-                          "message": "Milestone gifts have been updated"
+                          "message": "Milestone gifts have been updated",
+                          "plain_message": "Milestone gifts have been updated",
+                          "display_value": null,
+                          "old_display_value": null
                         }
                       }
                     }
@@ -3987,7 +4053,17 @@
                           },
                           "message": {
                             "type": "string",
-                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                            "description": "HTML-formatted user-friendly description of the change (formatted by ChangeFormatterService)"
+                          },
+                          "plain_message": {
+                            "type": "string",
+                            "description": "Plain text version of the change message for mobile display"
+                          },
+                          "display_value": {
+                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                          },
+                          "old_display_value": {
+                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
                           }
                         }
                       }
@@ -4017,22 +4093,34 @@
                         "driving_license_availability": {
                           "old": false,
                           "new": true,
-                          "message": "Driving license availability has been enabled"
+                          "message": "Driving license availability has been changed from disabled to enabled",
+                          "plain_message": "Driving license availability has been changed from disabled to enabled",
+                          "display_value": "enabled",
+                          "old_display_value": "disabled"
                         },
                         "living_format_test_moon": {
                           "old": "house",
                           "new": "apartment",
-                          "message": "Test moon living format has been changed to apartment"
+                          "message": "Test moon living format has been changed from house to apartment",
+                          "plain_message": "Test moon living format has been changed from house to apartment",
+                          "display_value": "apartment",
+                          "old_display_value": "house"
                         },
                         "living_format_test_moon_image": {
                           "old": "living-form-pictures/123_test_moon_old.jpg",
                           "new": "uploaded",
-                          "message": "New photo of Test Moon has been uploaded"
+                          "message": "New photo of Test Moon has been uploaded",
+                          "plain_message": "New photo of Test Moon has been uploaded",
+                          "display_value": null,
+                          "old_display_value": null
                         },
                         "housing_image": {
                           "old": null,
                           "new": "uploaded",
-                          "message": "New photo of Living Accommodation has been uploaded"
+                          "message": "New photo of Living Accommodation has been uploaded",
+                          "plain_message": "New photo of Living Accommodation has been uploaded",
+                          "display_value": null,
+                          "old_display_value": null
                         }
                       }
                     }
@@ -5210,7 +5298,17 @@
                           },
                           "message": {
                             "type": "string",
-                            "description": "User-friendly description of the change (formatted by ChangeFormatterService)"
+                            "description": "HTML-formatted user-friendly description of the change (formatted by ChangeFormatterService)"
+                          },
+                          "plain_message": {
+                            "type": "string",
+                            "description": "Plain text version of the change message for mobile display"
+                          },
+                          "display_value": {
+                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                          },
+                          "old_display_value": {
+                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
                           }
                         }
                       }
@@ -5233,12 +5331,18 @@
                         "status_of_registration": {
                           "old": "all",
                           "new": "registered",
-                          "message": "Status of registration has been changed to Registered Visitor"
+                          "message": "Status of registration has been changed from Any Visitor to Registered Visitor",
+                          "plain_message": "Status of registration has been changed from Any Visitor to Registered Visitor",
+                          "display_value": "Registered Visitor",
+                          "old_display_value": "Any Visitor"
                         },
                         "financial_verification_status": {
                           "old": "all",
                           "new": "verified",
-                          "message": "Financial verification status has been changed to Only Verified-Finance Users"
+                          "message": "Financial verification status has been changed from All Users to Only Verified-Finance Users",
+                          "plain_message": "Financial verification status has been changed from All Users to Only Verified-Finance Users",
+                          "display_value": "Only Verified-Finance Users",
+                          "old_display_value": "All Users"
                         }
                       }
                     }
