@@ -21371,8 +21371,23 @@
                       "description": "AI-generated response in HTML format with Tailwind CSS classes",
                       "example": "<p class=\"text-base text-gray-800 mb-4\">To reset your password, follow these steps:</p><p class=\"text-base text-gray-800 mb-4\">1. Go to the login page</p><p class=\"text-base text-gray-800 mb-4\">2. Click on \"Forgot Password\"</p><p class=\"text-base text-gray-800\">3. Enter your email address</p>"
                     },
+                    "raw_response": {
+                      "type": "string",
+                      "description": "AI-generated response in plain text format (without HTML)",
+                      "example": "To reset your password, follow these steps:\n\n1. Go to the login page\n2. Click on \"Forgot Password\"\n3. Enter your email address"
+                    },
                     "question_data": {
                       "$ref": "#/components/schemas/HelpdeskQuestion"
+                    },
+                    "cached": {
+                      "type": "boolean",
+                      "description": "Indicates whether the response was retrieved from cache",
+                      "example": false
+                    },
+                    "cache_source": {
+                      "type": "string",
+                      "description": "The source of the cache (e.g., 'database', 'redis')",
+                      "example": "database"
                     }
                   }
                 }
@@ -25320,10 +25335,20 @@
             "description": "The user's question",
             "example": "How do I reset my password?"
           },
+          "cache_key": {
+            "type": "string",
+            "description": "Cache key for the AI response",
+            "example": "help_center_5f4dcc3b5aa765d61d8327deb882cf99"
+          },
           "ai_response": {
             "type": "string",
-            "description": "AI-generated response in HTML format",
-            "example": "<p class=\"text-base text-gray-800 mb-4\">To reset your password, follow these steps:</p><p class=\"text-base text-gray-800 mb-4\">1. Go to the login page</p><p class=\"text-base text-gray-800 mb-4\">2. Click on \"Forgot Password\"</p><p class=\"text-base text-gray-800\">3. Enter your email address</p>"
+            "description": "AI-generated response in plain text format",
+            "example": "To reset your password, follow these steps..."
+          },
+          "ai_response_html": {
+            "type": "string",
+            "description": "AI-generated response in HTML format with Tailwind CSS classes",
+            "example": "<p class=\"text-base text-gray-800 mb-4\">To reset your password, follow these steps:</p>..."
           },
           "resolved": {
             "type": "boolean",
