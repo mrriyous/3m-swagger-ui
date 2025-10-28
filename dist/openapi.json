@@ -59,7 +59,7 @@
     },
     {
       "name": "Notifications",
-      "description": "Endpoints for managing user notifications, including listing, filtering, marking as read, updating importance, and managing user preferences. All endpoints require Bearer token authentication."
+      "description": "The Notifications API provides comprehensive endpoints for managing user notifications, including listing, filtering, marking as read, updating importance, and managing user preferences. All endpoints require Bearer token authentication.\n\n## Features\n\n- **Filtering & Pagination**: Filter by importance (low/medium/high), categories, and read status with pagination support\n- **Read Management**: Mark individual or all notifications as read\n- **Importance Control**: Update notification importance (except for Notice category)\n- **User Preferences**: Manage notification delivery preferences (email/push) and content type\n- **Real-time Count**: Get unread notification count for badges\n- **Styling Support**: Pre-calculated CSS classes and hex colors for consistent UI rendering\n- **Link Extraction**: Automatic extraction of URLs from message content (domain removed, path only)\n\n## Notification Types\n\n### Profile Notifications\n- **Category**: `Profile` | **Group**: `Profile` | **Importance**: medium (default, changeable)\n- Sent when someone marks a user as interested\n- Includes interested user details (ID, name, avatar)\n- **Styling**: Icon bg-pink-400 (#F472B6), Category bg-pink-100 text-pink-700\n\n### Notice Notifications\n- **Category**: `Notice` | **Group**: `Notice` | **Importance**: Set by admin (unchangeable)\n- System-generated notifications with HTML content support\n- Automatically extracts links from message content into `links_in_message` array\n- **Styling**: Icon bg-blue-400 (#60A5FA), Category bg-blue-100 text-blue-700\n- **Note**: Importance cannot be changed by users\n\n### Balance Notifications\n- **Categories**: `BalanceIncrease`, `BalanceDecrease` | **Group**: `Balance` | **Importance**: low (default, changeable)\n- Sent for wallet transactions and balance changes\n- Includes transaction details (ID, amount, currency)\n- **Styling**: Icon bg-green-400 (#4ADE80), Category bg-green-100 text-green-700\n\n### Contract Notifications\n- **Categories**: `ContractOfferReceived`, `ContractOfferSent`, `ContractStopped`, `ContractApproved`, `ContractRestarted`, `ContractPausedReminder`, `ContractRejected`, `ContractChangeRequested`\n- **Group**: `Contract` | **Importance**: medium (default, changeable)\n- **Styling**: Icon bg-purple-400 (#A78BFA), Category bg-purple-100 text-purple-700\n\n### Chat Notifications\n- **Category**: `Chat` | **Importance**: medium (default, changeable)\n- Sent for chat-related activities\n\n## Implementation Notes\n\n1. **Filtering**: Use query parameters to filter by importance, categories (comma-separated), and read status\n2. **Pagination**: All list endpoints support `per_page` and `page` parameters (default: 15/page)\n3. **Importance Updates**: Only non-Notice notifications can have their importance changed\n4. **Preferences**: Automatically created with defaults if they don't exist\n5. **Styling**: Each notification includes CSS classes and hex colors for consistent UI rendering\n6. **Link Extraction**: The `links_in_message` field extracts all HTML anchor tag URLs, removes domains, and keeps only paths for easy in-app navigation\n7. **Timezone Support**: Timestamps provided in both UTC and user's local timezone with formatted versions\n\n## Mobile App Integration\n\n### Recommended Flow\n1. **App Launch**: GET `/unread-count` for badge\n2. **Notifications Screen**: GET `/filter` for options, then GET `/` with filters\n3. **Notification Tap**: GET `/{id}` for details, then POST `/{id}/mark-read`\n4. **Settings**: Use `/preferences` endpoints\n5. **Background Sync**: Periodically call `/unread-count`\n\n### Link Navigation\nUse the `links_in_message` array to navigate to links extracted from notification messages:\n```javascript\nif (notification.links_in_message.length > 0) {\n  const path = notification.links_in_message[0];\n  router.push(path); // Navigate to /profile/edit, /settings, etc.\n}\n```"
     },
     {
       "name": "Affiliate",
@@ -19527,6 +19527,102 @@
                       "$ref": "#/components/schemas/Pagination"
                     }
                   }
+                },
+                "examples": {
+                  "ProfileNotification": {
+                    "summary": "Profile Interest Notification",
+                    "value": {
+                      "error": false,
+                      "data": [
+                        {
+                          "id": "550e8400-e29b-41d4-a716-446655440000",
+                          "icon_image_url": "http://localhost:8001/static/icons/solid_dice_white.svg",
+                          "icon_styling": "bg-pink-400",
+                          "icon_bg_color": "#F472B6",
+                          "category": "Profile",
+                          "category_group": "Profile",
+                          "category_styling": "bg-pink-100 text-pink-700",
+                          "category_bg_color": "#FCE7F3",
+                          "category_text_color": "#BE185D",
+                          "importance": "medium",
+                          "importance_styling": "bg-orange-100 text-orange-700",
+                          "importance_bg_color": "#FFEDD5",
+                          "importance_text_color": "#C2410C",
+                          "header": "Someone Found You Interesting!",
+                          "message": "Your profile just got marked as interesting! You're catching attention and more likely to show up in their suggestions and match lists.",
+                          "preview": "Your profile just got marked as interesting! You're catching attention and more likely to show up in their suggestions and match lists.",
+                          "read_at": null,
+                          "created_at": "2025-06-24T19:44:24.000000Z",
+                          "created_at_formatted": "24 Jun 2025 07:44 pm",
+                          "created_at_local": "2025-06-25T02:44:24.000000Z",
+                          "created_at_local_formatted": "25 Jun 2025 02:44 am",
+                          "is_system_notice": false,
+                          "interested_user_id": 123,
+                          "interested_user_name": "John",
+                          "interested_user_avatar": "https://example.com/avatar.jpg",
+                          "status_str": null,
+                          "status_bg_color": "#F5F5F5",
+                          "status_text_color": "#374151",
+                          "link": null,
+                          "link_label": null,
+                          "links_in_message": []
+                        }
+                      ],
+                      "pagination": {
+                        "total": 1,
+                        "per_page": 10,
+                        "current_page": 1,
+                        "last_page": 1
+                      }
+                    }
+                  },
+                  "NoticeNotification": {
+                    "summary": "System Notice with Links",
+                    "value": {
+                      "error": false,
+                      "data": [
+                        {
+                          "id": "650e8400-e29b-41d4-a716-446655440001",
+                          "icon_image_url": "http://localhost:8001/static/icons/solid_bell_white.svg",
+                          "icon_styling": "bg-blue-400",
+                          "icon_bg_color": "#60A5FA",
+                          "category": "Notice",
+                          "category_group": "Notice",
+                          "category_styling": "bg-blue-100 text-blue-700",
+                          "category_bg_color": "#DBEAFE",
+                          "category_text_color": "#1D4ED8",
+                          "importance": "medium",
+                          "importance_styling": "bg-orange-100 text-orange-700",
+                          "importance_bg_color": "#FFEDD5",
+                          "importance_text_color": "#C2410C",
+                          "header": "Finalize your profile",
+                          "message": "You can go to <a href=\"http://localhost:8000/profile/edit\">Profile</a> section and <a href=\"http://localhost:8000/settings\">Settings</a> to complete.",
+                          "preview": "You can go to Profile section and Settings to complete.",
+                          "read_at": null,
+                          "created_at": "2025-06-24T18:30:00.000000Z",
+                          "created_at_formatted": "24 Jun 2025 06:30 pm",
+                          "created_at_local": "2025-06-25T01:30:00.000000Z",
+                          "created_at_local_formatted": "25 Jun 2025 01:30 am",
+                          "is_system_notice": true,
+                          "interested_user_id": null,
+                          "interested_user_name": null,
+                          "interested_user_avatar": null,
+                          "status_str": null,
+                          "status_bg_color": "#F5F5F5",
+                          "status_text_color": "#374151",
+                          "link": null,
+                          "link_label": null,
+                          "links_in_message": ["/profile/edit", "/settings"]
+                        }
+                      ],
+                      "pagination": {
+                        "total": 1,
+                        "per_page": 10,
+                        "current_page": 1,
+                        "last_page": 1
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -19567,6 +19663,80 @@
                     },
                     "data": {
                       "$ref": "#/components/schemas/NotificationFilters"
+                    }
+                  }
+                },
+                "examples": {
+                  "FilterOptions": {
+                    "summary": "Available filter options",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "importances": [
+                          {
+                            "name": "All",
+                            "value": "all"
+                          },
+                          {
+                            "name": "Low",
+                            "value": "low"
+                          },
+                          {
+                            "name": "Medium",
+                            "value": "medium"
+                          },
+                          {
+                            "name": "High",
+                            "value": "high"
+                          }
+                        ],
+                        "filter_topics": [
+                          {
+                            "name": "All",
+                            "value": "All"
+                          },
+                          {
+                            "name": "Notice",
+                            "value": "Notice"
+                          },
+                          {
+                            "name": "Chat",
+                            "value": "Chat"
+                          },
+                          {
+                            "name": "Someone's interest to my profile",
+                            "value": "Profile"
+                          },
+                          {
+                            "name": "Balance Increase",
+                            "value": "BalanceIncrease"
+                          },
+                          {
+                            "name": "Balance Decrease",
+                            "value": "BalanceDecrease"
+                          }
+                        ],
+                        "notify_methods": [
+                          {
+                            "name": "Email",
+                            "value": "email"
+                          },
+                          {
+                            "name": "Push Notification",
+                            "value": "push_notification"
+                          }
+                        ],
+                        "notification_content": [
+                          {
+                            "name": "Header Only",
+                            "value": "header"
+                          },
+                          {
+                            "name": "Header and Content",
+                            "value": "header_content"
+                          }
+                        ]
+                      }
                     }
                   }
                 }
@@ -19621,6 +19791,47 @@
                     },
                     "data": {
                       "$ref": "#/components/schemas/Notification"
+                    }
+                  }
+                },
+                "examples": {
+                  "ProfileNotification": {
+                    "summary": "Profile Interest Notification",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "icon_image_url": "http://localhost:8001/static/icons/solid_dice_white.svg",
+                        "icon_styling": "bg-pink-400",
+                        "icon_bg_color": "#F472B6",
+                        "category": "Profile",
+                        "category_group": "Profile",
+                        "category_styling": "bg-pink-100 text-pink-700",
+                        "category_bg_color": "#FCE7F3",
+                        "category_text_color": "#BE185D",
+                        "importance": "medium",
+                        "importance_styling": "bg-orange-100 text-orange-700",
+                        "importance_bg_color": "#FFEDD5",
+                        "importance_text_color": "#C2410C",
+                        "header": "Someone Found You Interesting!",
+                        "message": "Your profile just got marked as interesting! You're catching attention and more likely to show up in their suggestions and match lists.",
+                        "preview": "Your profile just got marked as interesting! You're catching attention and more likely to show up in their suggestions and match lists.",
+                        "read_at": null,
+                        "created_at": "2025-06-24T19:44:24.000000Z",
+                        "created_at_formatted": "24 Jun 2025 07:44 pm",
+                        "created_at_local": "2025-06-25T02:44:24.000000Z",
+                        "created_at_local_formatted": "25 Jun 2025 02:44 am",
+                        "is_system_notice": false,
+                        "interested_user_id": 123,
+                        "interested_user_name": "John",
+                        "interested_user_avatar": "https://example.com/avatar.jpg",
+                        "status_str": null,
+                        "status_bg_color": "#F5F5F5",
+                        "status_text_color": "#374151",
+                        "link": null,
+                        "link_label": null,
+                        "links_in_message": []
+                      }
                     }
                   }
                 }
@@ -19687,6 +19898,15 @@
                       "type": "string"
                     }
                   }
+                },
+                "examples": {
+                  "MarkAsRead": {
+                    "summary": "Notification marked as read",
+                    "value": {
+                      "error": false,
+                      "message": "Notification marked as read"
+                    }
+                  }
                 }
               }
             }
@@ -19737,6 +19957,15 @@
                     },
                     "message": {
                       "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "MarkAllAsRead": {
+                    "summary": "All notifications marked as read",
+                    "value": {
+                      "error": false,
+                      "message": "All notifications marked as read"
                     }
                   }
                 }
@@ -19792,6 +20021,14 @@
                     "description": "New importance level"
                   }
                 }
+              },
+              "examples": {
+                "UpdateImportance": {
+                  "summary": "Update importance to high",
+                  "value": {
+                    "importance": "high"
+                  }
+                }
               }
             }
           }
@@ -19811,16 +20048,44 @@
                       "type": "string"
                     }
                   }
+                },
+                "examples": {
+                  "SuccessResponse": {
+                    "summary": "Importance updated successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Notification importance updated"
+                    }
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request - Cannot change importance for Notice category or validation error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ValidationErrorResponse"
+                },
+                "examples": {
+                  "NoticeRestriction": {
+                    "summary": "Cannot change Notice importance",
+                    "value": {
+                      "error": true,
+                      "message": "Importance cannot be changed for Notice notifications"
+                    }
+                  },
+                  "ValidationError": {
+                    "summary": "Invalid importance value",
+                    "value": {
+                      "error": true,
+                      "error_message": "Sorry, Please check your input and try again.",
+                      "errors": {
+                        "importance": ["The importance field is required."]
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -19878,6 +20143,17 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "UnreadCount": {
+                    "summary": "Unread notifications count",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "unread_count": 5
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -19918,6 +20194,23 @@
                     },
                     "data": {
                       "$ref": "#/components/schemas/NotificationPreferences"
+                    }
+                  }
+                },
+                "examples": {
+                  "UserPreferences": {
+                    "summary": "User notification preferences",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "id": 1,
+                        "user_id": 123,
+                        "important_notices_email": true,
+                        "important_notices_push": true,
+                        "content_type": "header_content",
+                        "created_at": "2025-06-24T19:44:24.000000Z",
+                        "updated_at": "2025-06-24T19:44:24.000000Z"
+                      }
                     }
                   }
                 }
@@ -19966,6 +20259,16 @@
                     "description": "Content type preference"
                   }
                 }
+              },
+              "examples": {
+                "UpdatePreferences": {
+                  "summary": "Update notification preferences",
+                  "value": {
+                    "important_notices_email": true,
+                    "important_notices_push": false,
+                    "content_type": "header"
+                  }
+                }
               }
             }
           }
@@ -19986,6 +20289,24 @@
                     },
                     "data": {
                       "$ref": "#/components/schemas/NotificationPreferences"
+                    }
+                  }
+                },
+                "examples": {
+                  "UpdatedPreferences": {
+                    "summary": "Updated notification preferences",
+                    "value": {
+                      "error": false,
+                      "message": "Notification preferences updated",
+                      "data": {
+                        "id": 1,
+                        "user_id": 123,
+                        "important_notices_email": true,
+                        "important_notices_push": false,
+                        "content_type": "header",
+                        "created_at": "2025-06-24T19:44:24.000000Z",
+                        "updated_at": "2025-06-24T20:30:15.000000Z"
+                      }
                     }
                   }
                 }
@@ -25007,6 +25328,36 @@
             "type": "string",
             "nullable": true,
             "description": "Avatar URL of the interested user"
+          },
+          "status_str": {
+            "type": "string",
+            "nullable": true,
+            "description": "Status text for the notification"
+          },
+          "status_bg_color": {
+            "type": "string",
+            "description": "Hex color for status background"
+          },
+          "status_text_color": {
+            "type": "string",
+            "description": "Hex color for status text"
+          },
+          "link": {
+            "type": "string",
+            "nullable": true,
+            "description": "External link associated with notification"
+          },
+          "link_label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Label for the external link"
+          },
+          "links_in_message": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of links extracted from the message (domain removed, path only)"
           }
         }
       },
