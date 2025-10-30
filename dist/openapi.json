@@ -25768,7 +25768,7 @@
             "description": "Formatted lifestyle support budget with thousand separators",
             "example": "5,000"
           },
-          "lifestyle_support_budget_trimmed_in_sc": {
+          "lifestyle_support_budget_in_sc_trimmed": {
             "type": "string",
             "description": "Formatted lifestyle support budget in system currency",
             "example": "5,000"
@@ -25828,9 +25828,9 @@
             "description": "Precise monthly income converted to local currency",
             "example": 183500
           },
-          "monthly_income_precise_in_lc_trimed": {
+          "monthly_income_precise_in_lc_trimmed": {
             "type": "string",
-            "description": "Formatted precise monthly income in local currency (Note: API uses 'trimed' with typo)",
+            "description": "Formatted precise monthly income in local currency",
             "example": "183,500"
           },
           "monthly_income_less_precise": {
@@ -26039,9 +26039,24 @@
             "description": "Gift amount",
             "example": 5000
           },
+          "amount_in_lc": {
+            "type": "number",
+            "description": "Gift amount in local currency",
+            "example": 18350
+          },
+          "amount_in_lc_trimmed": {
+            "type": "string",
+            "description": "Formatted gift amount in local currency",
+            "example": "18,350"
+          },
           "period": {
             "type": "string",
-            "description": "Time period for the milestone",
+            "description": "Milestone gift period (e.g., '6m', '1y')",
+            "example": "6m"
+          },
+          "period_label": {
+            "type": "string",
+            "description": "Human-readable period label",
             "example": "6 months"
           }
         }
