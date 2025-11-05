@@ -92,6 +92,10 @@
     {
       "name": "OneSignal",
       "description": "Endpoints for managing OneSignal push notification subscriptions and player IDs. Handles device registration, subscription management, and logout cleanup for push notifications. All endpoints require Bearer token authentication using Laravel Sanctum."
+    },
+    {
+      "name": "User Actions",
+      "description": "The User Actions API provides endpoints for manually tracking user behavior and actions within the platform. Some actions (load_more_profiles, subscription_attempt, and deposit_action) are automatically tracked by their respective APIs and do not need to be called manually. All endpoints require Bearer token authentication."
     }
   ],
   "paths": {
@@ -23421,6 +23425,190 @@
             "content": {
               "application/json": {
                 "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user-actions/track": {
+      "post": {
+        "summary": "Track User Action",
+        "description": "Track a user action for analytics and reporting purposes.\n\n## Overview\n\nThe User Actions API provides an endpoint for manually tracking user behavior and actions within the platform. Note that some actions (`load_more_profiles`, `subscription_attempt`, and `deposit_action`) are automatically tracked by their respective APIs and do not need to be called manually.\n\n## Action Types\n\n**Manually Tracked Actions:**\n- `profile_visit` - User visits another user's profile\n- `chat_attempt` - User attempts to initiate a chat\n- `deposit_page_visit` - User visits the deposit page\n\n**Automatically Tracked Actions** (no manual API calls needed):\n- `load_more_profiles` - Automatically tracked via Search API when users load more profiles\n- `subscription_attempt` - Automatically tracked via Subscription API when users attempt to subscribe\n- `deposit_action` - Automatically tracked via Deposit API when users perform deposit actions\n\n## Platform Detection\n\nIf the `platform` parameter is not provided, the system will automatically detect the platform from the request headers. The platform can be `mobile` or `website`.\n\n## Rate Limiting\n\nThis endpoint is subject to rate limiting. Excessive requests may result in temporary suspension.",
+        "tags": ["User Actions"],
+        "security": [{"bearerAuth": []}],
+        "operationId": "trackUserAction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action_type"],
+                "properties": {
+                  "action_type": {
+                    "type": "string",
+                    "description": "The type of action being tracked",
+                    "enum": ["load_more_profiles", "profile_visit", "chat_attempt", "subscription_attempt", "deposit_page_visit", "deposit_action"],
+                    "example": "profile_visit"
+                  },
+                  "action_data": {
+                    "type": "object",
+                    "description": "Additional data specific to the action type",
+                    "example": {
+                      "visited_username": "john_doe",
+                      "visited_user_id": 123
+                    }
+                  },
+                  "platform": {
+                    "type": "string",
+                    "description": "Platform identifier: mobile or website. If not provided, platform will be automatically detected from the request",
+                    "enum": ["mobile", "website"],
+                    "example": "website"
+                  }
+                }
+              },
+              "examples": {
+                "profile_visit": {
+                  "summary": "Track Profile Visit",
+                  "value": {
+                    "action_type": "profile_visit",
+                    "action_data": {
+                      "visited_username": "john_doe",
+                      "visited_user_id": 123
+                    },
+                    "platform": "website"
+                  }
+                },
+                "chat_attempt": {
+                  "summary": "Track Chat Attempt",
+                  "value": {
+                    "action_type": "chat_attempt",
+                    "action_data": {
+                      "target_username": "jane_doe",
+                      "target_user_id": 456
+                    },
+                    "platform": "mobile"
+                  }
+                },
+                "deposit_page_visit": {
+                  "summary": "Track Deposit Page Visit",
+                  "value": {
+                    "action_type": "deposit_page_visit",
+                    "platform": "website"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success - Action tracked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Action tracked successfully"
+                    }
+                  }
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Action tracked successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Action tracked successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/UnauthorizedError"}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error - Invalid parameters or action type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid action type or data"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "example": {
+                        "action_type": ["The action type field is required."]
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "ValidationError": {
+                    "summary": "Validation error - missing action type",
+                    "value": {
+                      "error": true,
+                      "message": "Invalid action type or data",
+                      "errors": {
+                        "action_type": ["The action type field is required."]
+                      }
+                    }
+                  },
+                  "InvalidActionType": {
+                    "summary": "Invalid action type",
+                    "value": {
+                      "error": true,
+                      "message": "Invalid action type or data",
+                      "errors": {
+                        "action_type": ["The selected action type is invalid."]
+                      }
+                    }
+                  },
+                  "InvalidPlatform": {
+                    "summary": "Invalid platform",
+                    "value": {
+                      "error": true,
+                      "message": "Invalid action type or data",
+                      "errors": {
+                        "platform": ["The selected platform is invalid."]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Server-side issue",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
               }
             }
           }
