@@ -27,7 +27,7 @@
     },
     {
       "name": "Profile",
-      "description": "Endpoints for viewing, updating, and managing the authenticated user's profile information, such as personal details, preferences, photos, and account settings. Includes comprehensive Profile Images and Albums API for organizing user photos into different categories like personal photos, places visited, interests, and fashion choices."
+      "description": "Endpoints for viewing, updating, and managing the authenticated user's profile information, such as personal details, preferences, photos, and account settings. Includes comprehensive Profile Images and Albums API for organizing user photos into different categories like personal photos, places visited, interests, and fashion choices.\n\n**Recent Changes (October 2025):**\n- `/api/profile/about` endpoint now includes `partner_preference` (required) and `lifestyle_support_budget` (optional) fields\n- For users with active subscriptions (role: 'rs'), lifestyle support budget changes are stored as pending and applied after subscription ends\n- `/api/profile/basic-info` now includes financial profile information\n- `/api/profile/picture` maximum file size increased from 5MB to 10MB\n- `/api/profile/relationship` endpoint: `partner_preference` field is deprecated (still supported for compatibility)\n- `/api/profile/financial` endpoint: `lifestyle_support_budget` field has been removed (now managed through `/api/profile/about`)\n- All update endpoints now return detailed change tracking in the `changes` response object"
     },
     {
       "name": "Financial Profile",
@@ -1053,7 +1053,7 @@
     "/profile/basic-info": {
       "get": {
         "summary": "Get Basic Info",
-        "description": "Get your basic profile information including personal details, contact information, and profile settings.",
+        "description": "Get your basic profile information including personal details, contact information, profile settings, and financial profile information.",
         "tags": [
           "Profile"
         ],
@@ -2281,7 +2281,7 @@
     "/profile/picture": {
       "post": {
         "summary": "Upload Profile Picture",
-        "description": "Upload or update your profile picture. The image will be automatically resized and optimized for web display.",
+        "description": "Upload or update your profile picture. The image will be automatically resized and optimized for web display.\n\n**Recent Changes (October 2025):**\n- Maximum file size increased from 5MB to 10MB",
         "tags": [
           "Profile"
         ],
@@ -2419,7 +2419,7 @@
     "/profile/about": {
       "post": {
         "summary": "Update About Section",
-        "description": "Update your profile's about section including basic information, personal details, location preferences, languages, hobbies, partner preference, lifestyle support budget, and extended descriptions. For users with active subscriptions (role: 'rs'), lifestyle support budget changes are stored as pending and applied after subscription ends. Currency conversion is automatic if user's currency differs from system default.",
+        "description": "Update your profile's about section including basic information, personal details, location preferences, languages, hobbies, partner preference, lifestyle support budget, and extended descriptions.\n\n**Recent Changes (October 2025):**\n- Added `partner_preference` field (required) - Preferred partner gender: \"male\", \"female\", or \"any\"\n- Added `lifestyle_support_budget` field (optional) - Monthly lifestyle support budget (0-1000000)\n- For users with active subscriptions (role: 'rs'), lifestyle support budget changes are now stored as pending and applied after subscription ends\n- Lifestyle support budget is automatically converted to the system's standard currency if user's currency differs\n\nAll changes are tracked in the `changes` response object, showing old values, new values, and user-friendly messages for all modified fields.",
         "tags": [
           "Profile"
         ],
@@ -2874,10 +2874,25 @@
                             "description": "Plain text version of the change message for mobile display"
                           },
                           "display_value": {
-                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\", \"$5,000\")"
+                          },
+                          "display_value_array": {
+                            "description": "Array of formatted values for array-based fields (e.g., languages, hobbies, milestone_gifts). Used for mobile display styling.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "old_display_value": {
-                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
+                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\", \"$4,000\")"
+                          },
+                          "action": {
+                            "type": "string",
+                            "description": "Optional action identifier (e.g., \"upgrade_budget_payment\" for lifestyle_support_budget changes for RS users)"
+                          },
+                          "action_label": {
+                            "type": "string",
+                            "description": "Optional action label (e.g., \"Complete Payment\")"
                           }
                         }
                       }
@@ -2890,6 +2905,20 @@
                       "data": {
                         "id": 123,
                         "public_username": "john_doe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "full_name": "John Doe",
+                        "email": "john@example.com",
+                        "gender": "male",
+                        "partner_preference": "female",
+                        "relationship_goals": "marriage",
+                        "role": "user",
+                        "profile_picture_url": "https://example.com/storage/profile-pictures/123_1640995200.jpg",
+                        "hide_images": 0,
+                        "initials": "JD",
+                        "lifestyle_support_budget": 5000,
+                        "lifestyle_support_budget_trimmed": "5,000",
+                        "has_enough_descriptions": true,
                         "profile": {
                           "birth_date": "1990-05-15",
                           "age_display": "Show Exact Age",
@@ -2941,6 +2970,13 @@
                               "emoji": "📸"
                             }
                           ]
+                        },
+                        "financialProfile": {
+                          "currency": "USD",
+                          "pending_lifestyle_support_budget": 0,
+                          "pending_lifestyle_support_budget_trimmed": "0",
+                          "lifestyle_support_budget": 5000,
+                          "lifestyle_support_budget_trimmed": "5,000"
                         }
                       },
                       "changes": {
@@ -2950,6 +2986,7 @@
                           "message": "Username has been changed from john_doe_old to john_doe",
                           "plain_message": "Username has been changed from john_doe_old to john_doe",
                           "display_value": "john_doe",
+                          "display_value_array": null,
                           "old_display_value": "john_doe_old"
                         },
                         "short_intro": {
@@ -2958,6 +2995,7 @@
                           "message": "Short introduction has been changed from Old introduction to Looking for meaningful connections",
                           "plain_message": "Short introduction has been changed from Old introduction to Looking for meaningful connections",
                           "display_value": "Looking for meaningful connections",
+                          "display_value_array": null,
                           "old_display_value": "Old introduction"
                         },
                         "weight": {
@@ -2966,6 +3004,7 @@
                           "message": "Weight has been changed from 75 kg to 70 kg",
                           "plain_message": "Weight has been changed from 75 kg to 70 kg",
                           "display_value": "70 kg",
+                          "display_value_array": null,
                           "old_display_value": "75 kg"
                         },
                         "extended_description": {
@@ -2974,39 +3013,46 @@
                           "message": "Extended descriptions have been updated",
                           "plain_message": "Extended descriptions have been updated",
                           "display_value": null,
+                          "display_value_array": null,
                           "old_display_value": null
                         },
                         "languages": {
                           "old": {"en": 4, "fr": 2},
                           "new": {"en": 5, "es": 3},
-                          "message": "Languages have been updated",
-                          "plain_message": "Languages have been updated",
+                          "message": "Languages have been updated:",
+                          "plain_message": "Languages have been updated:",
                           "display_value": null,
+                          "display_value_array": ["English (5)", "Spanish (3)"],
                           "old_display_value": null
                         },
                         "hobbies": {
                           "old": ["Photography", "Reading"],
                           "new": ["Photography", "Cooking"],
-                          "message": "Hobbies have been updated",
-                          "plain_message": "Hobbies have been updated",
+                          "message": "Hobbies have been updated:",
+                          "plain_message": "Hobbies have been updated:",
                           "display_value": null,
+                          "display_value_array": ["Photography", "Cooking"],
                           "old_display_value": null
                         },
                         "partner_preference": {
                           "old": "any",
                           "new": "female",
-                          "message": "Partner preference has been changed from any to female",
-                          "plain_message": "Partner preference has been changed from any to female",
-                          "display_value": "female",
-                          "old_display_value": "any"
+                          "message": "Partner preference has been changed from Any to Female",
+                          "plain_message": "Partner preference has been changed from Any to Female",
+                          "display_value": "Female",
+                          "display_value_array": null,
+                          "old_display_value": "Any"
                         },
                         "lifestyle_support_budget": {
-                          "old": "4000.00",
-                          "new": "5000.00",
-                          "message": "Lifestyle support budget has been changed from 4000.00 to 5000.00",
-                          "plain_message": "Lifestyle support budget has been changed from 4000.00 to 5000.00",
-                          "display_value": "5000.00",
-                          "old_display_value": "4000.00"
+                          "old": 4000,
+                          "new": 5000,
+                          "message": "Lifestyle support budget has been changed from $4,000 to $5,000",
+                          "plain_message": "Lifestyle support budget has been changed from $4,000 to $5,000",
+                          "display_value": "$5,000",
+                          "display_value_array": null,
+                          "old_display_value": "$4,000",
+                          "action": "upgrade_budget_payment",
+                          "action_label": "Complete Payment"
                         }
                       }
                     }
@@ -3114,7 +3160,7 @@
     "/profile/relationship": {
       "post": {
         "summary": "Update Relationship Preferences",
-        "description": "Update your relationship preferences and goals including relationship goals, duration preferences, and availability times. Note: Partner preference is managed through the /api/profile/about endpoint.",
+        "description": "Update your relationship preferences and goals including relationship goals, duration preferences, and availability times.\n\n**Note**: The `partner_preference` field is now primarily managed through the `/api/profile/about` endpoint. While it's still included here for compatibility, it's recommended to update partner preference using the about endpoint.",
         "tags": [
           "Profile"
         ],
@@ -3154,12 +3200,19 @@
                     "type": "boolean",
                     "description": "Available in evening",
                     "example": false
+                  },
+                  "partner_preference": {
+                    "type": "string",
+                    "description": "Preferred partner gender: 'male', 'female', or 'any'. **Deprecated**: This field is now primarily managed through the /api/profile/about endpoint. Still supported for compatibility.",
+                    "enum": ["male", "female", "any"],
+                    "example": "female"
                   }
                 }
               },
               "x-examples": {
                 "Example 1": {
                   "relationship_goals": "marriage",
+                  "partner_preference": "female",
                   "duration_preference": "long_term",
                   "available_time_morning": true,
                   "available_time_afternoon": true,
@@ -3249,10 +3302,25 @@
                             "description": "Plain text version of the change message for mobile display"
                           },
                           "display_value": {
-                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                            "description": "The formatted new value for styling purposes"
+                          },
+                          "display_value_array": {
+                            "description": "Array of formatted values for array-based fields. Used for mobile display styling.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "old_display_value": {
-                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
+                            "description": "The formatted old value for styling purposes"
+                          },
+                          "action": {
+                            "type": "string",
+                            "description": "Optional action identifier"
+                          },
+                          "action_label": {
+                            "type": "string",
+                            "description": "Optional action label"
                           }
                         }
                       }
@@ -3266,6 +3334,7 @@
                         "id": 1,
                         "user_id": 123,
                         "relationship_goals": "marriage",
+                        "partner_preference": "female",
                         "duration_preference": "long_term",
                         "available_time_morning": true,
                         "available_time_afternoon": true,
@@ -3280,6 +3349,7 @@
                           "message": "Relationship goals has been changed from casual to marriage",
                           "plain_message": "Relationship goals has been changed from casual to marriage",
                           "display_value": "marriage",
+                          "display_value_array": null,
                           "old_display_value": "casual"
                         },
                         "duration_preference": {
@@ -3288,6 +3358,7 @@
                           "message": "Duration preference has been changed from short_term to long_term",
                           "plain_message": "Duration preference has been changed from short_term to long_term",
                           "display_value": "long_term",
+                          "display_value_array": null,
                           "old_display_value": "short_term"
                         }
                       }
@@ -3375,7 +3446,7 @@
     "/profile/financial": {
       "post": {
         "summary": "Update Financial Profile",
-        "description": "Update your financial profile information including capital level, income details, child payments, marriage gifts, and milestone settings. Note: The lifestyle_support_budget field has been moved to /api/profile/about endpoint. For detailed financial profile documentation, see Financial Profile API.",
+        "description": "Update your financial profile information including capital level, income details, child payments, marriage gifts, and milestone settings.\n\n**Recent Changes (October 2025):**\n- **Removed**: `lifestyle_support_budget` field - Now managed through `/api/profile/about` endpoint\n\nFor detailed financial profile documentation, see Financial Profile API.",
         "tags": [
           "Profile"
         ],
@@ -3546,10 +3617,25 @@
                             "description": "Plain text version of the change message for mobile display"
                           },
                           "display_value": {
-                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                            "description": "The formatted new value for styling purposes (e.g., \"$5,000\", \"10%\")"
+                          },
+                          "display_value_array": {
+                            "description": "Array of formatted values for array-based fields (e.g., milestone_gifts). Used for mobile display styling.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "old_display_value": {
-                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
+                            "description": "The formatted old value for styling purposes (e.g., \"$4,000\", \"8%\")"
+                          },
+                          "action": {
+                            "type": "string",
+                            "description": "Optional action identifier"
+                          },
+                          "action_label": {
+                            "type": "string",
+                            "description": "Optional action label"
                           }
                         }
                       }
@@ -3562,35 +3648,52 @@
                       "data": {
                         "id": 1,
                         "user_id": 123,
-                        "capital_level_precise": "100000-250000",
-                        "monthly_income_precise": "10000-15000",
-                        "first_child_payment": "5000.00",
-                        "second_child_payment": "3000.00",
-                        "subsequent_child_payment": "2000.00",
-                        "monthly_child_budget": "1500.00",
-                        "marriage_gift": "10000.00",
-                        "growth_bonus": "10",
-                        "growth_clause": "12",
-                        "termination_comp": "15000.00",
-                        "termination_clause": "6",
+                        "currency": "USD",
+                        "capital_level_precise": "1000000",
+                        "capital_level_less_precise": null,
+                        "monthly_income_precise": "50000",
+                        "monthly_income_less_precise": null,
+                        "first_child_payment": 10000,
+                        "second_child_payment": 8000,
+                        "subsequent_child_payment": 5000,
+                        "monthly_child_budget": 2000,
+                        "marriage_gift": 50000,
+                        "growth_bonus": 10,
+                        "growth_clause": 12,
+                        "termination_comp": 10000,
+                        "termination_clause": 6,
+                        "lifestyle_support_budget": 5000,
+                        "lifestyle_support_budget_in_sc": 5000,
+                        "pending_lifestyle_support_budget": 0,
                         "created_at": "2024-01-15T10:30:00.000000Z",
                         "updated_at": "2024-01-20T14:45:00.000000Z"
                       },
                       "changes": {
+                        "capital_level_precise": {
+                          "old": "500000",
+                          "new": "1000000",
+                          "message": "Capital level (precise) has been changed from $500,000 to $1,000,000",
+                          "plain_message": "Capital level (precise) has been changed from $500,000 to $1,000,000",
+                          "display_value": "$1,000,000",
+                          "display_value_array": null,
+                          "old_display_value": "$500,000"
+                        },
                         "first_child_payment": {
-                          "old": "4000.00",
-                          "new": "5000.00",
-                          "message": "First child payment has been changed from 4000.00 to 5000.00",
-                          "plain_message": "First child payment has been changed from 4000.00 to 5000.00",
-                          "display_value": "5000.00",
-                          "old_display_value": "4000.00"
+                          "old": 4000,
+                          "new": 10000,
+                          "message": "First child payment has been changed from $4,000 to $10,000",
+                          "plain_message": "First child payment has been changed from $4,000 to $10,000",
+                          "display_value": "$10,000",
+                          "display_value_array": null,
+                          "old_display_value": "$4,000"
                         },
                         "milestone_gifts": {
-                          "old": [{"amount": "5000", "period": "6_months"}],
-                          "new": [{"amount": "10000", "period": "12_months"}],
-                          "message": "Milestone gifts have been updated",
-                          "plain_message": "Milestone gifts have been updated",
+                          "old": [{"amount": 5000, "period": "6m"}],
+                          "new": [{"amount": 10000, "period": "12m"}],
+                          "message": "Milestone gifts have been updated:",
+                          "plain_message": "Milestone gifts have been updated:",
                           "display_value": null,
+                          "display_value_array": ["10000 USD for 1 year"],
                           "old_display_value": null
                         }
                       }
@@ -4064,10 +4167,25 @@
                             "description": "Plain text version of the change message for mobile display"
                           },
                           "display_value": {
-                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                            "description": "The formatted new value for styling purposes"
+                          },
+                          "display_value_array": {
+                            "description": "Array of formatted values for array-based fields. Used for mobile display styling.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "old_display_value": {
-                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
+                            "description": "The formatted old value for styling purposes"
+                          },
+                          "action": {
+                            "type": "string",
+                            "description": "Optional action identifier"
+                          },
+                          "action_label": {
+                            "type": "string",
+                            "description": "Optional action label"
                           }
                         }
                       }
@@ -4100,6 +4218,7 @@
                           "message": "Driving license availability has been changed from disabled to enabled",
                           "plain_message": "Driving license availability has been changed from disabled to enabled",
                           "display_value": "enabled",
+                          "display_value_array": null,
                           "old_display_value": "disabled"
                         },
                         "living_format_test_moon": {
@@ -4108,6 +4227,7 @@
                           "message": "Test moon living format has been changed from house to apartment",
                           "plain_message": "Test moon living format has been changed from house to apartment",
                           "display_value": "apartment",
+                          "display_value_array": null,
                           "old_display_value": "house"
                         },
                         "living_format_test_moon_image": {
@@ -4116,6 +4236,7 @@
                           "message": "New photo of Test Moon has been uploaded",
                           "plain_message": "New photo of Test Moon has been uploaded",
                           "display_value": null,
+                          "display_value_array": null,
                           "old_display_value": null
                         },
                         "housing_image": {
@@ -4124,6 +4245,7 @@
                           "message": "New photo of Living Accommodation has been uploaded",
                           "plain_message": "New photo of Living Accommodation has been uploaded",
                           "display_value": null,
+                          "display_value_array": null,
                           "old_display_value": null
                         }
                       }
@@ -5309,10 +5431,25 @@
                             "description": "Plain text version of the change message for mobile display"
                           },
                           "display_value": {
-                            "description": "The formatted new value for styling purposes (e.g., \"70 kg\", \"enabled\")"
+                            "description": "The formatted new value for styling purposes"
+                          },
+                          "display_value_array": {
+                            "description": "Array of formatted values for array-based fields. Used for mobile display styling.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "old_display_value": {
-                            "description": "The formatted old value for styling purposes (e.g., \"75 kg\", \"disabled\")"
+                            "description": "The formatted old value for styling purposes"
+                          },
+                          "action": {
+                            "type": "string",
+                            "description": "Optional action identifier"
+                          },
+                          "action_label": {
+                            "type": "string",
+                            "description": "Optional action label"
                           }
                         }
                       }
@@ -5338,6 +5475,7 @@
                           "message": "Status of registration has been changed from Any Visitor to Registered Visitor",
                           "plain_message": "Status of registration has been changed from Any Visitor to Registered Visitor",
                           "display_value": "Registered Visitor",
+                          "display_value_array": null,
                           "old_display_value": "Any Visitor"
                         },
                         "financial_verification_status": {
@@ -5346,6 +5484,7 @@
                           "message": "Financial verification status has been changed from All Users to Only Verified-Finance Users",
                           "plain_message": "Financial verification status has been changed from All Users to Only Verified-Finance Users",
                           "display_value": "Only Verified-Finance Users",
+                          "display_value_array": null,
                           "old_display_value": "All Users"
                         }
                       }
