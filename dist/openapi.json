@@ -21765,11 +21765,12 @@
                       "type": "boolean",
                       "example": true
                     },
-                    "faqs": {
+                    "data": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/FAQ"
-                      }
+                      },
+                      "description": "Collection of FAQs grouped into categories such as password, account, profile, payment, chat, subscription, and privacy"
                     }
                   }
                 }
@@ -22061,6 +22062,77 @@
                       "example": "Question not found or unauthorized"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/help-center/ai-chat/send-message": {
+      "post": {
+        "summary": "Start or Continue AI Support Chat",
+        "description": "Creates or appends an AI-powered support conversation and returns both the stored user message and the AI-generated reply.",
+        "tags": ["Help Center"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIChatSendMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI chat response or informational message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AIChatSuccessResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AIChatLimitResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AIChatProcessingErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - chat not found or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AIChatNotFoundResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -26044,6 +26116,185 @@
             "format": "date-time",
             "description": "Timestamp when the question was last updated",
             "example": "2024-01-15T10:30:00.000000Z"
+          }
+        }
+      },
+      "AIChatSendMessageRequest": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The message to send to the AI assistant",
+            "maxLength": 5000,
+            "example": "How do I update my profile?"
+          },
+          "ai_chat_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Identifier of an existing AI chat belonging to the authenticated user",
+            "example": 123
+          },
+          "topic": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 255,
+            "description": "Optional topic label for grouping chat messages",
+            "example": "profile"
+          },
+          "topic_type": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 255,
+            "description": "Optional topic type for contextual metadata",
+            "example": "profile"
+          },
+          "topic_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Optional numeric identifier associated with the selected topic",
+            "example": 456
+          }
+        }
+      },
+      "AIChatSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identifier of the AI chat session",
+            "example": 123
+          }
+        }
+      },
+      "AIChatMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identifier of the chat message",
+            "example": 456
+          },
+          "ai_chat_id": {
+            "type": "integer",
+            "description": "Identifier of the AI chat this message belongs to",
+            "example": 123
+          },
+          "user_type": {
+            "type": "string",
+            "description": "Originator of the message",
+            "enum": ["user", "bot"],
+            "example": "user"
+          },
+          "user_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "User ID when applicable",
+            "example": 1
+          },
+          "message": {
+            "type": "string",
+            "description": "Raw text content of the message",
+            "example": "How do I update my profile?"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the message was created",
+            "example": "2025-11-10T09:15:00Z"
+          },
+          "html": {
+            "type": "string",
+            "nullable": true,
+            "description": "Formatted HTML version of the message",
+            "example": "<p>Your formatted AI response.</p>"
+          },
+          "display_time": {
+            "type": "string",
+            "description": "Formatted time string for UI display",
+            "example": "5:15 PM"
+          }
+        }
+      },
+      "AIChatMessagesPayload": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/AIChatMessage"
+          },
+          "assistant": {
+            "$ref": "#/components/schemas/AIChatMessage"
+          }
+        }
+      },
+      "AIChatSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates whether an error occurred",
+            "example": false
+          },
+          "ai_chat": {
+            "$ref": "#/components/schemas/AIChatSummary"
+          },
+          "messages": {
+            "$ref": "#/components/schemas/AIChatMessagesPayload"
+          }
+        }
+      },
+      "AIChatLimitResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates whether the request resulted in an error",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Explanation of the usage limit that was reached",
+            "example": "You have reached the maximum number of questions for now. Please submit a ticket to continue."
+          },
+          "limit_reached": {
+            "type": "boolean",
+            "description": "Indicates whether a limit has been reached",
+            "example": true
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The maximum number of questions allowed in the current period",
+            "example": 30
+          }
+        }
+      },
+      "AIChatProcessingErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates whether an error occurred",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Details about the processing error",
+            "example": "I apologize, but I'm having trouble processing your request right now. Please try again later."
+          }
+        }
+      },
+      "AIChatNotFoundResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "description": "Indicates whether an error occurred",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message when the provided chat is not found or does not belong to the user",
+            "example": "Chat not found."
           }
         }
       },
