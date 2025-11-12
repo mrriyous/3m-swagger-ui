@@ -303,6 +303,69 @@
         }
       }
     },
+    "/register/ip-country": {
+      "get": {
+        "summary": "Resolve IP Country",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Returns the caller's detected public IP address, best-effort country match, and the first matching dial code from `options.coach_phone_country_codes`. Can be overridden during Step 2 by submitting `ip_address`.",
+        "responses": {
+          "200": {
+            "description": "IP detected successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ip_address": {
+                          "type": "string",
+                          "description": "Detected public IPv4/IPv6 address for the request",
+                          "example": "203.0.113.10"
+                        },
+                        "country": {
+                          "type": "string",
+                          "description": "Resolved country name",
+                          "example": "United Arab Emirates"
+                        },
+                        "dial_code": {
+                          "type": "string",
+                          "description": "Dial code matched against `options.coach_phone_country_codes`",
+                          "example": "+971"
+                        }
+                      },
+                      "required": ["ip_address", "country", "dial_code"]
+                    }
+                  },
+                  "required": ["error", "data"]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Successfully resolved IP country and dial code",
+                    "value": {
+                      "error": false,
+                      "data": {
+                        "ip_address": "203.0.113.10",
+                        "country": "United Arab Emirates",
+                        "dial_code": "+971"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-register-ip-country"
+      }
+    },
     "/register": {
       "post": {
         "summary": "Registration",
@@ -324,8 +387,8 @@
                     },
                     "recaptcha_session_id": {
                       "type": "string",
-                      "description": "Session ID for Step 2 reCAPTCHA verification",
-                      "example": "abc123xyz456..."
+                      "description": "Session ID for Step 2 reCAPTCHA verification. Mobile registrations receive an empty string.",
+                      "example": "ZjA5Njc0YmY1M2E4Y2IxMjM0NTY3ODkwMTIzNDU2"
                     }
                   },
                   "required": ["error", "recaptcha_session_id"]
@@ -335,7 +398,14 @@
                     "summary": "Successful Step 1 validation",
                     "value": {
                       "error": false,
-                      "recaptcha_session_id": "abc123xyz456..."
+                      "recaptcha_session_id": "ZjA5Njc0YmY1M2E4Y2IxMjM0NTY3ODkwMTIzNDU2"
+                    }
+                  },
+                  "Mobile Success": {
+                    "summary": "Successful Step 1 validation from mobile (captcha skipped)",
+                    "value": {
+                      "error": false,
+                      "recaptcha_session_id": ""
                     }
                   }
                 }
@@ -430,8 +500,7 @@
                         "email": {
                           "type": "string",
                           "format": "email",
-                          "description": "User's email address",
-                          "nullable": true,
+                          "description": "User's verified email address",
                           "example": "john@example.com"
                         },
                         "gender": {
@@ -458,12 +527,43 @@
                         "affiliate_code": {
                           "type": "string",
                           "description": "User's generated affiliate code",
-                          "example": "ABC123XYZ"
+                          "example": "A1B2C3"
+                        },
+                        "phone_country_code": {
+                          "type": "string",
+                          "description": "Selected dial code for the user's phone number",
+                          "example": "+971"
+                        },
+                        "phone_number": {
+                          "type": "string",
+                          "description": "Phone number without dial code",
+                          "example": "501234567"
+                        },
+                        "phone_number_full": {
+                          "type": "string",
+                          "description": "Dial code concatenated with phone number",
+                          "example": "+971501234567"
+                        },
+                        "preferred_contact": {
+                          "type": "string",
+                          "description": "Preferred contact method",
+                          "nullable": true,
+                          "example": "whatsapp"
+                        },
+                        "age": {
+                          "type": "integer",
+                          "description": "User's age in years",
+                          "example": 32
+                        },
+                        "age_display": {
+                          "type": "string",
+                          "description": "Age visibility preference",
+                          "example": "Show Exact Age"
                         },
                         "is_test_user": {
-                          "type": "integer",
+                          "type": "boolean",
                           "description": "Indicates if user is a test user",
-                          "example": 0
+                          "example": false
                         },
                         "timeoffset": {
                           "type": "number",
@@ -484,12 +584,18 @@
                           "example": "2024-03-20T10:00:00Z"
                         }
                       },
-                      "required": ["id", "login_name", "public_username", "first_name", "last_name", "gender", "partner_preference", "role", "affiliate_code", "is_test_user", "created_at", "updated_at"]
+                      "required": ["id", "login_name", "public_username", "email", "gender", "partner_preference", "role", "affiliate_code", "phone_country_code", "phone_number_full", "is_test_user", "created_at", "updated_at"]
                     },
                     "token": {
                       "type": "string",
                       "description": "Authentication token for the created user",
                       "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                    },
+                    "ga_event": {
+                      "type": "string",
+                      "description": "Google Analytics event identifier returned for non test users in production.",
+                      "nullable": true,
+                      "example": "reg_success"
                     }
                   },
                   "required": ["error", "user", "token"]
@@ -510,13 +616,20 @@
                         "partner_preference": "female",
                         "duration_preference": "long_term_relationship",
                         "role": "rs",
-                        "affiliate_code": "ABC123XYZ",
-                        "is_test_user": 0,
+                        "affiliate_code": "A1B2C3",
+                        "phone_country_code": "+971",
+                        "phone_number": "501234567",
+                        "phone_number_full": "+971501234567",
+                        "preferred_contact": "whatsapp",
+                        "age": 32,
+                        "age_display": "Show Exact Age",
+                        "is_test_user": false,
                         "timeoffset": -300,
                         "created_at": "2024-03-20T10:00:00Z",
                         "updated_at": "2024-03-20T10:00:00Z"
                       },
-                      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                      "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                      "ga_event": "reg_success"
                     }
                   }
                 }
@@ -545,13 +658,15 @@
                         }
                       },
                       "example": {
-                        "recaptcha_session_id": ["reCAPTCHA verification failed. Please try again"],
+                        "recaptcha": ["reCAPTCHA verification failed. Please try again"],
+                        "recaptcha_session_id": ["Invalid or expired session. Please retry Step 1."],
                         "gender": ["Gender is required"],
                         "partner_preference": ["Partner preference is required"],
-                        "duration_preference": ["Please select your relationship duration preference"],
                         "role": ["Role is required"],
                         "budget": ["Minimum budget required is 100"],
-                        "currency": ["Invalid currency"]
+                        "currency": ["Currency must exist in the supported list"],
+                        "age": ["Age must be between 18 and 100"],
+                        "phone_number": ["Phone number must be between 7 and 15 digits"]
                       }
                     }
                   },
@@ -563,13 +678,15 @@
                     "value": {
                       "error": true,
                       "errors": {
-                        "recaptcha_session_id": ["reCAPTCHA verification failed. Please try again"],
+                        "recaptcha": ["reCAPTCHA verification failed. Please try again"],
+                        "recaptcha_session_id": ["Invalid or expired session. Please retry Step 1."],
                         "gender": ["Gender is required"],
                         "partner_preference": ["Partner preference is required"],
-                        "duration_preference": ["Please select your relationship duration preference"],
                         "role": ["Role is required"],
                         "budget": ["Minimum budget required is 100"],
-                        "currency": ["Invalid currency"]
+                        "currency": ["Currency must exist in the supported list"],
+                        "age": ["Age must be between 18 and 100"],
+                        "phone_number": ["Phone number must be between 7 and 15 digits"]
                       }
                     }
                   }
@@ -579,7 +696,7 @@
           }
         },
         "operationId": "registration",
-        "description": "Registration API with two-step process for user account creation.\n\n## Step 1: Initial Validation\nValidates user credentials and performs reCAPTCHA verification. Returns a session ID for Step 2.\n\n## Step 2: Complete Registration\nCompletes user registration with additional profile information and creates the user account.\n\n### Key Features:\n- Two-step registration process with reCAPTCHA verification\n- Mobile registration support (skips reCAPTCHA when is_mobile=Y)\n- Comprehensive validation for all fields\n- Automatic profile creation (financial, relationship, visibility settings)\n- Affiliate/referral system support\n- Timezone handling with offset or timezone identifier\n- Budget conversion to system default currency\n- RocketChat integration\n- Email verification and welcome notifications\n- Test user detection (login_name starting with 'test_')\n\n### Validation Rules:\n- login_name: 4-20 chars, alphanumeric with ._\n- public_username: 3-20 chars, alphanumeric with ._\n- password: min 8 chars, 1 uppercase, 1 number, 1 special char\n- email: valid email format (optional)\n- budget: minimum 100\n- gender: male, female, other\n- partner_preference: male, female, any\n- duration_preference: short_term_relationship, medium_term_relationship, long_term_relationship\n- role: rs, srs\n- currency: valid currency code\n",
+        "description": "Registration API with a two-step process for user account creation.\n\n## Step 1: Initial Validation\nValidates core credentials, performs captcha verification when required, and returns a session ID for Step 2.\n\n## Step 2: Complete Registration\nCaptures profile, preference, and contact information, creates the user, and triggers onboarding automations.\n\n### Key Features:\n- Two-step registration with reCAPTCHA verification persisted via session ID\n- Mobile registration support (skips reCAPTCHA and session validation when `is_mobile = \"Y\"`)\n- Comprehensive validation including age, phone uniqueness, and budget thresholds\n- Automatic profile bootstrap (basic, financial, relationship, visibility)\n- Referral and affiliate linkage, marketing attribution, and timezone capture\n- Rocket.Chat user provisioning and welcome notification queueing\n- Google Analytics success events suppressed for test users (`login_name` prefixed with `test_`/`Test_` or matching `test\\d+_`)\n\n### Validation Rules:\n#### Step 1 (Initial Validation)\n- `step`: must equal `1`\n- `login_name`: 5-20 chars, letters/digits/`.`/`_`, case-insensitive unique\n- `public_username`: 5-20 chars, letters/digits/`.`/`_`, case-insensitive unique\n- `email`: required, valid format, case-insensitive unique\n- `password`: ≥8 chars, at least 1 uppercase, 1 lowercase, 1 digit, 1 special character; `password_confirmation` must match\n- `terms_accepted`: must equal `\"1\"`\n- `recaptcha`: required unless `is_mobile` = `\"Y\"`\n\n#### Step 2 (Complete Registration)\n- `step`: must equal `2`\n- Re-submit all Step 1 fields with the same constraints\n- `recaptcha_session_id`: must match Step 1 response unless `is_mobile` = `\"Y\"`\n- `gender`: one of `male`, `female`, `other`\n- `partner_preference`: one of `male`, `female`, `any`\n- `role`: one of `rs`, `srs`\n- `budget`: numeric, minimum `100`\n- `currency`: must exist in the currencies table (e.g. `USD`, `AED`)\n- `age`: integer 18-100\n- `age_display`: one of `Show Exact Age`, `Show Age Range`, `Hide Age`\n- `phone_country_code`: must match configured dial codes\n- `phone_number`: 7-15 digits after sanitisation; unique per dial code\n- Optional: `duration_preference`, `preferred_contact`, `ip_address`, `referrer_domain`, `referrer_url`, `utm_campaign`, `affiliate_code`, `timeoffset`, `timezone`, `first_name`, `last_name`\n\n### Behaviour Notes\n- Captcha session validation is skipped for mobile registrations\n- Age and phone validations enforce real-world bounds and uniqueness per dial code\n- Timezones prefer `timeoffset` (JavaScript `getTimezoneOffset()`), falling back to `timezone`, defaulting to UTC when absent\n- Successful registration queues welcome, verification, support, affiliate, and referral notifications\n- Rocket.Chat user provisioning runs asynchronously; failures are logged without blocking registration",
         "requestBody": {
           "content": {
             "application/json": {
@@ -608,7 +725,7 @@
                     "password_confirmation": "Password123!",
                     "terms_accepted": "1",
                     "recaptcha": "03AFcWeA5...",
-                    "recaptcha_session_id": "abc123xyz456...",
+                    "recaptcha_session_id": "ZjA5Njc0YmY1M2E4Y2IxMjM0NTY3ODkwMTIzNDU2",
                     "is_mobile": "N",
                     "gender": "male",
                     "partner_preference": "female",
@@ -616,8 +733,13 @@
                     "role": "rs",
                     "budget": 5000,
                     "currency": "USD",
-                    "timeoffset": -300,
-                    "affiliate_code": "REF123ABC"
+                    "age": 32,
+                    "age_display": "Show Exact Age",
+                    "phone_country_code": "+971",
+                    "phone_number": "501234567",
+                    "preferred_contact": "whatsapp",
+                    "affiliate_code": "REF123ABC",
+                    "timeoffset": -300
                   },
                   "Mobile Registration (Step 1)": {
                     "step": 1,
@@ -646,6 +768,11 @@
                     "role": "rs",
                     "budget": 5000,
                     "currency": "USD",
+                    "age": 32,
+                    "age_display": "Show Exact Age",
+                    "phone_country_code": "+971",
+                    "phone_number": "501234567",
+                    "preferred_contact": "whatsapp",
                     "timezone": "America/New_York",
                     "affiliate_code": "REF123ABC"
                   }
@@ -659,44 +786,44 @@
                   },
                   "login_name": {
                     "type": "string",
-                    "description": "Unique identifier for login. 4-20 characters, alphanumeric with ._ allowed.",
-                    "minLength": 4,
+                    "description": "Unique identifier for login. 5-20 characters, letters, digits, period, or underscore only; case-insensitive unique.",
+                    "minLength": 5,
                     "maxLength": 20,
                     "pattern": "^[a-zA-Z0-9._]+$",
                     "example": "johndoe123"
                   },
                   "public_username": {
                     "type": "string",
-                    "description": "Display name visible to other users. 3-20 characters, alphanumeric with ._ allowed.",
-                    "minLength": 3,
+                    "description": "Display name visible to other users. 5-20 characters, letters, digits, period, or underscore only; case-insensitive unique.",
+                    "minLength": 5,
                     "maxLength": 20,
                     "pattern": "^[a-zA-Z0-9._]+$",
                     "example": "JohnDoe"
                   },
                   "first_name": {
                     "type": "string",
-                    "description": "User's first name. Required for Step 2.",
+                    "description": "User's first name. Optional but recommended for onboarding.",
                     "nullable": true,
                     "example": "John"
                   },
                   "last_name": {
                     "type": "string",
-                    "description": "User's last name. Required for Step 2.",
+                    "description": "User's last name. Optional but recommended for onboarding.",
                     "nullable": true,
                     "example": "Doe"
                   },
                   "email": {
                     "type": "string",
                     "format": "email",
-                    "description": "User's email address. Optional but recommended.",
-                    "nullable": true,
+                    "description": "User's primary contact email. Required for both steps; case-insensitive unique.",
+                    "nullable": false,
                     "example": "john@example.com"
                   },
                   "password": {
                     "type": "string",
-                    "description": "Account password. Minimum 8 characters, must contain 1 uppercase letter, 1 number, and 1 special character.",
+                    "description": "Account password. Minimum 8 characters, must contain at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.",
                     "minLength": 8,
-                    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]",
+                    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$",
                     "example": "Password123!"
                   },
                   "password_confirmation": {
@@ -718,7 +845,7 @@
                   },
                   "recaptcha_session_id": {
                     "type": "string",
-                    "description": "Session ID from Step 1. Required for Step 2 unless is_mobile=Y.",
+                    "description": "Session ID from Step 1. Required for Step 2 unless is_mobile=Y. Mobile registrations receive an empty string.",
                     "nullable": true,
                     "example": "abc123xyz456..."
                   },
@@ -762,8 +889,32 @@
                   },
                   "currency": {
                     "type": "string",
-                    "description": "User's preferred currency code. Required for Step 2.",
+                    "description": "User's preferred currency code. Must match an existing currency record. Required for Step 2.",
                     "example": "USD"
+                  },
+                  "age": {
+                    "type": "integer",
+                    "description": "User's age in years. Must be between 18 and 100. Required for Step 2.",
+                    "minimum": 18,
+                    "maximum": 100,
+                    "example": 32
+                  },
+                  "age_display": {
+                    "type": "string",
+                    "description": "Age visibility preference. Required for Step 2.",
+                    "enum": ["Show Exact Age", "Show Age Range", "Hide Age"],
+                    "example": "Show Exact Age"
+                  },
+                  "phone_country_code": {
+                    "type": "string",
+                    "description": "Dial code selected from options.coach_phone_country_codes. Required for Step 2.",
+                    "example": "+971"
+                  },
+                  "phone_number": {
+                    "type": "string",
+                    "description": "Phone number without the dial code. Must be 7-15 digits after sanitisation. Required for Step 2.",
+                    "pattern": "^\\d{7,15}$",
+                    "example": "501234567"
                   },
                   "timeoffset": {
                     "type": "number",
@@ -782,9 +933,40 @@
                     "description": "Referral code from another user. Optional.",
                     "nullable": true,
                     "example": "REF123ABC"
+                  },
+                  "preferred_contact": {
+                    "type": "string",
+                    "description": "Preferred communications channel. Optional.",
+                    "enum": ["phone_call", "whatsapp", "video_call", "text_message"],
+                    "nullable": true,
+                    "example": "whatsapp"
+                  },
+                  "ip_address": {
+                    "type": "string",
+                    "description": "Override for detected public IP address. Optional; accepts IPv4 or IPv6.",
+                    "nullable": true,
+                    "example": "203.0.113.10"
+                  },
+                  "referrer_domain": {
+                    "type": "string",
+                    "description": "Attribution source domain. Optional.",
+                    "nullable": true,
+                    "example": "example.com"
+                  },
+                  "referrer_url": {
+                    "type": "string",
+                    "description": "Attribution source URL. Optional.",
+                    "nullable": true,
+                    "example": "https://example.com/campaign"
+                  },
+                  "utm_campaign": {
+                    "type": "string",
+                    "description": "Marketing campaign identifier. Optional.",
+                    "nullable": true,
+                    "example": "wintersale"
                   }
                 },
-                "required": ["step", "login_name", "public_username", "password", "password_confirmation", "terms_accepted"]
+                "required": ["step", "login_name", "public_username", "email", "password", "password_confirmation", "terms_accepted"]
               },
               "examples": {}
             }
@@ -18126,6 +18308,122 @@
             }
           }
         }
+      }
+    },
+    "/options/contact-preference": {
+      "get": {
+        "summary": "Contact Preference Options",
+        "tags": [
+          "Options"
+        ],
+        "description": "Returns dial codes and coach contact methods for use during registration. Data is sourced from `config/options.php` (`coach_phone_country_codes`, `coach_contact_methods`) and is presented in the predefined product order.",
+        "responses": {
+          "200": {
+            "description": "Options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "phone_country_codes": {
+                      "type": "array",
+                      "description": "List of available dial codes",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "example": "United Arab Emirates"
+                          },
+                          "value": {
+                            "type": "string",
+                            "example": "+971"
+                          },
+                          "display": {
+                            "type": "string",
+                            "description": "Human-friendly combination of country and dial code",
+                            "example": "+971 • United Arab Emirates"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "Absolute flag icon URL prefixed with `config('app.url')`",
+                            "example": "https://startup2050.com/storage/flags/ae.svg"
+                          }
+                        },
+                        "required": ["label", "value", "display", "icon"]
+                      }
+                    },
+                    "contact_methods": {
+                      "type": "array",
+                      "description": "Preferred outreach channels",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "example": "WhatsApp"
+                          },
+                          "value": {
+                            "type": "string",
+                            "example": "whatsapp"
+                          }
+                        },
+                        "required": ["label", "value"]
+                      }
+                    }
+                  },
+                  "required": ["error", "phone_country_codes", "contact_methods"]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Dial codes and contact methods",
+                    "value": {
+                      "error": false,
+                      "phone_country_codes": [
+                        {
+                          "label": "United Arab Emirates",
+                          "value": "+971",
+                          "display": "+971 • United Arab Emirates",
+                          "icon": "https://startup2050.com/storage/flags/ae.svg"
+                        },
+                        {
+                          "label": "United States",
+                          "value": "+1",
+                          "display": "+1 • United States",
+                          "icon": "https://startup2050.com/storage/flags/us.svg"
+                        }
+                      ],
+                      "contact_methods": [
+                        {
+                          "label": "Phone Call",
+                          "value": "phone_call"
+                        },
+                        {
+                          "label": "WhatsApp",
+                          "value": "whatsapp"
+                        },
+                        {
+                          "label": "Video Call",
+                          "value": "video_call"
+                        },
+                        {
+                          "label": "Text Message",
+                          "value": "text_message"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-options-contact-preference"
       }
     },
     "/options/about-me": {
