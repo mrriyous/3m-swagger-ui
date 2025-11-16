@@ -303,6 +303,183 @@
         }
       }
     },
+    "/email-verification/send-code": {
+      "post": {
+        "summary": "Send Email Verification Code",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Sends a 6-digit non-predictable verification code to the specified email. Re-sending a code revokes any previous unverified codes for the same email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email to verify (case-insensitive)",
+                    "example": "john@example.com"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification code dispatched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "email_verification": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "john@example.com"
+                    }
+                  },
+                  "required": ["error", "email_verification"]
+                },
+                "examples": {
+                  "Success": {
+                    "value": {
+                      "error": false,
+                      "email_verification": "john@example.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "boolean", "example": true },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "example": {
+                        "email": ["Please enter a valid email address"]
+                      }
+                    }
+                  },
+                  "required": ["error", "errors"]
+                },
+                "examples": {
+                  "Invalid Email": {
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "email": ["Please enter a valid email address"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/email-verification/verify": {
+      "post": {
+        "summary": "Verify Email Code",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Verifies the 6-digit code previously sent to the email. Must match the last sent (non-expired) code.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email used to request the code (case-insensitive)",
+                    "example": "john@example.com"
+                  },
+                  "code": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$",
+                    "description": "6-digit verification code",
+                    "example": "123456"
+                  }
+                },
+                "required": ["email", "code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "boolean", "example": false },
+                    "valid": { "type": "boolean", "example": true },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "john@example.com"
+                    }
+                  },
+                  "required": ["error", "valid", "email"]
+                },
+                "examples": {
+                  "Success": {
+                    "value": {
+                      "error": false,
+                      "valid": true,
+                      "email": "john@example.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Invalid Code": {
+                    "value": {
+                      "error": true,
+                      "message": "The verification code is incorrect or has expired."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/register/ip-country": {
       "get": {
         "summary": "Resolve IP Country",
@@ -666,7 +843,8 @@
                         "budget": ["Minimum budget required is 100"],
                         "currency": ["Currency must exist in the supported list"],
                         "age": ["Age must be between 18 and 100"],
-                        "phone_number": ["Phone number must be between 7 and 15 digits"]
+                        "phone_number": ["Phone number must be between 7 and 15 digits"],
+                        "email": ["The verification code is incorrect or has expired"]
                       }
                     }
                   },
@@ -686,7 +864,8 @@
                         "budget": ["Minimum budget required is 100"],
                         "currency": ["Currency must exist in the supported list"],
                         "age": ["Age must be between 18 and 100"],
-                        "phone_number": ["Phone number must be between 7 and 15 digits"]
+                        "phone_number": ["Phone number must be between 7 and 15 digits"],
+                        "email": ["The verification code is incorrect or has expired"]
                       }
                     }
                   }
@@ -737,6 +916,7 @@
                     "age_display": "Show Exact Age",
                     "phone_country_code": "+971",
                     "phone_number": "501234567",
+                    "email_verification_code": "123456",
                     "preferred_contact": "whatsapp",
                     "affiliate_code": "REF123ABC",
                     "timeoffset": -300
@@ -772,6 +952,7 @@
                     "age_display": "Show Exact Age",
                     "phone_country_code": "+971",
                     "phone_number": "501234567",
+                    "email_verification_code": "123456",
                     "preferred_contact": "whatsapp",
                     "timezone": "America/New_York",
                     "affiliate_code": "REF123ABC"
@@ -915,6 +1096,12 @@
                     "description": "Phone number without the dial code. Must be 7-15 digits after sanitisation. Required for Step 2.",
                     "pattern": "^\\d{7,15}$",
                     "example": "501234567"
+                  },
+                  "email_verification_code": {
+                    "type": "string",
+                    "description": "6-digit code from email verification. Required for Step 2 to mark the email as verified.",
+                    "pattern": "^[0-9]{6}$",
+                    "example": "123456"
                   },
                   "timeoffset": {
                     "type": "number",
