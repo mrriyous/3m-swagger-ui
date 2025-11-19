@@ -15889,6 +15889,50 @@
         "tags": [
           "Reports & Interactions"
         ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Sort field: created_at, monthly_budget, or age",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["created_at", "monthly_budget", "age"],
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Sort direction: asc or desc",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Archived profiles retrieved successfully",
@@ -16065,7 +16109,7 @@
           }
         ],
         "summary": "Add profile to archived",
-        "description": "Archives a user profile for the authenticated user",
+        "description": "Archives a user profile for the authenticated user. Archiving a profile will automatically remove it from Saved and Interested lists.",
         "tags": [
           "Reports & Interactions"
         ],
@@ -16109,7 +16153,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Profile archived successfully",
+                      "message": "Profile has been archived.",
                       "data": {}
                     }
                   }
@@ -16188,7 +16232,7 @@
                   },
                   "x-examples": {
                     "Example 1": {
-                      "message": "Profile removed from archive"
+                      "message": "Profile has been removed from archive."
                     }
                   }
                 }
@@ -16233,6 +16277,50 @@
         "description": "Retrieves the list of profiles that the authenticated user has saved",
         "tags": [
           "Reports & Interactions"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Sort field: created_at, monthly_budget, or age",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["created_at", "monthly_budget", "age"],
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Sort direction: asc or desc",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -16410,7 +16498,7 @@
           }
         ],
         "summary": "Add profile to saved",
-        "description": "Saves a user profile for the authenticated user",
+        "description": "Saves a user profile for the authenticated user. Saving a profile will automatically remove it from Archived and Interested lists.",
         "tags": [
           "Reports & Interactions"
         ],
@@ -16454,7 +16542,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Profile saved successfully",
+                      "message": "Profile has been saved.",
                       "data": {}
                     }
                   }
@@ -16479,7 +16567,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": true,
-                      "message": "You already saved this user"
+                      "message": "You have already saved this user."
                     }
                   }
                 }
@@ -16533,7 +16621,7 @@
                   },
                   "x-examples": {
                     "Example 1": {
-                      "message": "Profile removed from saved"
+                      "message": "Profile has been removed from saved."
                     }
                   }
                 }
@@ -16554,6 +16642,50 @@
         "description": "Retrieves the list of profiles that the authenticated user has marked as interested",
         "tags": [
           "Reports & Interactions"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Sort field: created_at, monthly_budget, or age",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["created_at", "monthly_budget", "age"],
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Sort direction: asc or desc",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -16691,7 +16823,7 @@
                           "first_name": "Alice",
                           "last_name": "Johnson",
                           "email": "srs22@example.com",
-                          "gender": "male",
+                          "gender": "female",
                           "partner_preference": null,
                           "relationship_goals": null,
                           "role": "srs",
@@ -16731,7 +16863,7 @@
           }
         ],
         "summary": "Add profile to interested",
-        "description": "Marks a user profile as interested for the authenticated user",
+        "description": "Marks a user profile as interested for the authenticated user. Marking a profile as interested will automatically remove it from Archived and Saved lists. The target user will receive a notification when you mark them as interested.",
         "tags": [
           "Reports & Interactions"
         ],
@@ -16775,7 +16907,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Profile marked as Interesting. The user has been notified.",
+                      "message": "Profile has been marked as interesting. The user has been notified.",
                       "data": {}
                     }
                   }
@@ -16800,7 +16932,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": true,
-                      "message": "You already marked this user as interesting"
+                      "message": "You have already marked this user as interesting."
                     }
                   }
                 }
@@ -16854,7 +16986,7 @@
                   },
                   "x-examples": {
                     "Example 1": {
-                      "message": "Interest in profile removed"
+                      "message": "Interest in profile has been removed."
                     }
                   }
                 }
