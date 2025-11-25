@@ -87,7 +87,7 @@
     },
     {
       "name": "Account Management",
-      "description": "Endpoints for managing user account settings including username, password, and email updates. All endpoints require authentication using Laravel Sanctum Bearer tokens. Features include validation, activity logging, and security measures for account modifications."
+      "description": "Endpoints for managing user account settings including username, password, email, and phone number updates. All endpoints require authentication using Laravel Sanctum Bearer tokens. Features include validation, activity logging, and security measures for account modifications. Email updates use a two-step verification process (request + verify)."
     },
     {
       "name": "OneSignal",
@@ -22918,10 +22918,10 @@
                 "properties": {
                   "public_username": {
                     "type": "string",
-                    "description": "New public username (3-30 characters, letters, numbers, underscores only)",
-                    "minLength": 3,
-                    "maxLength": 30,
-                    "pattern": "^[a-zA-Z0-9_]+$",
+                    "description": "New public username (5-20 characters, only letters, numbers, dots, and underscores, no spaces, must be unique)",
+                    "minLength": 5,
+                    "maxLength": 20,
+                    "pattern": "^[a-zA-Z0-9._]+$",
                     "example": "newusername"
                   }
                 }
@@ -23051,7 +23051,7 @@
                   },
                   "password": {
                     "type": "string",
-                    "description": "New password (min 8 chars, must contain uppercase, number, special char)",
+                    "description": "New password (minimum 8 characters, must contain uppercase letter, number, and special character)",
                     "minLength": 8,
                     "example": "NewPass123!"
                   },
@@ -23160,10 +23160,10 @@
         }
       }
     },
-    "/api/account/update-email": {
+    "/api/account/update-email-request": {
       "post": {
-        "summary": "Update Email Address",
-        "description": "Updates the user's email address and sends a verification email.",
+        "summary": "Request Email Update",
+        "description": "Requests an email update by sending a verification code to the new email address. This is the first step in the two-step email update process.",
         "tags": ["Account Management"],
         "security": [
           {
@@ -23181,8 +23181,13 @@
                   "email": {
                     "type": "string",
                     "format": "email",
-                    "description": "New email address",
+                    "description": "New email address (must be unique, must be different from current email)",
                     "example": "newemail@example.com"
+                  },
+                  "resend": {
+                    "type": "boolean",
+                    "description": "Set to true to resend verification code for the same email",
+                    "example": false
                   }
                 }
               }
@@ -23191,7 +23196,7 @@
         },
         "responses": {
           "200": {
-            "description": "Email updated successfully",
+            "description": "Verification code sent successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -23203,21 +23208,21 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Email updated successfully. Please check your inbox to verify your new email address."
+                      "example": "Verification code has been sent to your email."
                     },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "email": {
-                          "type": "string",
-                          "example": "newemail@example.com"
-                        },
-                        "email_verified_at": {
-                          "type": "string",
-                          "nullable": true,
-                          "example": null
-                        }
-                      }
+                    "email_verification": {
+                      "type": "string",
+                      "example": "newemail@example.com"
+                    },
+                    "email_verification_expires_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-01-15T10:30:00.000000Z"
+                    },
+                    "email_verification_lifetime": {
+                      "type": "integer",
+                      "description": "Remaining seconds until expiration (typically 600 seconds / 10 minutes)",
+                      "example": 600
                     }
                   }
                 }
@@ -23281,7 +23286,303 @@
                     },
                     "message": {
                       "type": "string",
+                      "example": "Failed to request email update: Database connection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/update-email": {
+      "post": {
+        "summary": "Update Email Address",
+        "description": "Completes the email update process by verifying the code sent to the new email address. This is the second step in the two-step email update process. You must first call update-email-request to receive a verification code.",
+        "tags": ["Account Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code"],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "The verification code sent to the new email address",
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Email has been updated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "string",
+                          "example": "newemail@example.com"
+                        },
+                        "email_verified_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-01-15T10:25:00.000000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Possible error messages: 'Verification code is required', 'No pending email verification found. Please request a new verification code.', 'Invalid or expired verification code', 'This email address is already in use'",
+                      "example": "Verification code is required"
+                    }
+                  }
+                },
+                "examples": {
+                  "code_required": {
+                    "summary": "Code is required",
+                    "value": {
+                      "error": true,
+                      "message": "Verification code is required"
+                    }
+                  },
+                  "no_pending_verification": {
+                    "summary": "No pending verification",
+                    "value": {
+                      "error": true,
+                      "message": "No pending email verification found. Please request a new verification code."
+                    }
+                  },
+                  "invalid_code": {
+                    "summary": "Invalid or expired code",
+                    "value": {
+                      "error": true,
+                      "message": "Invalid or expired verification code"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
                       "example": "Failed to update email: Database connection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/update-phone": {
+      "post": {
+        "summary": "Update Phone Number",
+        "description": "Updates the user's phone number. Phone numbers are sanitized (non-digit characters removed) before validation and storage. Phone number uniqueness is checked using the full phone number (country code + number).",
+        "tags": ["Account Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone_country_code", "phone_number"],
+                "properties": {
+                  "phone_country_code": {
+                    "type": "string",
+                    "description": "Country code with + prefix (e.g., +971, +1)",
+                    "pattern": "^\\+[0-9]+$",
+                    "example": "+971"
+                  },
+                  "phone_number": {
+                    "type": "string",
+                    "description": "Phone number without country code (7-15 digits, must be unique when combined with country code, must be different from current phone number)",
+                    "minLength": 7,
+                    "maxLength": 15,
+                    "pattern": "^[0-9]+$",
+                    "example": "501234567"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone number updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Phone number has been updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "phone_country_code": {
+                          "type": "string",
+                          "example": "+971"
+                        },
+                        "phone_number": {
+                          "type": "string",
+                          "example": "501234567"
+                        },
+                        "phone_number_full": {
+                          "type": "string",
+                          "description": "Full phone number (country code + sanitized phone number)",
+                          "example": "+971501234567"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "phone_country_code": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["Country code is required"]
+                        },
+                        "phone_number": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["This phone number is already registered"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to update phone number: Database connection error"
                     }
                   }
                 }
