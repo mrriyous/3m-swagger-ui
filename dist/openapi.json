@@ -13324,7 +13324,7 @@
                         "unread_count": {
                           "type": "integer",
                           "description": "Total number of unread messages across all chat rooms",
-                          "example": 12
+                          "example": 15
                         }
                       }
                     }
@@ -13391,7 +13391,7 @@
           }
         ],
         "summary": "Get Chat Room",
-        "description": "Retrieves comprehensive information about a specific chat room with a user, including room metadata, last message, chat partner details, subscription information, and room settings. Returns detailed chat room data with timestamps, unread counts, and user preferences.",
+        "description": "Retrieves comprehensive information about a specific chat room with a user, including room metadata, last message, chat partner details, subscription information, and room settings. Returns detailed chat room data with timestamps, unread counts, and user preferences.\n\n**Notes:**\n- If the user is an RS user without an active subscription, `message_hidden` will be `true` and `lastMessage` will be `null`\n- If the user is an RS user with insufficient budget compared to the chat partner, `message_hidden` will be `true` and `message_hidden_text` will provide an explanation",
         "tags": [
           "Chat"
         ],
@@ -13596,6 +13596,34 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden - Chat disabled due to moderation strikes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Chat has been disabled due to moderation strikes"
+                    },
+                    "chat_disabled": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "strike_count": {
+                      "type": "integer",
+                      "example": 5
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found - Chat room not found or user doesn't exist",
             "content": {
@@ -13609,7 +13637,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Chat room not found"
+                      "example": "User not found"
                     }
                   }
                 }
@@ -13906,6 +13934,25 @@
                           "items": {
                             "$ref": "#/components/schemas/MessageObject"
                           }
+                        },
+                        "count": {
+                          "type": "integer",
+                          "description": "Number of messages returned",
+                          "example": 4
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "description": "Pagination offset",
+                          "example": 0
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of messages",
+                          "example": 4
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "example": true
                         }
                       }
                     }
@@ -14100,7 +14147,11 @@
                             "editable": false,
                             "is_edited": false
                           }
-                        ]
+                        ],
+                        "count": 4,
+                        "offset": 0,
+                        "total": 4,
+                        "success": true
                       }
                     }
                   }
@@ -14275,6 +14326,16 @@
                     "message": {
                       "type": "string",
                       "example": "You have blocked this user and cannot send messages to them"
+                    },
+                    "chat_disabled": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Present when chat is disabled due to moderation strikes"
+                    },
+                    "strike_count": {
+                      "type": "integer",
+                      "example": 5,
+                      "description": "Number of moderation strikes (present when chat_disabled is true)"
                     }
                   }
                 }
@@ -14327,6 +14388,16 @@
                     "chat_disabled": {
                       "type": "boolean",
                       "example": false
+                    },
+                    "total_strikes": {
+                      "type": "integer",
+                      "example": 3,
+                      "description": "Total number of moderation strikes for this user pair"
+                    },
+                    "strikes_until_chat_disabled": {
+                      "type": "integer",
+                      "example": 2,
+                      "description": "Number of strikes remaining before chat is disabled"
                     }
                   }
                 }
@@ -15340,6 +15411,106 @@
                     "Example 1": {
                       "error": false,
                       "webview_url": "https://startup2050.com/chats/john_doe?webview_token=abc123def456"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{publicUsername}/typing": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "publicUsername",
+          "in": "path",
+          "required": true,
+          "description": "Public username of the chat partner"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "Typing Indicator",
+        "description": "Sends a typing indicator to notify the chat partner that the user is typing or has stopped typing. The typing indicator is broadcast via WebSocket to the chat partner's private-chat-user.{userId} channel with the event name user.typing. It's recommended to send is_typing: true when the user starts typing and is_typing: false when they stop typing or send a message. The typing indicator automatically expires after a period of inactivity.",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "is_typing": {
+                    "type": "boolean",
+                    "description": "Whether the user is typing (true) or stopped typing (false). Defaults to true",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Typing status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Typing status updated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
                     }
                   }
                 }
