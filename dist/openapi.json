@@ -26896,7 +26896,7 @@
           "importance": {
             "type": "string",
             "enum": ["low", "medium", "high"],
-            "description": "Importance level"
+            "description": "Importance level (low/medium/high)"
           },
           "importance_styling": {
             "type": "string",
@@ -26916,7 +26916,15 @@
           },
           "message": {
             "type": "string",
-            "description": "Full notification message"
+            "description": "Full notification message (raw text)"
+          },
+          "message_in_html": {
+            "type": "string",
+            "description": "Notification message formatted as HTML"
+          },
+          "is_message_hidden": {
+            "type": "boolean",
+            "description": "Whether the message is hidden (e.g., subscription required for Chat notifications)"
           },
           "preview": {
             "type": "string",
