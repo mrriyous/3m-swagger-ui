@@ -79,7 +79,7 @@
     },
     {
       "name": "Transactions",
-      "description": "Endpoints for managing user transactions, including viewing transaction history, details, status, and cancellation. All endpoints require Bearer token authentication using Laravel Sanctum. Supports filtering by status and type, with comprehensive transaction data including payments, subscription plans, and counterparty information. Features include status styling with CSS classes and color codes, pagination, and detailed transaction relationships."
+      "description": "Endpoints for managing user transactions, including viewing transaction history, details, status, and cancellation. All endpoints require Bearer token authentication using Laravel Sanctum. Supports filtering by status (pending, completed, failed, cancelled, rejected) and type (deposit, subscription, budget_upgrade, withdrawal, contract_payment, contract_received, affiliate_earning), with comprehensive transaction data including payments, subscription plans, and counterparty information. Features include status styling with CSS classes and color codes, pagination, detailed transaction relationships, balance history integration, and webview URL support for mobile app integration."
     },
     {
       "name": "Options",
@@ -10093,7 +10093,7 @@
     "/transactions": {
       "get": {
         "summary": "Get Transactions List",
-        "description": "Retrieves a paginated list of the authenticated user's transactions with optional filtering.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n#### Available Status Values\n- `pending` - Transaction is pending processing\n- `completed` - Transaction has been completed successfully\n- `failed` - Transaction has failed\n- `cancelled` - Transaction has been cancelled\n\n#### Available Transaction Types\n- `deposit` - Money deposit to user account\n- `subscription` - Subscription purchase\n- `budget_upgrade` - Budget upgrade payment\n- `withdrawal` - Money withdrawal from user account",
+        "description": "Retrieves a paginated list of the authenticated user's transactions with optional filtering.\n\n#### Authentication\n- Requires authentication token in the request header\n- Token must be obtained through login\n\n#### Available Status Values\n- `pending` - Transaction is pending processing\n- `completed` - Transaction has been completed successfully\n- `failed` - Transaction has failed\n- `cancelled` - Transaction has been cancelled\n- `rejected` - Transaction has been rejected\n\n#### Available Transaction Types\n- `deposit` - Money deposit to user account\n- `subscription` - Subscription purchase\n- `budget_upgrade` - Budget upgrade payment\n- `withdrawal` - Money withdrawal from user account\n- `contract_payment` - Payment for contract service\n- `contract_received` - Received payment from contract\n- `affiliate_earning` - Affiliate commission earning",
         "tags": [
           "Transactions"
         ],
@@ -10115,7 +10115,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["pending", "completed", "failed", "cancelled"]
+              "enum": ["pending", "completed", "failed", "cancelled", "rejected"]
             }
           },
           {
@@ -10125,7 +10125,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["deposit", "subscription", "budget_upgrade", "withdrawal"]
+              "enum": ["deposit", "subscription", "budget_upgrade", "withdrawal", "contract_payment", "contract_received", "affiliate_earning"]
             }
           }
         ],
@@ -10385,6 +10385,79 @@
                           "created_at_local_formatted": {
                             "type": "string",
                             "description": "Human-readable local creation time"
+                          },
+                          "balance_history_type": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Type of balance change (deposit or deduction)"
+                          },
+                          "balance_history_balance_type": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Type of balance affected (active_balance, affiliate_earning_balance, affiliate_purchase_earning_balance)"
+                          },
+                          "balance_history_balance_type_label": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Human-readable label for balance type"
+                          },
+                          "balance_history_amount": {
+                            "type": "number",
+                            "nullable": true,
+                            "description": "Numeric amount of the balance change"
+                          },
+                          "balance_history_amount_trimmed": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Formatted amount string (trailing zeros removed)"
+                          },
+                          "balance_history_currency": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Currency code for the balance change"
+                          },
+                          "display_balance": {
+                            "type": "object",
+                            "description": "Balance information based on transaction status",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Type of balance change (deposit or deduction)"
+                              },
+                              "amount": {
+                                "type": "number",
+                                "description": "Balance change amount"
+                              },
+                              "amount_trimmed": {
+                                "type": "string",
+                                "description": "Formatted amount string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "description": "Currency code"
+                              },
+                              "balance_type": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Type of balance affected"
+                              },
+                              "balance_type_label": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Human-readable label for balance type"
+                              }
+                            }
+                          },
+                          "bank_transfer_reference": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Bank transfer reference number"
+                          },
+                          "webview_url": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Webview URL for mobile app integration with token-based access"
                           }
                         }
                       }
@@ -10450,7 +10523,7 @@
                             "price": 464.00
                           },
                           "counterparty": {
-                            "first_name": "MMM",
+                            "first_name": "MatchMeMuch",
                             "last_name": "Finance",
                             "public_username": "",
                             "profile_picture_url": "https://startup2050.com/static/images/logo.png"
@@ -10469,11 +10542,41 @@
                               "updated_at": "2024-01-01T10:00:00.000000Z"
                             }
                           ],
+                          "balance_history_type": "deduction",
+                          "balance_history_balance_type": "active_balance",
+                          "balance_history_balance_type_label": "Balance",
+                          "balance_history_amount": 464.00,
+                          "balance_history_amount_trimmed": "464",
+                          "balance_history_currency": "USD",
+                          "display_balance": {
+                            "type": "deduction",
+                            "amount": 464.00,
+                            "amount_trimmed": "464",
+                            "currency": "USD",
+                            "balance_type": "active_balance",
+                            "balance_type_label": "Balance"
+                          },
                           "created_at": "2024-01-01T10:00:00.000000Z",
                           "updated_at": "2024-01-01T10:00:00.000000Z",
                           "created_at_local": "2024-01-01T18:00:00.000000Z",
-                          "created_at_local_formatted": "01 Jan 2024 06:00 pm"
-                        },
+                          "created_at_local_formatted": "01 Jan 2024 06:00 pm",
+                          "bank_transfer_reference": null
+                        }
+                      ],
+                      "pagination": {
+                        "total": 25,
+                        "per_page": 10,
+                        "current_page": 1,
+                        "last_page": 3
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "error": false,
+                      "transactions": [
                         {
                           "id": 176,
                           "user_id": 14,
@@ -11636,6 +11739,10 @@
                                 "type": "number",
                                 "description": "Payment amount"
                               },
+                              "amount_trimmed": {
+                                "type": "string",
+                                "description": "Formatted payment amount"
+                              },
                               "amount_in_lc": {
                                 "type": "number",
                                 "description": "Payment amount in local currency"
@@ -11705,6 +11812,88 @@
                               "description": "Subscription end date"
                             }
                           }
+                        },
+                        "balance_history_type": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Type of balance change (deposit or deduction)"
+                        },
+                        "balance_history_balance_type": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Type of balance affected (active_balance, affiliate_earning_balance, affiliate_purchase_earning_balance)"
+                        },
+                        "balance_history_balance_type_label": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Human-readable label for balance type"
+                        },
+                        "balance_history_amount": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "Numeric amount of the balance change"
+                        },
+                        "balance_history_amount_trimmed": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Formatted amount string (trailing zeros removed)"
+                        },
+                        "balance_history_currency": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Currency code for the balance change"
+                        },
+                        "display_balance": {
+                          "type": "object",
+                          "description": "Balance information based on transaction status",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Type of balance change (deposit or deduction)"
+                            },
+                            "amount": {
+                              "type": "number",
+                              "description": "Balance change amount"
+                            },
+                            "amount_trimmed": {
+                              "type": "string",
+                              "description": "Formatted amount string"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "description": "Currency code"
+                            },
+                            "balance_type": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Type of balance affected"
+                            },
+                            "balance_type_label": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Human-readable label for balance type"
+                            }
+                          }
+                        },
+                        "bank_transfer_reference": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Bank transfer reference number"
+                        },
+                        "webview_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Webview URL for mobile app integration with token-based access"
+                        },
+                        "created_at_local": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Transaction creation time in local timezone"
+                        },
+                        "created_at_local_formatted": {
+                          "type": "string",
+                          "description": "Human-readable local creation time"
                         }
                       }
                     }
@@ -11714,12 +11903,17 @@
                       "error": false,
                       "transaction": {
                         "id": 1,
+                        "transaction_number": "TXN-2024-001234",
                         "user_id": 1,
                         "transaction_type": "subscription",
                         "subscription_transaction_type": "subscription",
                         "currency": "USD",
                         "user_currency": "USD",
                         "status": "completed",
+                        "status_label": "Completed",
+                        "status_classes_str": "bg-green-100 text-green-700",
+                        "status_bg_color": "#dcfce7",
+                        "status_text_color": "#15803d",
                         "payment_method": "BTC",
                         "amount": 464.00,
                         "amount_in_lc": 464.00,
@@ -11755,6 +11949,7 @@
                             "transaction_id": 1,
                             "payment_method": "BTC",
                             "amount": 464.00,
+                            "amount_trimmed": "464",
                             "amount_in_lc": 464.00,
                             "currency": "USD",
                             "status": "completed",
@@ -11773,8 +11968,25 @@
                           "start_date": "2024-01-01T10:00:00.000000Z",
                           "end_date": "2024-12-31T23:59:59.000000Z"
                         },
+                        "balance_history_type": null,
+                        "balance_history_balance_type": null,
+                        "balance_history_balance_type_label": null,
+                        "balance_history_amount": null,
+                        "balance_history_amount_trimmed": null,
+                        "balance_history_currency": null,
+                        "display_balance": {
+                          "type": null,
+                          "amount": 0,
+                          "amount_trimmed": "0",
+                          "currency": "USD",
+                          "balance_type": null,
+                          "balance_type_label": null
+                        },
                         "created_at": "2024-01-01T10:00:00.000000Z",
                         "updated_at": "2024-01-01T10:00:00.000000Z",
+                        "created_at_local": "2024-01-01T18:00:00.000000Z",
+                        "created_at_local_formatted": "01 Jan 2024 06:00 pm",
+                        "bank_transfer_reference": null,
                         "deleted_at": null
                       }
                     }
@@ -11832,6 +12044,7 @@
                             "transaction_id": 1,
                             "payment_method": "BTC",
                             "amount": 464.00,
+                            "amount_trimmed": "464",
                             "amount_in_lc": 464.00,
                             "currency": "USD",
                             "status": "completed",
@@ -11850,8 +12063,25 @@
                           "start_date": "2024-01-01T10:00:00.000000Z",
                           "end_date": "2024-12-31T23:59:59.000000Z"
                         },
+                        "balance_history_type": null,
+                        "balance_history_balance_type": null,
+                        "balance_history_balance_type_label": null,
+                        "balance_history_amount": null,
+                        "balance_history_amount_trimmed": null,
+                        "balance_history_currency": null,
+                        "display_balance": {
+                          "type": null,
+                          "amount": 0,
+                          "amount_trimmed": "0",
+                          "currency": "USD",
+                          "balance_type": null,
+                          "balance_type_label": null
+                        },
                         "created_at": "2024-01-01T10:00:00.000000Z",
                         "updated_at": "2024-01-01T10:00:00.000000Z",
+                        "created_at_local": "2024-01-01T18:00:00.000000Z",
+                        "created_at_local_formatted": "01 Jan 2024 06:00 pm",
+                        "bank_transfer_reference": null,
                         "deleted_at": null
                       }
                     }
