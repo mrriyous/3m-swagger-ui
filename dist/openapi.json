@@ -39,7 +39,7 @@
     },
     {
       "name": "Chat",
-      "description": "The Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging. Features include AI-powered content moderation with strike system, file attachments, real-time events, chat archiving, message search, and rate limiting. The API supports both text messages and file attachments, with automatic content moderation that can disable chat between users based on violation strikes."
+      "description": "The Chat API provides comprehensive messaging functionality for the platform, including direct messaging, message management, and chat room operations. All endpoints require authentication and integrate with RocketChat for real-time messaging. Features include AI-powered content moderation with strike system, file attachments, real-time events, chat archiving, message search, and rate limiting. The API supports both text messages and file attachments, with automatic content moderation that can disable chat between users based on violation strikes.\n\n## Message Visibility and Budget Restrictions\n\nFor users with the 'rs' (Relationship Sponsor) role, message visibility is subject to subscription and budget restrictions:\n\n- **Subscription Requirements**: If an RS user does not have an active subscription, `message_hidden` will be `true` and `lastMessage` will be `null`\n- **Budget Requirements**: If an RS user has an active subscription but their monthly budget is lower than the chat partner's budget, `message_hidden` will be `true` and `message_hidden_text` will provide an explanation\n- **Staff Account Exception**: Staff accounts (`is_staff_account: true`) have `non_subscriber_chat_allowed: true`, allowing RS users to chat regardless of subscription status or budget levels. Messages from/to staff accounts are never hidden due to subscription or budget restrictions.\n\nBudget comparisons use system currency conversions (`lifestyle_support_budget_in_sc`) for accurate cross-currency comparisons."
     },
     {
       "name": "Reports & Interactions",
@@ -13621,7 +13621,7 @@
           }
         ],
         "summary": "Get Chat Room",
-        "description": "Retrieves comprehensive information about a specific chat room with a user, including room metadata, last message, chat partner details, subscription information, and room settings. Returns detailed chat room data with timestamps, unread counts, and user preferences.\n\n**Notes:**\n- If the user is an RS user without an active subscription, `message_hidden` will be `true` and `lastMessage` will be `null`\n- If the user is an RS user with insufficient budget compared to the chat partner, `message_hidden` will be `true` and `message_hidden_text` will provide an explanation",
+        "description": "Retrieves comprehensive information about a specific chat room with a user, including room metadata, last message, chat partner details, subscription information, and room settings. Returns detailed chat room data with timestamps, unread counts, and user preferences.\n\n**Notes:**\n- If the user is an RS user without an active subscription, `message_hidden` will be `true` and `lastMessage` will be `null`\n- If the user is an RS user with insufficient budget compared to the chat partner, `message_hidden` will be `true` and `message_hidden_text` will provide an explanation\n- These restrictions do not apply when the chat partner is a staff account (`non_subscriber_chat_allowed: true`)",
         "tags": [
           "Chat"
         ],
@@ -15197,7 +15197,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Successfully archived chat room"
+                      "message": "Successfully archived chat"
                     }
                   }
                 }
@@ -15248,7 +15248,7 @@
                   "x-examples": {
                     "Example 1": {
                       "error": false,
-                      "message": "Successfully deleted chat room"
+                      "message": "Successfully deleted chat"
                     }
                   }
                 }
@@ -25359,25 +25359,52 @@
           "is_sent_by_logged_in_user": { "type": "boolean" },
           "editable": { "type": "boolean" },
           "is_edited": { "type": "boolean" },
-          "msg_shortened": { "type": "string" }
+          "msg_shortened": { "type": "string" },
+          "score": { 
+            "type": "number",
+            "description": "Relevance score for search results (only present in search-messages endpoint)",
+            "example": 0.75,
+            "nullable": true
+          }
         }
       },
       "ChatPartner": {
         "type": "object",
         "properties": {
           "id": { "type": "integer" },
+          "show_only_avatar_uploaded_text": { 
+            "type": "boolean",
+            "description": "Indicates if only avatar is uploaded (no profile images)",
+            "example": false
+          },
           "login_name": { "type": "string" },
           "public_username": { "type": "string" },
           "first_name": { "type": "string", "nullable": true },
           "last_name": { "type": "string", "nullable": true },
-          "email": { "type": "string", "nullable": true },
+          "full_name": { 
+            "type": "string",
+            "description": "Full name (first + last) or public_username if name not available"
+          },
+          "email": { 
+            "type": "string", 
+            "nullable": true,
+            "description": "User's email (hidden for other users, empty string)"
+          },
           "email_verified_at": { "type": "string", "nullable": true },
-          "hide_images": { "type": "integer" },
+          "hide_images": { 
+            "type": "integer",
+            "description": "Whether user has hidden their images (0 = visible, 1 = hidden)",
+            "example": 0
+          },
           "email_verified": { "type": "integer" },
           "gender": { "type": "string" },
           "partner_preference": { "type": "string", "nullable": true },
           "relationship_goals": { "type": "string", "nullable": true },
-          "role": { "type": "string" },
+          "role": { 
+            "type": "string",
+            "description": "User role (rs for Relationship Sponsor, srs for Seeking Relationship Sponsor)",
+            "example": "srs"
+          },
           "created_at": { "type": "string", "format": "date-time" },
           "updated_at": { "type": "string", "format": "date-time" },
           "deleted_at": { "type": "string", "nullable": true },
@@ -25392,12 +25419,50 @@
           "referred_by_user_id": { "type": "integer", "nullable": true },
           "profile_picture_album_url": { "type": "string" },
           "profile_picture_url": { "type": "string" },
-          "full_name": { "type": "string" },
-          "lifestyle_support_budget_in_sc": { 
+          "initials": { 
+            "type": "string",
+            "description": "User's initials",
+            "example": "NN"
+          },
+          "lifestyle_support_budget": { 
             "type": "number",
-            "description": "Chat partner's lifestyle support budget in system currency (used for budget comparison)",
+            "description": "Lifestyle support budget amount (converted to viewer's currency)",
             "example": 5000,
             "nullable": true
+          },
+          "lifestyle_support_budget_trimmed": { 
+            "type": "string",
+            "description": "Formatted lifestyle support budget (e.g., '5,000')",
+            "example": "5,000",
+            "nullable": true
+          },
+          "lifestyle_support_budget_in_sc": { 
+            "type": "number",
+            "description": "Lifestyle support budget in system currency (for budget comparisons)",
+            "example": 5000,
+            "nullable": true
+          },
+          "profileImages": {
+            "type": "array",
+            "description": "Array of profile image objects (if includeProfileImages is enabled)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "url": { "type": "string" },
+                "thumbnail_url": { "type": "string" }
+              }
+            }
+          },
+          "has_enough_descriptions": { 
+            "type": "boolean",
+            "description": "Whether user has enough profile descriptions",
+            "example": true
+          },
+          "non_subscriber_chat_allowed": { 
+            "type": "boolean",
+            "description": "Indicates if chat is allowed without subscription requirements. true for staff accounts (is_staff_account: true), allowing RS users to chat regardless of subscription or budget status",
+            "example": false
           }
         }
       },
@@ -25487,7 +25552,11 @@
             "items": { "type": "string" }
           },
           "_updatedAt": { "type": "string", "format": "date-time" },
-          "lastMessage": { "$ref": "#/components/schemas/LastMessage" },
+          "lastMessage": { 
+            "allOf": [{ "$ref": "#/components/schemas/LastMessage" }],
+            "nullable": true,
+            "description": "Last message in the chat room. Will be null if message_hidden is true due to subscription or budget restrictions"
+          },
           "lm": { "type": "string", "format": "date-time" },
           "subscription": { "$ref": "#/components/schemas/Subscription" },
           "chat_partner": { "$ref": "#/components/schemas/ChatPartner" },
@@ -25580,7 +25649,11 @@
             "items": { "type": "string" }
           },
           "_updatedAt": { "type": "string", "format": "date-time" },
-          "lastMessage": { "$ref": "#/components/schemas/LastMessage" },
+          "lastMessage": { 
+            "allOf": [{ "$ref": "#/components/schemas/LastMessage" }],
+            "nullable": true,
+            "description": "Last message in the chat room. Will be null if message_hidden is true due to subscription or budget restrictions"
+          },
           "lm": { "type": "string", "format": "date-time" },
           "subscription": { "$ref": "#/components/schemas/Subscription" },
           "chat_partner": { "$ref": "#/components/schemas/ChatPartner" },
