@@ -47,7 +47,7 @@
     },
     {
       "name": "Contracts",
-      "description": "Endpoints for managing contracts between sponsors and seekers, including contract creation, approval, modification, and lifecycle management."
+      "description": "Comprehensive API documentation for all contract-related endpoints in the MatchMeMuch Matching Platform. This API enables sponsors and seekers to create, manage, approve, modify, and control the lifecycle of relationship contracts. Features include contract templates, approval workflows, extension requests, stage upgrades (test_moon → preliminary → main), change requests with granular approval, cool-off periods, and comprehensive action tracking. All endpoints require Bearer token authentication.\n\n## Contract Types\n- `test_moon`: Initial test period contract\n- `preliminary`: Preliminary contract stage\n- `main`: Main contract stage\n\n## Contract Status Values\n- `awaiting_sponsor_approval`: Contract is waiting for sponsor approval\n- `awaiting_seeker_approval`: Contract is waiting for seeker approval\n- `active`: Contract is active and running\n- `paused`: Contract is temporarily paused (cool-off period)\n- `expired`: Contract has expired\n- `stopped`: Contract has been stopped\n- `rejected`: Contract has been rejected\n\n## Action Types\n- `offer`: Contract offer action\n- `extend`: Contract extension request\n- `start_next_stage`: Contract upgrade request (test_moon → preliminary → main)\n- `change`: Contract terms change request\n- `stop`: Contract stop action\n- `restart`: Contract restart action\n\n## Action Status Values\n- `pending`: Action is waiting for approval\n- `approved`: Action has been approved (intermediate status)\n- `completed`: Action has been completed\n- `rejected`: Action has been rejected\n\n## Status Color Fields\nAll contract and contract action responses include `status_bg_color` and `status_text_color` fields for consistent UI styling:\n\n### Contract Status Colors\n- **Awaiting Approval** (both sponsor and seeker): `#FEF3C7` (Yellow-100) background, `#A16207` (Yellow-700) text\n- **Active**: `#DCFCE7` (Green-100) background, `#15803D` (Green-700) text\n- **Paused**: `#DBEAFE` (Blue-100) background, `#1D4ED8` (Blue-700) text\n- **Expired/Stopped**: `#FEE2E2` (Red-100) background, `#B91C1C` (Red-700) text\n\n### Contract Action Status Colors\n- **Pending**: `#FEF3C7` (Yellow-100) background, `#A16207` (Yellow-700) text\n- **Approved**: `#DCFCE7` (Green-100) background, `#15803D` (Green-700) text\n- **Rejected**: `#FEE2E2` (Red-100) background, `#B91C1C` (Red-700) text\n- **Completed**: `#DBEAFE` (Blue-100) background, `#1D4ED8` (Blue-700) text\n\n## Financial Fields\nThe following financial fields are available for contracts:\n- `monthly_amount`: Monthly budget amount\n- `monthly_budget_per_child`: Monthly budget per child\n- `financial_gift_per_milestone`: Financial gift per milestone\n- `financial_gift_upon_marriage`: Financial gift upon marriage\n- `relationship_termination_compensation`: Relationship termination compensation\n- `capital_growth_bonus`: Capital growth share percentage (0-100)\n\n## Cool-Off Period\nWhen a contract is stopped, the behavior depends on the contract status:\n- **Active Contracts**: Enter `paused` status with 72-hour cool-off period. Cool-off period starts immediately when stopped. Contract can be restarted within 72 hours by the user who stopped it. Missed time during pause is added to billing when restarted. If not restarted, final payment is processed after cool-off period.\n- **Inactive Contracts** (awaiting approval, expired, etc.): Enter `stopped` status immediately. No cool-off period applies. Contract cannot be restarted (must create new contract).\n\n## Restart Functionality\n- Only the user who stopped the contract can restart it (not the partner)\n- Restarting adds missed days during the pause to the contract expiration date\n- Contract returns to `active` status\n- `paused_at` and `end_date` are cleared\n- All financial obligations resume\n\n## Contract Actions Workflow\n### Pending Actions\nWhen a contract action is created, it goes into a `pending` status and requires approval from the partner. The following actions require partner approval:\n1. **Extension Requests**: When a user requests to extend a contract\n2. **Upgrade Requests**: When a user requests to upgrade to the next contract stage\n3. **Change Requests**: When a user requests to change contract terms\n\n### Action Approval Process\n1. User creates an action (extension, upgrade, or change)\n2. Action is marked as `pending`\n3. Partner receives notification and can approve or reject\n4. If approved, action status becomes `approved` then `completed`\n5. If rejected, action status becomes `rejected`\n\n### Action Conflicts\n- Users cannot create new actions if there are pending actions of the same type\n- Users cannot create conflicting changes to fields that are already pending approval\n- All pending actions must be resolved before new actions can be created\n\n## Contract Type Progression Rules\n- `test_moon` can upgrade to: `preliminary` or `main`\n- `preliminary` can upgrade to: `main`\n- `main` cannot be upgraded further"
     },
     {
       "name": "People",
@@ -16969,7 +16969,7 @@
     "/contracts/has-active-contracts": {
       "get": {
         "summary": "Check Active Contracts",
-        "description": "Checks if the authenticated user has any active contracts.",
+        "description": "Checks if the authenticated user has any active contracts and pending contracts.",
         "tags": ["Contracts"],
         "responses": {
           "200": {
@@ -16981,11 +16981,32 @@
                 },
                 "examples": {
                   "Example 1": {
-                    "summary": "User has active contracts",
+                    "summary": "User has active and pending contracts",
                     "value": {
                       "error": false,
                       "active_contracts": 1,
-                      "has_active_contracts": true
+                      "has_active_contracts": true,
+                      "pending_contracts": [
+                        {
+                          "id": 2,
+                          "contract_id": "XYZ67890",
+                          "contract_type": "test_moon",
+                          "status": "awaiting_seeker_approval",
+                          "sponsor": {
+                            "id": 3,
+                            "first_name": "Bob",
+                            "last_name": "Wilson",
+                            "public_username": "bobwilson"
+                          },
+                          "seeker": {
+                            "id": 1,
+                            "first_name": "John",
+                            "last_name": "Doe",
+                            "public_username": "johndoe"
+                          }
+                        }
+                      ],
+                      "has_pending_contracts": true
                     }
                   },
                   "Example 2": {
@@ -16993,7 +17014,9 @@
                     "value": {
                       "error": false,
                       "active_contracts": 0,
-                      "has_active_contracts": false
+                      "has_active_contracts": false,
+                      "pending_contracts": [],
+                      "has_pending_contracts": false
                     }
                   }
                 }
@@ -17573,10 +17596,10 @@
                 },
                 "examples": {
                   "Example 1": {
-                    "summary": "Contract cannot be extended",
+                    "summary": "Cannot approve this contract",
                     "value": {
                       "error": true,
-                      "message": "Contract cannot be extended"
+                      "message": "You cannot approve this contract"
                     }
                   },
                   "Example 2": {
@@ -17632,6 +17655,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RejectContractResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Contract rejected successfully",
+                    "value": {
+                      "error": false,
+                      "message": "Contract rejected successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "summary": "Cannot reject this contract",
+                    "value": {
+                      "error": true,
+                      "message": "You cannot reject this contract"
+                    }
+                  }
                 }
               }
             }
@@ -17642,7 +17693,7 @@
     "/contracts/{contractId}/extend": {
       "post": {
         "summary": "Extend Contract",
-        "description": "Requests to extend an active contract.",
+        "description": "Requests to extend an active contract. The extension request requires partner approval. The total contract duration cannot exceed 365 days.",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -17713,7 +17764,7 @@
     "/contracts/{contractId}/start-next-stage": {
       "post": {
         "summary": "Start Next Stage",
-        "description": "Requests to upgrade contract to the next stage (test_moon → preliminary → main). Contract type progression rules: test_moon can upgrade to preliminary or main, preliminary can upgrade to main, main cannot be upgraded further.",
+        "description": "Requests to upgrade contract to the next stage (test_moon → preliminary → main).\n\n## Contract Type Progression Rules\n- `test_moon` can upgrade to: `preliminary` or `main`\n- `preliminary` can upgrade to: `main`\n- `main` cannot be upgraded further",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -17838,7 +17889,7 @@
     "/contracts/{contractId}/change": {
       "post": {
         "summary": "Change Contract",
-        "description": "Requests to change contract terms.",
+        "description": "Requests to change contract terms. The change request requires partner approval. Partners can selectively approve or reject individual changes using the `confirmChanges` endpoint. All changes must be different from current contract terms.",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -17963,7 +18014,7 @@
     "/contracts/{contractId}/stop": {
       "post": {
         "summary": "Stop Contract",
-        "description": "Stops an active contract and starts a 72-hour cool-off period.",
+        "description": "Stops a contract. Behavior depends on the contract status:\n\n- **Active contracts**: Enters a 72-hour cool-off period (status becomes `paused`)\n  - Cool-off period starts immediately when stopped\n  - Contract can be restarted within 72 hours by the user who stopped it\n  - Missed time during pause is added to billing when restarted\n  - If not restarted, final payment is processed after cool-off period\n  - Response includes `cool_off_ends_at` timestamp\n\n- **Inactive contracts**: Immediately stopped (status becomes `stopped`)\n  - No cool-off period applies\n  - Contract cannot be restarted (must create new contract)\n  - Response includes `cool_off_ends_at` as `null`",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -17986,7 +18037,7 @@
                 },
                 "examples": {
                   "Example 1": {
-                    "summary": "Contract stopped successfully",
+                    "summary": "Active Contract - Cool-Off Period",
                     "value": {
                       "error": false,
                       "message": "The cool off period has been started.",
@@ -17999,7 +18050,40 @@
                         "contract_type_str": "Test Moon",
                         "status": "paused",
                         "status_str": "Paused",
+                        "status_bg_color": "#DBEAFE",
+                        "status_text_color": "#1D4ED8",
                         "paused_at": "2024-01-15T10:00:00Z",
+                        "end_date": "2024-01-15",
+                        "sponsor": {
+                          "id": 1,
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        "seeker": {
+                          "id": 2,
+                          "first_name": "Jane",
+                          "last_name": "Smith"
+                        }
+                      }
+                    }
+                  },
+                  "Example 2": {
+                    "summary": "Inactive Contract - Full Stop",
+                    "value": {
+                      "error": false,
+                      "message": "Contract stopped successfully!",
+                      "sub_messages": "",
+                      "cool_off_ends_at": null,
+                      "contract": {
+                        "id": 1,
+                        "contract_id": "ABC12345",
+                        "contract_type": "test_moon",
+                        "contract_type_str": "Test Moon",
+                        "status": "stopped",
+                        "status_str": "Stopped",
+                        "status_bg_color": "#FEE2E2",
+                        "status_text_color": "#B91C1C",
+                        "stopped_at": "2024-01-15T10:00:00Z",
                         "end_date": "2024-01-15",
                         "sponsor": {
                           "id": 1,
@@ -18043,7 +18127,7 @@
     "/contracts/{contractId}/restart": {
       "post": {
         "summary": "Restart Contract",
-        "description": "Restarts a stopped contract.",
+        "description": "Restarts a stopped contract. Only the user who stopped the contract can restart it (not the partner). Restarting adds missed days during the pause to the contract expiration date. Contract returns to `active` status. `paused_at` and `end_date` are cleared. All financial obligations resume.",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -18130,7 +18214,7 @@
     "/contracts/{contractId}/actions/{actionId}/approve": {
       "post": {
         "summary": "Approve Contract Action",
-        "description": "Approves a pending contract action (extension, upgrade, or change request).",
+        "description": "Approves a pending contract action (extension or upgrade request). This endpoint automatically applies all changes in the action.\n\n**Note**: For `change` type actions, use the `confirmChanges` endpoint instead, which allows selective approval/rejection of individual changes.\n\n## Supported Action Types\n- `extend`: Extension requests - automatically extends the contract expiration date\n- `start_next_stage`: Upgrade requests - automatically upgrades the contract type and applies all changes",
         "tags": ["Contracts"],
         "parameters": [
           {
@@ -18224,7 +18308,7 @@
     "/contracts/{contractId}/actions/{actionId}/confirm-changes": {
       "post": {
         "summary": "Confirm Changes",
-        "description": "Confirms or rejects specific changes in a contract change request.",
+        "description": "Confirms or rejects specific changes in a contract change request. This endpoint allows granular control over which changes to accept or reject within a change action.\n\n**Note**: For `extend` and `start_next_stage` actions, use the `approveAction` endpoint instead, which automatically approves all changes.\n\n## Supported Change Fields\nThe following fields can be confirmed/rejected:\n- `duration_days`: Contract duration in days\n- `monthly_amount`: Monthly budget amount\n- `contract_type`: Contract type (for next stage actions)\n- `capital_growth_bonus`: Capital growth share percentage\n- `monthly_budget_per_child`: Monthly budget per child\n- `financial_gift_per_milestone`: Financial gift per milestone\n- `financial_gift_upon_marriage`: Financial gift upon marriage\n- `relationship_termination_compensation`: Relationship termination compensation\n- `extension_days`: Extension days (for extend actions)\n\n## Notes\n- All changes can be rejected if needed\n- Only accepted changes are applied to the contract\n- The `contract_action` field contains the updated action with acceptance/rejection status for each change\n- Accepted changes update the contract immediately\n- Rejected changes are recorded but do not affect the contract",
         "tags": ["Contracts"],
         "parameters": [
           {
