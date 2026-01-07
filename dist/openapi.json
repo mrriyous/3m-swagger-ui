@@ -87,7 +87,7 @@
     },
     {
       "name": "Account Management",
-      "description": "Endpoints for managing user account settings including username, password, email, and phone number updates. All endpoints require authentication using Laravel Sanctum Bearer tokens. Features include validation, activity logging, and security measures for account modifications. Email updates use a two-step verification process (request + verify)."
+      "description": "Endpoints for managing user account settings including username, password, email updates, and account deletion. All endpoints require authentication using Laravel Sanctum Bearer tokens. Features include validation, activity logging, and security measures for account modifications. Email updates automatically send verification emails. Account deletion permanently soft-deletes the user account, stops all contracts, removes tokens, and cleans up OneSignal subscriptions."
     },
     {
       "name": "OneSignal",
@@ -22972,10 +22972,10 @@
                 "properties": {
                   "public_username": {
                     "type": "string",
-                    "description": "New public username (5-20 characters, only letters, numbers, dots, and underscores, no spaces, must be unique)",
-                    "minLength": 5,
-                    "maxLength": 20,
-                    "pattern": "^[a-zA-Z0-9._]+$",
+                    "description": "New public username (3-30 characters, only letters, numbers, and underscores, no spaces, must be unique)",
+                    "minLength": 3,
+                    "maxLength": 30,
+                    "pattern": "^[a-zA-Z0-9_]+$",
                     "example": "newusername"
                   }
                 }
@@ -23050,6 +23050,53 @@
                           },
                           "example": ["This public username is already taken"]
                         }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "username_required": {
+                    "summary": "Username is required",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "public_username": ["Public username is required"]
+                      }
+                    }
+                  },
+                  "username_length": {
+                    "summary": "Username length invalid",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "public_username": ["Public username must be between 3 and 30 characters"]
+                      }
+                    }
+                  },
+                  "username_invalid_chars": {
+                    "summary": "Username contains invalid characters",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "public_username": ["Public username can only contain letters, numbers, and underscores"]
+                      }
+                    }
+                  },
+                  "username_spaces": {
+                    "summary": "Username contains spaces",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "public_username": ["Public username cannot contain spaces"]
+                      }
+                    }
+                  },
+                  "username_taken": {
+                    "summary": "Username already taken",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "public_username": ["This public username is already taken"]
                       }
                     }
                   }
@@ -23184,6 +23231,80 @@
                           },
                           "example": ["Password must contain at least one special character"]
                         }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "current_password_required": {
+                    "summary": "Current password is required",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "current_password": ["Current password is required"]
+                      }
+                    }
+                  },
+                  "current_password_incorrect": {
+                    "summary": "Current password is incorrect",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "current_password": ["The current password is incorrect"]
+                      }
+                    }
+                  },
+                  "password_required": {
+                    "summary": "New password is required",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "password": ["New password is required"]
+                      }
+                    }
+                  },
+                  "password_length": {
+                    "summary": "Password too short",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "password": ["Password must be at least 8 characters long"]
+                      }
+                    }
+                  },
+                  "password_uppercase": {
+                    "summary": "Password missing uppercase",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "password": ["Password must contain at least one uppercase letter"]
+                      }
+                    }
+                  },
+                  "password_number": {
+                    "summary": "Password missing number",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "password": ["Password must contain at least one number"]
+                      }
+                    }
+                  },
+                  "password_special": {
+                    "summary": "Password missing special character",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "password": ["Password must contain at least one special character"]
+                      }
+                    }
+                  },
+                  "password_confirmation": {
+                    "summary": "Password confirmation mismatch",
+                    "value": {
+                      "error": true,
+                      "errors": {
+                        "password": ["Password confirmation does not match"]
                       }
                     }
                   }
@@ -23353,7 +23474,7 @@
     "/api/account/update-email": {
       "post": {
         "summary": "Update Email Address",
-        "description": "Completes the email update process by verifying the code sent to the new email address. This is the second step in the two-step email update process. You must first call update-email-request to receive a verification code.",
+        "description": "Updates the user's email address and sends a verification email. After updating the email, the user will need to verify the new email address before it becomes active. A verification email will be sent automatically.",
         "tags": ["Account Management"],
         "security": [
           {
@@ -23366,12 +23487,13 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["code"],
+                "required": ["email"],
                 "properties": {
-                  "code": {
+                  "email": {
                     "type": "string",
-                    "description": "The verification code sent to the new email address",
-                    "example": "123456"
+                    "format": "email",
+                    "description": "New email address (must be unique, valid email format)",
+                    "example": "newemail@example.com"
                   }
                 }
               }
@@ -23392,7 +23514,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Email has been updated successfully."
+                      "example": "Email updated successfully. Please check your inbox to verify your new email address."
                     },
                     "data": {
                       "type": "object",
@@ -23404,7 +23526,8 @@
                         "email_verified_at": {
                           "type": "string",
                           "format": "date-time",
-                          "example": "2024-01-15T10:25:00.000000Z"
+                          "nullable": true,
+                          "example": null
                         }
                       }
                     }
@@ -23440,33 +23563,46 @@
                       "type": "boolean",
                       "example": true
                     },
-                    "message": {
-                      "type": "string",
-                      "description": "Possible error messages: 'Verification code is required', 'No pending email verification found. Please request a new verification code.', 'Invalid or expired verification code', 'This email address is already in use'",
-                      "example": "Verification code is required"
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["This email address is already in use"]
+                        }
+                      }
                     }
                   }
                 },
                 "examples": {
-                  "code_required": {
-                    "summary": "Code is required",
+                  "email_required": {
+                    "summary": "Email is required",
                     "value": {
                       "error": true,
-                      "message": "Verification code is required"
+                      "errors": {
+                        "email": ["Email address is required"]
+                      }
                     }
                   },
-                  "no_pending_verification": {
-                    "summary": "No pending verification",
+                  "invalid_email": {
+                    "summary": "Invalid email format",
                     "value": {
                       "error": true,
-                      "message": "No pending email verification found. Please request a new verification code."
+                      "errors": {
+                        "email": ["Please enter a valid email address"]
+                      }
                     }
                   },
-                  "invalid_code": {
-                    "summary": "Invalid or expired code",
+                  "email_taken": {
+                    "summary": "Email already in use",
                     "value": {
                       "error": true,
-                      "message": "Invalid or expired verification code"
+                      "errors": {
+                        "email": ["This email address is already in use"]
+                      }
                     }
                   }
                 }
@@ -23637,6 +23773,88 @@
                     "message": {
                       "type": "string",
                       "example": "Failed to update phone number: Database connection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account": {
+      "delete": {
+        "summary": "Delete Account",
+        "description": "Permanently deletes the authenticated user's account. This action is irreversible. Once deleted, the user cannot log in again and will not be visible in the system.\n\n**⚠️ WARNING: This action is irreversible.**\n\n**What Happens When Account is Deleted:**\n\n1. **Contracts:**\n   - All active and paused contracts are stopped (status set to `STOPPED`)\n   - All awaiting approval contracts are rejected\n   - Contract action records are created with reason \"Account deleted\"\n   - Contract partners are notified (via ContractService)\n\n2. **Authentication:**\n   - All user's access tokens are deleted\n   - User cannot authenticate with existing tokens\n   - Soft-deleted users are automatically excluded from authentication attempts\n\n3. **Notifications:**\n   - OneSignal subscriptions are removed\n   - User will no longer receive push notifications\n\n4. **Account Status:**\n   - User account is soft-deleted (`deleted_at` timestamp is set)\n   - User will not appear in search results or any user listings\n   - User data is preserved in database but hidden from normal queries\n\n5. **Activity Logging:**\n   - Account deletion is logged with user details\n   - User action is tracked for analytics\n\n**Important Notes:**\n- This operation is performed within a database transaction for data integrity\n- If contract stopping fails, the error is logged but account deletion continues\n- The user is immediately logged out after successful deletion\n- Deleted users cannot be recovered through the API (requires database intervention)",
+        "tags": ["Account Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "No request body is required. The authenticated user is automatically identified from the Bearer token.",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Your account has been successfully deleted. You will not be able to log in again."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthenticated."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to delete account. Please try again later or contact support."
                     }
                   }
                 }
