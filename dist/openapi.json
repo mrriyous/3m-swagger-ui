@@ -309,7 +309,7 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Sends a verification code to the user's email address. Can be used for initial verification or resending codes.\n\n**Notes:**\n- Verification codes expire after 10 minutes (600 seconds)\n- Accounts may be temporarily locked after multiple failed verification attempts\n- Re-sending a code (with `resend: true` or by calling again) will revoke any previous unverified codes for the same email",
+        "description": "Sends a 6-digit verification code to the specified email address. Codes expire after 30 minutes. Maximum 5 incorrect attempts per code, with a 15-minute lockout after 5 failed attempts. Requesting a new code automatically revokes any previous unverified codes for the same email.",
         "requestBody": {
           "required": true,
           "content": {
@@ -373,28 +373,15 @@
                       "format": "email",
                       "description": "The email address that received the code",
                       "example": "john@example.com"
-                    },
-                    "email_verification_expires_at": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "ISO 8601 timestamp when the code expires",
-                      "example": "2024-01-15T10:30:00.000000Z"
-                    },
-                    "email_verification_lifetime": {
-                      "type": "integer",
-                      "description": "Code lifetime in seconds (typically 600 seconds / 10 minutes).",
-                      "example": 600
                     }
                   },
-                  "required": ["error", "email_verification", "email_verification_expires_at", "email_verification_lifetime"]
+                  "required": ["error", "email_verification"]
                 },
                 "examples": {
                   "Success": {
                     "value": {
                       "error": false,
-                      "email_verification": "john@example.com",
-                      "email_verification_expires_at": "2024-01-15T10:30:00.000000Z",
-                      "email_verification_lifetime": 600
+                      "email_verification": "john@example.com"
                     }
                   }
                 }
@@ -435,11 +422,11 @@
                       }
                     }
                   },
-                  "Too Many Attempts": {
-                    "summary": "Too Many Verification Attempts",
+                  "Locked": {
+                    "summary": "Email Locked - Too Many Incorrect Attempts",
                     "value": {
                       "error": true,
-                      "message": "Too many verification attempts. Please try again later."
+                      "message": "Too many incorrect attempts. Please try again after 15 minutes."
                     }
                   },
                   "Email Already Registered": {
@@ -464,7 +451,7 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Verifies the email verification code entered by the user.\n\n**Status Codes:**\n- `422`: Invalid code or expired\n- `429`: Account locked due to too many failed attempts\n\n**Error Types:**\n- `invalid_code`: Code is incorrect or expired\n- `locked`: Account temporarily locked due to excessive failed attempts\n- `expired`: Code has expired",
+        "description": "Verifies a 6-digit code sent to the email address. This endpoint validates the code but does not mark it as verified in the database. The code is marked as verified only during registration Step 2 when `email_verification_code` is included. After 5 failed attempts, the account is locked for 15 minutes.",
         "requestBody": {
           "required": true,
           "content": {
@@ -529,7 +516,7 @@
             }
           },
           "422": {
-            "description": "Invalid code or expired",
+            "description": "Invalid code, expired, or not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -538,12 +525,18 @@
                     "error": { "type": "boolean", "example": true },
                     "message": { 
                       "type": "string",
-                      "example": "The verification code is incorrect or has expired."
+                      "description": "Error message describing the issue"
                     },
                     "error_type": {
                       "type": "string",
-                      "enum": ["invalid_code", "expired"],
+                      "enum": ["invalid", "expired", "not_found"],
                       "description": "Type of error encountered"
+                    },
+                    "remaining_attempts": {
+                      "type": "integer",
+                      "description": "Number of attempts remaining before lockout (only present for invalid code errors)",
+                      "nullable": true,
+                      "example": 3
                     }
                   },
                   "required": ["error", "message", "error_type"]
@@ -553,16 +546,25 @@
                     "summary": "Invalid Code",
                     "value": {
                       "error": true,
-                      "message": "The verification code is incorrect or has expired.",
-                      "error_type": "invalid_code"
+                      "message": "The verification code is incorrect.",
+                      "error_type": "invalid",
+                      "remaining_attempts": 3
                     }
                   },
                   "Expired Code": {
                     "summary": "Expired Code",
                     "value": {
                       "error": true,
-                      "message": "The verification code is incorrect or has expired.",
+                      "message": "This code has expired. Please request a new one.",
                       "error_type": "expired"
+                    }
+                  },
+                  "Not Found": {
+                    "summary": "No Verification Code Found",
+                    "value": {
+                      "error": true,
+                      "message": "No verification code found. Please request a new one.",
+                      "error_type": "not_found"
                     }
                   }
                 }
@@ -624,13 +626,13 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Returns the caller's public IP, a best-effort country match, and the first matching dial code from the dial codes configuration.\n\nIf the IP address cannot be geolocated or no matching dial code is found, `dial_code` and `dial_country_name` will be `null`.",
+        "description": "Returns the caller's public IP, a best-effort country match, and the first matching dial code from the dial codes configuration. If the IP address cannot be geolocated or no matching dial code is found, `dial_code` and `dial_country_name` will be `null`.",
         "parameters": [
           {
             "name": "ip_address",
             "in": "query",
             "required": true,
-            "description": "Valid IPv4 or IPv6 address. IP address to geolocate. Required.",
+            "description": "Valid IPv4 or IPv6 address. IP address to geolocate.",
             "schema": {
               "type": "string",
               "example": "203.0.113.10"
@@ -1015,7 +1017,7 @@
           }
         },
         "operationId": "registration",
-        "description": "Registration API with a two-step process for user account creation.\n\n## Step 1: Initial Validation\nValidates basic account information (login name, username, email, password, terms).\n\n## Email Verification\nAfter Step 1 validation, users (except test users and quasi1 users) must verify their email address before proceeding to Step 2. The email verification flow consists of two endpoints:\n- Send verification code via `/email-verification/send-code`\n- Verify code via `/email-verification/verify`\n\n## Step 2: Complete Registration\nResubmit all Step 1 fields with the same rules plus additional profile information.\n\n### Required Parameters (Step 1)\n- `step`: Must equal `1`\n- `login_name`: 5-20 chars, letters/digits/`.`/`_`, no spaces; case-insensitive unique; must differ from `public_username`\n- `public_username`: 5-20 chars, letters/digits/`.`/`_`, no spaces; case-insensitive unique; must differ from `login_name`\n- `email`: Valid email format; case-insensitive unique\n- `password`: ≥8 chars, at least 1 uppercase, 1 digit, 1 special character\n- `password_confirmation`: Must exactly match `password`\n- `terms_accepted`: Must equal `\"1\"`\n- `recaptcha`: Required when `is_mobile` ≠ `\"Y\"` (valid Google reCAPTCHA token)\n\n### Optional Parameters (Step 1)\n- `is_mobile`: `\"Y\"` / `\"N\"` - `\"Y\"` toggles captcha skip\n\n### Required Parameters (Step 2)\n- `step`: Must equal `2`\n- All Step 1 fields with the same constraints\n- `recaptcha_session_id`: Matches the Step 1 value; required unless `is_mobile` is `\"Y\"`\n- `email_verification_code`: Required for non-test/non-quasi1 users; must match the code sent to email\n- `gender`: One of `male`, `female`, `other`\n- `partner_preference`: One of `male`, `female`, `any`\n- `role`: One of `rs`, `srs`\n- `budget`: Numeric, minimum `100`\n- `currency`: Must exist in `currencies` table (e.g. `USD`, `AED`, `SGD`)\n- `age`: Integer 18-100\n- `age_display`: One of `Show Exact Age`, `Show Age Range`, `Hide Age` from `options.age_displays`\n- `phone_country_code`: Must match configured dial codes (e.g. `+1`, `+44`, `+65`, `+971`, `+81`, `+86`, `+62`)\n- `phone_number`: 7-15 digits after sanitisation; duplicates rejected per combined country code\n\n### Optional & Conditional Parameters (Step 2)\n- `duration_preference`: One of `short_term_relationship`, `medium_term_relationship`, `long_term_relationship`\n- `preferred_contact`: One of `phone_call`, `whatsapp`, `video_call`, `text_message` (`options.coach_contact_methods`)\n- `first_name`: Free-form string (recommended for better onboarding)\n- `last_name`: Free-form string (recommended for better onboarding)\n- `phone_country_name`: Optional, free-form string\n- `ip_address`: Public IPv4/IPv6 (overrides auto-detected IP for country inference)\n- `referrer_domain`: Free-form string (stored for attribution)\n- `referrer_url`: Free-form string (stored for attribution)\n- `utm_campaign`: Free-form string (marketing attribution tag)\n- `affiliate_code`: Must match an existing user's affiliate code; self referral ignored\n- `timeoffset`: Minutes from JavaScript `getTimezoneOffset()` (server negates automatically)\n- `timezone`: Valid PHP timezone identifier; used when `timeoffset` absent\n- `is_mobile`: `\"Y\"` / `\"N\"` - `\"Y\"` skips captcha session checks\n\n### Contact Preference Options\n- **Endpoint:** `GET /options/contact-preference`\n- **Purpose:** Supplies the dial codes and contact methods used during registration.\n- **Response shape:**\n  - `phone_country_codes[]` → `label`, `value`, `display`, `icon` (absolute URL prefixed with `config('app.url')`)\n  - `contact_methods[]` → `label`, `value`\n- Data is sourced from `config/options.php` (`coach_phone_country_codes`, `coach_contact_methods`) and returned in product-defined order.\n\n### Behaviour Notes\n- **Login name and public username:** Must be different from each other. Both are validated for uniqueness (case-insensitive) and format (5-20 characters, alphanumeric with dots and underscores only, no spaces).\n- **Captcha flow:** Step 2 checks `recaptcha_session_id` against the stored token unless `is_mobile` is `\"Y\"`.\n- **Email verification:** Required for all users except test users (login names starting with `test_`, `Test_`, or matching `test\\d+_`) and quasi1 users (login names starting with `quasi1`). Verification codes expire after 10 minutes and accounts may be temporarily locked after multiple failed attempts.\n- **Age & phone validation:** Ages must be integers between 18 and 100. Phone numbers are digit-only (the API strips non-digits) and must be unique in combination with the submitted country code. The `phone_number_full` field is automatically generated by concatenating `phone_country_code` and `phone_number` (with spaces removed).\n- **Timezone handling:** The server negates JavaScript offsets and falls back to `timezone` (PHP identifier) when provided; otherwise it defaults to UTC (0).\n- **Profile bootstrap:** Successful registration automatically creates basic, financial, relationship, and visibility profile records, converts the submitted budget to the default system currency, and logs the registration via `activity()`.\n- **Email verification on registration:** When `email_verification_code` is provided in Step 2, the corresponding `EmailVerification` record is marked as verified and the user's `email_verified_at` and `email_verified` fields are set.\n- **Notifications:** A `UserRegistrationNotificationTask` is queued and processed by `ProcessUserRegistrationNotifications`, which sends the welcome, verification, support, welcome notice, affiliate, and referral emails when applicable.\n- **Rocket.Chat integration:** The API attempts to create a Rocket.Chat user asynchronously; failures are logged but do not block registration.\n- **Test users:** Any `login_name` beginning with `test_`, `Test_`, or matching `test\\d+_` is marked as a test user and skips GA success events and email verification.\n- **Quasi1 users:** Any `login_name` beginning with `quasi1` (case-insensitive) skips email verification.\n- **IP geolocation:** The API attempts to detect the user's country from their IP address using ip-api.com. If successful, it automatically populates location fields using Google Places API.",
+        "description": "Two-step registration process. Step 1 validates basic account information (login name, username, email, password, terms). After Step 1, users (except test and quasi1 users) must verify their email via `/email-verification/send-code` and `/email-verification/verify`. Step 2 completes registration with profile information including the verified email code.\n\n**Key Points:**\n- Login name and public username must be different (5-20 chars, alphanumeric with dots/underscores)\n- Email verification codes expire after 30 minutes (5 attempts max, 15-min lockout)\n- Test users (login names starting with `test_`, `Test_`, or `test\\d+_`) and quasi1 users skip email verification\n- Phone numbers must be unique per country code (7-15 digits)\n- Age must be 18-100\n- Budget minimum is 100\n- Use `GET /options/contact-preference` to get available dial codes and contact methods",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1054,6 +1056,8 @@
                     "currency": "USD",
                     "age": 32,
                     "age_display": "Show Exact Age",
+                    "country_of_residence": "United Arab Emirates",
+                    "country_of_partner_search": "Worldwide",
                     "phone_country_code": "+971",
                     "phone_country_name": "United Arab Emirates",
                     "phone_number": "501234567",
@@ -1091,6 +1095,8 @@
                     "currency": "USD",
                     "age": 32,
                     "age_display": "Show Exact Age",
+                    "country_of_residence": "United Arab Emirates",
+                    "country_of_partner_search": "Worldwide",
                     "phone_country_code": "+971",
                     "phone_country_name": "United Arab Emirates",
                     "phone_number": "501234567",
@@ -1299,6 +1305,18 @@
                     "description": "Marketing attribution tag. Free-form string.",
                     "nullable": true,
                     "example": "wintersale"
+                  },
+                  "country_of_residence": {
+                    "type": "string",
+                    "description": "Country name for residence location. Required for Step 2. Free-form string.",
+                    "nullable": true,
+                    "example": "United Arab Emirates"
+                  },
+                  "country_of_partner_search": {
+                    "type": "string",
+                    "description": "Country name for partner search location. Optional for Step 2, defaults to \"Worldwide\". Free-form string; can be \"Worldwide\".",
+                    "nullable": true,
+                    "example": "Worldwide"
                   }
                 },
                 "required": ["step", "login_name", "public_username", "email", "password", "password_confirmation", "terms_accepted"]
