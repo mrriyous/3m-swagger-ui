@@ -1057,7 +1057,6 @@
                     "age": 32,
                     "age_display": "Show Exact Age",
                     "country_of_residence": "United Arab Emirates",
-                    "country_of_partner_search": "Worldwide",
                     "phone_country_code": "+971",
                     "phone_country_name": "United Arab Emirates",
                     "phone_number": "501234567",
@@ -1096,7 +1095,6 @@
                     "age": 32,
                     "age_display": "Show Exact Age",
                     "country_of_residence": "United Arab Emirates",
-                    "country_of_partner_search": "Worldwide",
                     "phone_country_code": "+971",
                     "phone_country_name": "United Arab Emirates",
                     "phone_number": "501234567",
@@ -1311,12 +1309,6 @@
                     "description": "Country name for residence location. Required for Step 2. Free-form string.",
                     "nullable": true,
                     "example": "United Arab Emirates"
-                  },
-                  "country_of_partner_search": {
-                    "type": "string",
-                    "description": "Country name for partner search location. Optional for Step 2, defaults to \"Worldwide\". Free-form string; can be \"Worldwide\".",
-                    "nullable": true,
-                    "example": "Worldwide"
                   }
                 },
                 "required": ["step", "login_name", "public_username", "email", "password", "password_confirmation", "terms_accepted"]
