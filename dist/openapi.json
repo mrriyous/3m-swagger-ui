@@ -18950,6 +18950,98 @@
         "operationId": "get-options-contact-preference"
       }
     },
+    "/options/country-of-residence": {
+      "get": {
+        "summary": "Country of Residence Options",
+        "tags": [
+          "Options"
+        ],
+        "description": "Returns a list of all available countries formatted as options for select components. Used to populate country selection dropdowns in registration forms and profile settings. Countries are sorted alphabetically by label.",
+        "responses": {
+          "200": {
+            "description": "Options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "array",
+                      "description": "List of available countries",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "string",
+                            "description": "Country name (used when submitting forms)",
+                            "example": "United Arab Emirates"
+                          },
+                          "label": {
+                            "type": "string",
+                            "description": "Human-readable country name for display",
+                            "example": "United Arab Emirates"
+                          },
+                          "code": {
+                            "type": "string",
+                            "description": "ISO 3166-1 alpha-2 country code (2-letter code)",
+                            "pattern": "^[A-Z]{2}$",
+                            "example": "AE"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "Absolute URL to country flag icon (may be null)",
+                            "nullable": true,
+                            "example": "https://startup2050.com/static/icons/flag/united-arab-emirates.png"
+                          },
+                          "emoji": {
+                            "type": "string",
+                            "description": "Country flag emoji (may be null)",
+                            "nullable": true,
+                            "example": "🇦🇪"
+                          }
+                        },
+                        "required": ["value", "label", "code"]
+                      }
+                    }
+                  },
+                  "required": ["error", "data"]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Country options list",
+                    "value": {
+                      "error": false,
+                      "data": [
+                        {
+                          "value": "United Arab Emirates",
+                          "label": "United Arab Emirates",
+                          "code": "AE",
+                          "icon": "https://startup2050.com/static/icons/flag/united-arab-emirates.png",
+                          "emoji": "🇦🇪"
+                        },
+                        {
+                          "value": "United States",
+                          "label": "United States",
+                          "code": "US",
+                          "icon": "https://startup2050.com/static/icons/flag/united-states.png",
+                          "emoji": "🇺🇸"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-options-country-of-residence"
+      }
+    },
     "/options/about-me": {
       "get": {
         "summary": "Get About Me Options",
