@@ -1319,6 +1319,200 @@
         }
       }
     },
+    "/register/v2": {
+      "post": {
+        "summary": "Registration API v2",
+        "tags": ["Authentication"],
+        "description": "Registration v2 is a single endpoint that handles both initial validation (Step 1) and full registration (Step 2). It supports optional profile avatar and photo uploads via multipart/form-data, and adds v2-specific fields such as short_intro and search_visibility.\n\n**Flow:**\n1. **Step 1** – Submit step=1 with account basics (login name, username, email, password, terms). The API validates and returns recaptcha_session_id and need_verification.\n2. **Email verification** (when need_verification is true) – Use POST /email-verification/send-code and POST /email-verification/verify.\n3. **Step 2** – Submit step=2 with all Step 1 fields plus profile data. Optionally send registration_avatar and registration_photos[] as files. On success, returns user and auth token (200 OK).\n\n**Exemptions:** Test users (login names starting with test_, Test_, or test\\d+_), quasi1 users (quasi1), and staff accounts (staff1) do not require email verification.",
+        "operationId": "registration-v2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterV2Request"
+              },
+              "examples": {
+                "Step 1 - Initial Validation": {
+                  "summary": "Step 1 validation",
+                  "value": {
+                    "step": 1,
+                    "login_name": "johndoe123",
+                    "public_username": "JohnDoe",
+                    "email": "john@example.com",
+                    "password": "Password123!",
+                    "password_confirmation": "Password123!",
+                    "terms_accepted": "1",
+                    "recaptcha": "03AFcWeA5...",
+                    "is_mobile": "N"
+                  }
+                },
+                "Step 2 - Complete Registration (JSON)": {
+                  "summary": "Step 2 with all fields",
+                  "value": {
+                    "step": 2,
+                    "login_name": "johndoe123",
+                    "public_username": "JohnDoe",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "email": "john@example.com",
+                    "email_verification_code": "123456",
+                    "password": "Password123!",
+                    "password_confirmation": "Password123!",
+                    "terms_accepted": "1",
+                    "recaptcha": "03AFcWeA5...",
+                    "recaptcha_session_id": "ZjA5Njc0YmY1M2E4Y2IxMjM0NTY3ODkwMTIzNDU2",
+                    "is_mobile": "N",
+                    "gender": "male",
+                    "partner_preference": "female",
+                    "duration_preference": "long_term_relationship",
+                    "role": "rs",
+                    "budget": 5000,
+                    "currency": "USD",
+                    "age": 32,
+                    "age_display": "Show Exact Age",
+                    "country_of_residence": "United Arab Emirates",
+                    "country_of_partner_search": "Worldwide",
+                    "phone_country_code": "+971",
+                    "phone_country_name": "United Arab Emirates",
+                    "phone_number": "501234567",
+                    "preferred_contact": "whatsapp",
+                    "short_intro": "A brief introduction.",
+                    "search_visibility": "visible",
+                    "affiliate_code": "REF123ABC",
+                    "timeoffset": -300
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "description": "Use for Step 2 when sending registration_avatar and/or registration_photos. All other fields as form fields.",
+                "properties": {
+                  "registration_avatar": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Profile picture (e.g. JPEG). Multipart only."
+                  },
+                  "registration_photos": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "binary" },
+                    "description": "Album photos. Keys: registration_photos[0], registration_photos[1], ..."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Step 1 success (need_verification, recaptcha_session_id) or Step 2 success (user, token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "description": "Step 1 response",
+                      "properties": {
+                        "error": { "type": "boolean", "example": false },
+                        "need_verification": { "type": "boolean", "description": "Whether the user must verify email before Step 2" },
+                        "recaptcha_session_id": { "type": "string", "description": "Persisted server-side; required in Step 2 unless is_mobile is Y. Empty when is_mobile is Y.", "example": "ZjA5Njc0YmY1M2E4Y2IxMjM0NTY3ODkwMTIzNDU2" }
+                      },
+                      "required": ["error", "need_verification", "recaptcha_session_id"]
+                    },
+                    {
+                      "type": "object",
+                      "description": "Step 2 response",
+                      "properties": {
+                        "error": { "type": "boolean", "example": false },
+                        "user": { "$ref": "#/components/schemas/RegisterV2User" },
+                        "token": { "type": "string", "description": "Sanctum auth token; use Authorization: Bearer <token>", "example": "1|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..." },
+                        "ga_event": { "type": "string", "nullable": true, "description": "Present only in production and only for non–test users", "example": "reg_success" }
+                      },
+                      "required": ["error", "user", "token"]
+                    }
+                  ]
+                },
+                "examples": {
+                  "Step 1 Success": {
+                    "summary": "Step 1 validation success",
+                    "value": {
+                      "error": false,
+                      "need_verification": true,
+                      "recaptcha_session_id": "ZjA5Njc0YmY1M2E4Y2IxMjM0NTY3ODkwMTIzNDU2"
+                    }
+                  },
+                  "Step 2 Success": {
+                    "summary": "Registration complete",
+                    "value": {
+                      "error": false,
+                      "user": {
+                        "id": 9421,
+                        "login_name": "johndoe123",
+                        "public_username": "JohnDoe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john@example.com",
+                        "gender": "male",
+                        "partner_preference": "female",
+                        "role": "rs",
+                        "affiliate_code": "A1B2C3",
+                        "phone_country_code": "+971",
+                        "phone_number": "501234567",
+                        "phone_number_full": "+971501234567",
+                        "preferred_contact": "whatsapp",
+                        "timeoffset": -300,
+                        "is_test_user": false
+                      },
+                      "token": "1|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                      "ga_event": "reg_success"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity – validation errors or invalid step",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "boolean", "example": true },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": { "type": "array", "items": { "type": "string" } },
+                      "example": {
+                        "login_name": ["This login name is already taken"],
+                        "step": ["Invalid step"]
+                      }
+                    }
+                  },
+                  "required": ["error", "errors"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Registration failure (e.g. database error)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Registration failed. Please try again." },
+                    "error": { "type": "string", "nullable": true, "description": "Detailed error (only when app.debug is true)" }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/password/reset-link": {
       "post": {
         "summary": "Send Reset Password Link",
@@ -25262,6 +25456,71 @@
   },
   "components": {
     "schemas": {
+      "RegisterV2Request": {
+        "type": "object",
+        "description": "Registration v2 request body. Step 1: step=1 + account basics. Step 2: step=2 + all Step 1 fields + profile data.",
+        "properties": {
+          "step": { "type": "integer", "enum": [1, 2], "description": "Flow stage: 1 = validation, 2 = complete registration" },
+          "login_name": { "type": "string", "minLength": 5, "maxLength": 20, "pattern": "^[a-zA-Z0-9_]+$", "description": "5-20 chars; letters, digits, underscores; case-insensitive unique; ≠ public_username" },
+          "public_username": { "type": "string", "minLength": 5, "maxLength": 20, "pattern": "^[a-zA-Z0-9_]+$", "description": "5-20 chars; letters, digits, underscores; case-insensitive unique; ≠ login_name" },
+          "email": { "type": "string", "format": "email", "description": "Valid email; case-insensitive unique" },
+          "password": { "type": "string", "minLength": 8, "description": "≥8 chars; at least 1 uppercase, 1 digit, 1 special character" },
+          "password_confirmation": { "type": "string", "description": "Must exactly match password" },
+          "terms_accepted": { "type": "string", "enum": ["1"], "description": "Acceptance of terms" },
+          "recaptcha": { "type": "string", "nullable": true, "description": "Valid Google reCAPTCHA token; required when is_mobile ≠ Y" },
+          "recaptcha_session_id": { "type": "string", "nullable": true, "description": "From Step 1 response; required in Step 2 unless is_mobile is Y" },
+          "email_verification_code": { "type": "string", "nullable": true, "description": "From /email-verification/verify; required when platform has email verification (except test/quasi1/staff)" },
+          "is_mobile": { "type": "string", "enum": ["Y", "N"], "description": "Y skips reCAPTCHA" },
+          "first_name": { "type": "string", "nullable": true },
+          "last_name": { "type": "string", "nullable": true },
+          "gender": { "type": "string", "enum": ["male", "female", "other"], "description": "Step 2 required" },
+          "partner_preference": { "type": "string", "enum": ["male", "female", "any"], "description": "Step 2 required" },
+          "duration_preference": { "type": "string", "enum": ["short_term_relationship", "medium_term_relationship", "long_term_relationship"], "nullable": true },
+          "role": { "type": "string", "enum": ["rs", "srs"], "description": "Step 2 required" },
+          "budget": { "type": "number", "minimum": 100, "description": "Step 2 required" },
+          "currency": { "type": "string", "description": "Step 2 required; e.g. USD, AED, SGD" },
+          "age": { "type": "integer", "minimum": 18, "maximum": 100, "description": "Step 2 required" },
+          "age_display": { "type": "string", "enum": ["Show Exact Age", "Show Age Range", "Hide Age"], "description": "Step 2 required" },
+          "phone_country_code": { "type": "string", "description": "Step 2 required; e.g. +1, +44, +971" },
+          "phone_number": { "type": "string", "description": "Step 2 required; 7-15 digits; unique per country code" },
+          "phone_country_name": { "type": "string", "nullable": true },
+          "country_of_residence": { "type": "string", "nullable": true },
+          "country_of_partner_search": { "type": "string", "nullable": true, "description": "Stored only when not Worldwide" },
+          "preferred_contact": { "type": "string", "nullable": true, "description": "e.g. phone_call, whatsapp, video_call, text_message" },
+          "short_intro": { "type": "string", "nullable": true, "description": "V2 profile field" },
+          "search_visibility": { "type": "string", "nullable": true, "description": "V2 visibility; default visible" },
+          "ip_address": { "type": "string", "nullable": true },
+          "referrer_domain": { "type": "string", "nullable": true },
+          "referrer_url": { "type": "string", "nullable": true },
+          "utm_campaign": { "type": "string", "nullable": true },
+          "affiliate_code": { "type": "string", "nullable": true },
+          "timeoffset": { "type": "number", "nullable": true, "description": "Minutes from getTimezoneOffset(); server negates" },
+          "timezone": { "type": "string", "nullable": true, "description": "PHP timezone identifier; used when timeoffset absent" }
+        },
+        "required": ["step", "login_name", "public_username", "email", "password", "password_confirmation", "terms_accepted"]
+      },
+      "RegisterV2User": {
+        "type": "object",
+        "description": "User object returned on successful Step 2 registration",
+        "properties": {
+          "id": { "type": "integer" },
+          "login_name": { "type": "string" },
+          "public_username": { "type": "string" },
+          "first_name": { "type": "string", "nullable": true },
+          "last_name": { "type": "string", "nullable": true },
+          "email": { "type": "string" },
+          "gender": { "type": "string" },
+          "partner_preference": { "type": "string" },
+          "role": { "type": "string" },
+          "affiliate_code": { "type": "string" },
+          "phone_country_code": { "type": "string" },
+          "phone_number": { "type": "string" },
+          "phone_number_full": { "type": "string" },
+          "preferred_contact": { "type": "string", "nullable": true },
+          "timeoffset": { "type": "number", "nullable": true },
+          "is_test_user": { "type": "boolean" }
+        }
+      },
       "MessageUser": {
         "type": "object",
         "properties": {
